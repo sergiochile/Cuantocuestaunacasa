@@ -1,678 +1,557 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>¿Cuánto sale una casa en Chile? Calculadora hipotecaria, UF y subsidios 2026</title>
-  <meta name="description" content="Calcula si puedes comprar una casa en Chile: dividendo, pie, valor UF, arriendo vs comprar y subsidios MINVU. Compara bancos y precios por región en minutos.">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <meta property="og:title" content="¿Puedes comprarte una casa en Chile?">
-  <meta property="og:description" content="Calcula dividendo, pie, valor UF, arriendo vs comprar y subsidios MINVU. Compara bancos y precios por región en Chile.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://cuantocuestaunacasa.cl/">
-  <meta property="og:image" content="https://cuantocuestaunacasa.cl/og.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="¿Puedes comprarte una casa en Chile?">
-  <meta name="twitter:description" content="Calcula dividendo, pie, valor UF, arriendo vs comprar y subsidios MINVU. Compara bancos y precios por región en Chile.">
-  <meta name="twitter:image" content="https://cuantocuestaunacasa.cl/og.png">
-  <meta name="google-site-verification" content="N38iM0TXCfqVkn06TXqvxZXXInpPBYHMIJ8c0Z5ZEUU" />
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8151493924438623" crossorigin="anonymous"></script>
-  <link rel="canonical" href="https://cuantocuestaunacasa.cl/">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --negro:      #111111;
-      --texto:      #1C1C1C;
-      --suave:      #666666;
-      --suave2:     #888888;
-      --borde:      #E5E5E5;
-      --fondo:      #F8F6F3;
-      --blanco:     #FFFFFF;
-      --verde:      #1A7A4A;
-      --verde-l:    #E8F5EE;
-      --amarillo:   #7D540A;
-      --amarillo-l: #FEF6E4;
-      --rojo:       #C0392B;
-      --rojo-l:     #FDECEA;
-      --azul:       #1A5FA8;
-      --azul-l:     #EBF2FC;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--blanco); color: var(--texto); font-size: 16px; line-height: 1.6; }
-
-    nav { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 2rem; border-bottom: 1px solid var(--borde); position: sticky; top: 0; background: var(--blanco); z-index: 100; }
-    .nav-logo { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; color: var(--negro); cursor: pointer; }
-  .nav-logo:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; border-radius: 6px; }
-    .nav-logo em { color: var(--rojo); font-style: italic; }
-    .uf-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; background: var(--fondo); border: 1px solid var(--borde); border-radius: 20px; font-size: 12px; color: var(--suave); }
-    .dot-live { width: 6px; height: 6px; border-radius: 50%; background: #4CAF50; animation: pulse 2s infinite; flex-shrink: 0; }
-    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
-
-    .wrap { max-width: 680px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
-
-    /* INDICADOR PASOS */
-    .wizard-steps { display: flex; align-items: center; margin-bottom: 2.5rem; }
-    .ws-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--suave2); font-weight: 500; }
-    .ws-item.activo { color: var(--negro); }
-    .ws-item.done   { color: var(--verde); }
-    .ws-num { width: 24px; height: 24px; border-radius: 50%; background: var(--borde); color: var(--suave); font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .2s, color .2s; }
-    .ws-item.activo .ws-num { background: var(--negro); color: #fff; }
-    .ws-item.done   .ws-num { background: var(--verde); color: #fff; }
-    .ws-linea { flex: 1; height: 1px; background: var(--borde); margin: 0 10px; }
-    .ws-linea.done { background: var(--verde); }
-    .ws-label { display: none; }
-    @media (min-width: 480px) { .ws-label { display: inline; } }
-
-    /* PANTALLAS */
-    .screen { display: none; }
-    .screen.activa { display: block; }
-
-    /* TÍTULOS */
-    .titulo-grande { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 300; line-height: 1.1; color: var(--negro); margin-bottom: .4rem; }
-    .titulo-grande em { font-style: italic; color: var(--rojo); }
-    .subtitulo { font-size: 15px; color: var(--suave); margin-bottom: 2rem; }
-
-    /* STATS */
-    .stats-strip { display: flex; gap: 0; margin-bottom: 2.5rem; border: 1.5px solid var(--borde); border-radius: 14px; overflow: hidden; }
-    .stat-item { flex: 1; padding: 1rem 1.2rem; border-right: 1px solid var(--borde); text-align: center; }
-    .stat-item:last-child { border-right: none; }
-    .stat-num { font-family: 'Fraunces', serif; font-size: 1.8rem; font-weight: 600; color: var(--rojo); line-height: 1; }
-    .stat-txt { font-size: 11px; color: var(--suave); margin-top: 4px; line-height: 1.4; }
-
-    /* CAMPOS */
-    .campos { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1rem; }
-    .campo { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 155px; }
-    .campo label { font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
-    .campo select,
-    .campo input[type="number"],
-    .campo input[type="text"] {
-      width: 100%;
-      padding: 13px 16px;
-      border: none;
-      border-bottom: 2px solid var(--borde);
-      border-radius: 0;
-      background: transparent;
-      color: var(--texto);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 16px;
-      appearance: none;
-      transition: border-color .2s;
-    }
-    .campo select:focus,
-    .campo input:focus {
-      outline: none;
-      border-bottom-color: var(--negro);
-    }
-    .campo .hint { font-size: 11px; color: var(--suave2); margin-top: 3px; }
-
-    /* CHECKS */
-    .checks { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1.5rem; }
-    .check-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border: 1.5px solid var(--borde); border-radius: 20px; font-size: 13px; cursor: pointer; background: var(--blanco); color: var(--texto); transition: border-color .15s, background .15s; user-select: none; }
-    .check-btn input[type="checkbox"] { display: none; }
-    .check-btn.activo { border-color: var(--negro); background: var(--negro); color: #fff; }
-
-    /* SELECTOR SITUACIÓN VIVIENDA */
-    .sit-grupo { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; margin-bottom:4px; }
-    .sit-btn { flex:1; min-width:100px; padding:9px 12px; border:1.5px solid var(--borde); border-radius:22px; font-size:13px; font-weight:500; color:var(--suave); background:var(--blanco); cursor:pointer; text-align:center; transition:all .15s; font-family:inherit; }
-    .sit-btn:hover { border-color:var(--negro); color:var(--negro); }
-    .sit-btn.activo { background:var(--negro); border-color:var(--negro); color:#fff; }
-    .sit-aviso { background:#fef9ec; border:1.5px solid #fcd34d; border-radius:10px; padding:.65rem .9rem; font-size:12.5px; color:#92400e; line-height:1.5; margin-top:.5rem; display:none; }
-    .sit-aviso.visible { display:block; }
-
-    /* SELECTOR AHORRO */
-    .ahorro-selector { display:flex; gap:7px; flex-wrap:wrap; margin-top:5px; }
-    .ahorro-btn { flex:1; min-width:70px; padding:8px 10px; border:1.5px solid var(--borde); border-radius:20px; font-size:12.5px; font-weight:600; color:var(--suave); background:var(--blanco); cursor:pointer; text-align:center; transition:all .15s; }
-    .ahorro-btn:hover { border-color:var(--azul); color:var(--azul); }
-    .ahorro-btn.activo { background:var(--negro); border-color:var(--negro); color:#fff; }
-
-    /* BOTONES */
-    .btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 15px 24px; background: var(--negro); color: #fff; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: background .15s, transform .1s; margin-top: .5rem; }
-    .btn-primary:hover { background: #333; }
-    .btn-primary:active { transform: scale(.99); }
-    .btn-back { display: inline-flex; align-items: center; gap: 6px; background: none; border: 1.5px solid var(--borde); border-radius: 10px; padding: 9px 16px; font-size: 13px; color: var(--suave); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: border-color .15s, color .15s; margin-bottom: 1.5rem; }
-    .btn-back:hover { border-color: var(--negro); color: var(--negro); }
-
-    /* TABS */
-    .tabs-nav { display: flex; border-bottom: 1.5px solid var(--borde); margin-bottom: 1.75rem; overflow-x: auto; scrollbar-width: none; }
-    .tabs-nav::-webkit-scrollbar { display: none; }
-    .tab-btn { flex-shrink: 0; padding: 10px 16px; min-height: 44px; font-size: 13px; font-weight: 500; color: var(--suave); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: color .15s, border-color .15s; white-space: nowrap; margin-bottom: -1.5px; }
-    .tab-btn:hover { color: var(--negro); }
-    .tab-btn.activo { color: var(--negro); border-bottom-color: var(--negro); }
-    .tab-panel { display: none; }
-    .tab-panel.activo { display: block; }
-
-    /* RESUMEN TOP */
-    .resumen-top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 12px 16px; background: var(--fondo); border: 1.5px solid var(--borde); border-radius: 12px; margin-bottom: 1.75rem; }
-    .resumen-top-item { display: flex; flex-direction: column; flex: 1; min-width: 100px; }
-    .resumen-top-label { font-size: 10px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
-    .resumen-top-val { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 600; color: var(--negro); }
-    .resumen-top-sep { width: 1px; height: 32px; background: var(--borde); }
-    .btn-editar { background: none; border: 1.5px solid var(--borde); border-radius: 8px; padding: 5px 12px; font-size: 12px; color: var(--suave); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: color .15s, border-color .15s; white-space: nowrap; }
-    .btn-editar:hover { color: var(--negro); border-color: var(--negro); }
-  .btn-editar:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; border-color: var(--azul); color: var(--negro); }
-
-    /* RESULTADO */
-    .resultado-bloque { border: 1.5px solid var(--borde); border-radius: 16px; overflow: hidden; margin-bottom: 1.5rem; }
-    .resultado-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--borde); background: var(--fondo); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
-    .resultado-header-titulo { font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
-    .pct-grande { font-family: 'Fraunces', serif; font-size: 3rem; font-weight: 600; line-height: 1; color: var(--negro); }
-    .barra-area { padding: 1.5rem 1.75rem; border-bottom: 1px solid var(--borde); }
-    .barra-row { display: flex; align-items: baseline; gap: 14px; margin-bottom: 1rem; }
-    .pill { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-    .pill-verde    { background: var(--verde-l);    color: var(--verde); }
-    .pill-amarillo { background: var(--amarillo-l); color: var(--amarillo); }
-    .pill-rojo     { background: var(--rojo-l);     color: var(--rojo); }
-    .pill-azul     { background: var(--azul-l);     color: var(--azul); }
-    .barra-desc { font-size: 13px; color: var(--suave); }
-    .barra-track { height: 7px; background: var(--fondo); border-radius: 4px; overflow: hidden; border: 1px solid var(--borde); }
-    .barra-fill  { height: 100%; border-radius: 4px; transition: width .5s ease, background .4s; }
-    .barra-ticks { display: flex; justify-content: space-between; font-size: 11px; color: var(--suave2); margin-top: 4px; }
-    .metricas { display: grid; grid-template-columns: 1fr 1fr; }
-    .metrica { padding: 1.1rem 1.5rem; border-right: 1px solid var(--borde); border-bottom: 1px solid var(--borde); }
-    .metrica:nth-child(2n) { border-right: none; }
-    .metrica:nth-last-child(-n+2) { border-bottom: none; }
-    .metrica-label { font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); margin-bottom: 5px; }
-    .metrica-valor { font-family: 'Fraunces', serif; font-size: 1.65rem; font-weight: 600; line-height: 1; color: var(--negro); }
-    .metrica-sub   { font-size: 11.5px; color: var(--suave); margin-top: 3px; }
-
-    /* AVISOS */
-    .aviso { padding: 12px 16px; border-radius: 10px; font-size: 13px; line-height: 1.6; border-left: 3px solid; margin-bottom: 1.5rem; }
-    .aviso-verde  { background: var(--verde-l);    color: var(--verde);    border-color: var(--verde); }
-    .aviso-azul   { background: var(--azul-l);     color: var(--azul);     border-color: var(--azul); }
-    .aviso-neutro { background: var(--fondo);      color: var(--suave);    border-color: var(--borde); }
-
-    /* IMPACTO */
-    .frase-impacto { background: var(--negro); color: #fff; border-radius: 14px; padding: 1.4rem 1.75rem; margin-bottom: 1.5rem; }
-    .frase-impacto .fi-label { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-bottom: .4rem; }
-    .frase-impacto .fi-texto { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 300; line-height: 1.45; }
-    .frase-impacto .fi-texto em { color: #ff8a7a; font-style: italic; }
-    .frase-impacto .fi-texto strong { color: #fff; }
-
-    /* EDAD CARD */
-    .edad-card { border: 2px solid var(--negro); border-radius: 14px; padding: 1.3rem 1.5rem; background: var(--negro); color: var(--blanco); margin-bottom: 1.5rem; }
-    .edad-card-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 1.1rem; }
-    .edad-icono { font-size: 1.5rem; line-height: 1; }
-    .edad-titulo { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 600; color: var(--blanco); line-height: 1.2; }
-    .edad-sub { font-size: 12px; color: #aaa; margin-top: 3px; }
-    .edad-metricas { display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid #333; border-radius: 10px; overflow: hidden; margin-bottom: .9rem; }
-    .edad-metrica { padding: .9rem 1rem; border-right: 1px solid #333; }
-    .edad-metrica:last-child { border-right: none; }
-    .edad-metrica-label { font-size: 10px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: #888; margin-bottom: 5px; }
-    .edad-metrica-valor { font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 600; color: var(--blanco); line-height: 1; }
-    .edad-metrica-valor.rojo { color: #ff6b6b; }
-    .edad-metrica-valor.amarillo { color: #ffd166; }
-    .edad-metrica-valor.verde { color: #6bcb77; }
-    .edad-metrica-sub { font-size: 11px; color: #888; margin-top: 4px; }
-    .edad-veredicto { font-size: 13px; line-height: 1.7; color: #ccc; border-top: 1px solid #333; padding-top: .9rem; }
-    .edad-veredicto strong { color: var(--blanco); }
-    .edad-veredicto em { color: #ffd166; font-style: normal; }
-
-    /* ESCENARIOS */
-    .seccion-titulo { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 300; color: var(--negro); margin-bottom: .4rem; }
-    .seccion-sub { font-size: 13px; color: var(--suave); margin-bottom: 1.25rem; }
-    .escenarios { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.5rem; align-items: start; }
-    .esc-card { border: 1.5px solid var(--borde); border-radius: 14px; padding: 1.1rem 1.15rem; position: relative; transition: box-shadow .15s; }
-    .esc-card:not(.esc-no-aplica) { cursor: pointer; }
-    .esc-card:not(.esc-no-aplica):hover { box-shadow: 0 2px 10px rgba(0,0,0,.08); }
-    .esc-card.destacado { border-color: var(--verde); background: #FAFFF9; }
-    .esc-card-tag { font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--suave); margin-bottom: .5rem; }
-    .esc-card.destacado .esc-card-tag { color: var(--verde); }
-    .esc-cuota { font-family: 'Fraunces', serif; font-size: 1.45rem; font-weight: 600; color: var(--negro); line-height: 1; margin-bottom: 3px; }
-    .esc-linea { font-size: 12px; color: var(--suave); line-height: 1.6; }
-    .esc-badge { position: absolute; top: -10px; right: 12px; background: var(--verde); color: #fff; font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 10px; }
-    .esc-no-aplica { opacity: .45; }
-    .esc-expand-hint { font-size: 10px; color: var(--suave2); margin-top: 9px; text-align: center; letter-spacing: .02em; }
-    .esc-card-detalle { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--borde); }
-    .esc-card.expandido .esc-card-detalle { display: block; }
-    .det-fila { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; font-size: 11px; padding: 2.5px 0; }
-    .det-fila .det-k { color: var(--suave); flex-shrink: 0; }
-    .det-fila .det-v { font-weight: 500; color: var(--texto); text-align: right; }
-    .det-sep { border: none; border-top: 1px solid var(--borde); margin: 5px 0; }
-
-    /* BYPASS SUBSIDIOS */
-    .sub-bypass { display: flex; align-items: center; gap: 10px; margin-top: 1rem; }
-    .sub-bypass hr { flex: 1; border: none; border-top: 1px solid var(--borde); }
-    .sub-bypass span { font-size: 11px; color: var(--suave2); flex-shrink: 0; }
-    .bypass-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: .5rem; }
-    .bypass-card { border: 1.5px solid var(--borde); border-radius: 12px; padding: .9rem .6rem; cursor: pointer; text-align: center; transition: border-color .15s, background .15s; background: var(--blanco); }
-    .bypass-card:hover { border-color: var(--negro); background: var(--fondo); }
-  .bypass-card:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; border-color: var(--azul); background: var(--fondo); }
-    .bypass-card-ico { font-size: 1.4rem; margin-bottom: 4px; }
-    .bypass-card-titulo { font-size: 12px; font-weight: 500; color: var(--negro); line-height: 1.3; }
-    .bypass-card-sub { font-size: 10px; color: var(--suave2); margin-top: 2px; line-height: 1.3; }
-
-    /* PANTALLA SUBSIDIOS RÁPIDOS */
-    .sub-hero { background: linear-gradient(135deg, var(--azul) 0%, var(--verde) 100%); border-radius: 16px; padding: 1.5rem 1.6rem; color: #fff; margin-bottom: 1.75rem; }
-    .sub-hero-title { font-family: 'Fraunces', serif; font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 300; line-height: 1.2; margin-bottom: .5rem; }
-    .sub-hero-title em { font-style: italic; }
-    .sub-hero-sub { font-size: 13px; opacity: .88; line-height: 1.5; }
-    .sub-form-box { border: 1.5px solid var(--borde); border-radius: 14px; padding: 1.2rem 1.4rem; margin-bottom: 1.25rem; }
-
-    /* ── Filtros y barra de contexto ── */
-    .sub-filtros { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:1.25rem; }
-    .sub-filtro-btn { background:#fff; border:1.5px solid var(--borde); border-radius:20px; padding:.35rem .85rem; font-size:12px; font-weight:600; color:var(--suave); cursor:pointer; transition:all .15s; }
-    .sub-filtro-btn:hover { border-color:var(--azul); color:var(--azul); }
-    .sub-filtro-btn.activo { background:var(--azul); border-color:var(--azul); color:#fff; }
-  .sub-filtro-btn:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; border-color: var(--azul); color: var(--azul); }
-    .sub-ctx-bar { display:flex; align-items:center; gap:10px; background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:12px; padding:.75rem 1rem; margin-bottom:1.1rem; flex-wrap:wrap; }
-    .sub-ctx-tag { font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:#1d4ed8; flex-shrink:0; }
-    .sub-ctx-txt { font-size:13px; color:var(--negro); flex:1; line-height:1.5; }
-    .sub-ctx-btn { background:#2563eb; color:#fff; border:none; border-radius:8px; padding:.35rem .8rem; font-size:11.5px; font-weight:600; cursor:pointer; white-space:nowrap; }
-    .sub-ctx-btn:hover { background:#1d4ed8; }
-    .sub-sin-ctx { font-size:12.5px; color:var(--suave); background:var(--fondo); border:1.5px dashed var(--borde); border-radius:10px; padding:.65rem 1rem; margin-bottom:1.1rem; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-    /* Badge de elegibilidad en tarjetas interactivas */
-    .sub-badge--califica  { background:#dcfce7; color:#15803d; border:1px solid #86efac; border-radius:20px; font-size:10.5px; font-weight:700; padding:2px 9px; }
-    .sub-badge--nocalifica{ background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; border-radius:20px; font-size:10.5px; font-weight:700; padding:2px 9px; }
-    .sub-badge--simular   { background:#fef9c3; color:#854d0e; border:1px solid #fde047; border-radius:20px; font-size:10.5px; font-weight:700; padding:2px 9px; }
-    .sub-card-grande { border: 1.5px solid var(--borde); border-radius: 14px; padding: 1.25rem 1.4rem; margin-bottom: 10px; }
-    .sub-card-grande.verde { border-color: var(--verde); background: var(--verde-l); }
-    .sub-card-grande.amarillo { border-color: var(--amarillo); background: var(--amarillo-l); }
-    .sub-card-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
-    .sub-card-label.verde { color: var(--verde); }
-    .sub-card-label.amarillo { color: var(--amarillo); }
-    .sub-metrics { display: flex; gap: 8px; flex-wrap: wrap; margin: .75rem 0; }
-    .sub-metric { flex: 1; min-width: 110px; background: #fff; border-radius: 10px; padding: .65rem .9rem; }
-    .sub-metric-label { font-size: 9px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); margin-bottom: 2px; }
-    .sub-metric-val { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 600; color: var(--negro); line-height: 1; }
-    .sub-metric-val.verde { color: var(--verde); }
-    .sub-metric-sub { font-size: 10px; color: var(--suave); margin-top: 2px; }
-    .sub-universal { border: 1.5px solid var(--borde); border-radius: 12px; padding: .9rem 1.1rem; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
-    .sub-cta-completo { border: 1.5px solid var(--negro); border-radius: 14px; padding: 1.1rem 1.4rem; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 1.5rem; }
-
-    /* SUBSIDIOS */
-    .subs-lista { display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.5rem; }
-    .sub-cat-body.subs-lista { padding:10px 14px 14px; margin-bottom:0; }
-    .sub-item { border: 1.5px solid var(--borde); border-radius: 14px; padding: 1.1rem 1.25rem; }
-    .sub-item.aplica { border-color: var(--verde); background: #FAFFF9; }
-    .sub-item.no-aplica { opacity: .65; }
-    .sub-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:.65rem; }
-    .sub-header-left { display:flex; align-items:flex-start; gap:10px; }
-    .sub-icono { font-size:1.25rem; flex-shrink:0; margin-top:1px; }
-    .sub-nombre { font-size: 13.5px; font-weight: 600; color: var(--negro); line-height:1.35; }
-    .sub-monto  { flex-shrink:0; }
-    /* badges */
-    .sub-badge { display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px; }
-    .sub-badge--verde { background:#dcfce7; color:#15803d; }
-    .sub-badge--azul  { background:#dbeafe; color:#1d4ed8; }
-    .sub-badge--rojo  { background:#fee2e2; color:#dc2626; }
-    .sub-badge--gris  { background:#f3f4f6; color:#6b7280; }
-    /* desplegables de categoría */
-    .sub-cat-details { border:1.5px solid var(--borde); border-radius:12px; margin:10px 0; overflow:hidden; }
-    .sub-cat-details[open] { border-color:var(--azul,#2563eb); }
-    .sub-cat-summary { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 16px; background:var(--fondo,#f8f9fa); cursor:pointer; list-style:none; user-select:none; }
-    .sub-cat-summary::-webkit-details-marker { display:none; }
-    .sub-cat-details[open] .sub-cat-summary { background:#eff6ff; border-bottom:1.5px solid var(--borde); }
-    .sub-cat-summary:hover { background:#e8f0fe; }
-    .sub-cat-chevron { font-size:.85rem; color:var(--suave); transition:transform .2s; flex-shrink:0; }
-    .sub-cat-details[open] .sub-cat-chevron { transform:rotate(180deg); }
-    .sub-cat-body { padding:10px 0 4px; }
-    /* cabeceras de categoría (estructura interna del summary) */
-    .sub-cat-header { display:flex; align-items:center; gap:10px; }
-    .sub-cat-header-left { display:flex; align-items:center; gap:10px; }
-    .sub-cat-emoji { font-size:1.4rem; flex-shrink:0; }
-    .sub-cat-titulo { font-weight:700; font-size:.93rem; color:var(--negro,#111); }
-    .sub-cat-desc   { font-size:.78rem; color:var(--suave,#6b7280); margin-top:2px; }
-    /* chips de info (RSH, UF máx, ahorro) */
-    .sub-chips { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 4px; }
-    .sub-chip  { background:#e0e7ff; color:#3730a3; font-size:.78rem; font-weight:600; border-radius:20px; padding:2px 10px; }
-    /* descripción y quien */
-    .sub-desc   { font-size: 13px; color: var(--texto); line-height: 1.55; margin-bottom:.55rem; }
-    .sub-quien  { font-size: 12.5px; color: var(--suave); line-height: 1.5; margin-bottom:.5rem; }
-    .sub-modal  { font-size: 12px; color: var(--suave); margin-bottom:.5rem; }
-    /* fecha tag */
-    .sub-fecha-tag { display:inline-block; font-size:11.5px; font-weight:500; color:#92400e; background:#fef3c7; border-radius:8px; padding:3px 10px; margin-bottom:.6rem; }
-    /* razones */
-    .sub-razones { background:var(--rojo-l); border-radius:10px; padding:.65rem 1rem; margin-bottom:.6rem; }
-    .sub-razones-titulo { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--rojo); margin-bottom:6px; }
-    .sub-razones ul { list-style:none; padding:0; margin:0; font-size:13px; line-height:1.6; }
-    .sub-razones ul li { display:flex; gap:8px; align-items:flex-start; margin-bottom:3px; }
-    /* requisitos */
-    .sub-req-wrap { background:var(--fondo); border-radius:10px; padding:.7rem 1rem; margin-bottom:.6rem; }
-    .sub-req-titulo { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--suave); margin-bottom:7px; }
-    .sub-req-lista { list-style:none; padding:0; margin:0; font-size:13px; color:var(--texto); line-height:1.6; }
-    .sub-req-lista li { display:flex; gap:8px; align-items:flex-start; margin-bottom:4px; }
-    .sub-req-bullet { flex-shrink:0; font-size:12px; }
-    /* botones MINVU */
-    .sub-links-bar { display:flex; gap:8px; flex-wrap:wrap; margin-top:.65rem; }
-    .sub-btn { display:inline-block; font-size:12px; font-weight:600; padding:6px 14px; border-radius:8px; text-decoration:none; transition:opacity .15s; }
-    .sub-btn--outline  { border:1.5px solid var(--negro); color:var(--negro); background:transparent; }
-    .sub-btn--primary  { background:var(--negro); color:#fff; border:1.5px solid var(--negro); }
-    .sub-btn:hover { opacity:.75; }
-    /* calendario 2026 */
-    .sub-calendario { background:#f8fafc; border:1.5px solid var(--borde); border-radius:14px; padding:1rem 1.25rem; margin-bottom:14px; }
-    .sub-cal-titulo { font-size:13px; font-weight:600; color:var(--negro); margin-bottom:.6rem; }
-    .sub-cal-grid { display:flex; flex-wrap:wrap; gap:8px; }
-    .sub-cal-item { display:flex; flex-direction:column; background:#fff; border:1px solid var(--borde); border-radius:8px; padding:5px 10px; min-width:120px; }
-    .sub-cal-mes  { font-size:11.5px; font-weight:700; color:var(--negro); }
-    .sub-cal-prog { font-size:11px; color:var(--suave); }
-
-    /* TABLA */
-    .tabla-wrap { overflow-x: auto; margin-bottom: 1.5rem; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { text-align: left; font-size: 10px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: var(--suave); padding: 7px 10px; border-bottom: 1px solid var(--borde); }
-    td { padding: 10px 10px; border-bottom: 1px solid var(--borde); vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    tr.fila-activa td { background: #FFF8F7; }
-    .pill-t { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 10.5px; font-weight: 500; }
-
-    /* AVC */
-    .avc-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
-
-    /* ══ ESTUDIO HIPOTECARIO BANCOS 2026 ══════════════════════════════════ */
-    .bco-hero { background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%); color:#fff; border-radius:16px; padding:1.5rem 1.6rem; margin-bottom:1.5rem; }
-    .bco-hero-tag { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#93c5fd; margin-bottom:.5rem; }
-    .bco-hero-titulo { font-family:'Fraunces',serif; font-size:clamp(1.4rem,4vw,2rem); font-weight:700; line-height:1.2; margin-bottom:.4rem; }
-    .bco-hero-sub { font-size:13px; color:#94a3b8; line-height:1.5; }
-    .bco-hero-stats { display:flex; flex-wrap:wrap; gap:14px; margin-top:1.1rem; }
-    .bco-stat { background:rgba(255,255,255,.08); border-radius:10px; padding:.6rem 1rem; }
-    .bco-stat-val { font-family:'Fraunces',serif; font-size:1.35rem; font-weight:700; color:#fff; }
-    .bco-stat-lbl { font-size:11px; color:#94a3b8; margin-top:1px; }
-
-    /* Gráfico de barras tasas */
-    .bco-grafico { margin-bottom:1.5rem; }
-    .bco-grafico-titulo { font-size:13px; font-weight:700; color:var(--negro); margin-bottom:.75rem; }
-    .bco-bar-row { display:flex; align-items:center; gap:10px; margin-bottom:7px; }
-    .bco-bar-label { font-size:12px; color:var(--negro); min-width:130px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .bco-bar-track { flex:1; height:20px; background:var(--fondo); border-radius:6px; overflow:hidden; }
-    .bco-bar-fill  { height:100%; border-radius:6px; display:flex; align-items:center; padding-left:8px; font-size:11px; font-weight:700; color:#fff; transition:width .6s ease; }
-    .bco-bar-fill.verde    { background:#16a34a; }
-    .bco-bar-fill.amarillo { background:#d97706; }
-    .bco-bar-fill.rojo     { background:#dc2626; }
-    .bco-bar-pct { font-size:12px; font-weight:700; min-width:38px; text-align:right; }
-    .bco-bar-pct.verde    { color:#16a34a; }
-    .bco-bar-pct.amarillo { color:#d97706; }
-    .bco-bar-pct.rojo     { color:#dc2626; }
-
-    /* Tabla comparativa */
-    .bco-tabla-wrap { overflow-x:auto; margin-bottom:1.5rem; }
-    .bco-tabla { width:100%; border-collapse:collapse; font-size:13px; }
-    .bco-tabla th { font-size:10px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:var(--suave); padding:7px 10px; border-bottom:2px solid var(--borde); text-align:left; white-space:nowrap; }
-    .bco-tabla td { padding:10px; border-bottom:1px solid var(--borde); vertical-align:middle; }
-    .bco-tabla tr:last-child td { border-bottom:none; }
-    .bco-tabla tr:hover td { background:var(--fondo); }
-    .bco-tabla tr.bco-tr-top td { background:#f0fdf4; }
-    .bco-badge { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px; white-space:nowrap; }
-    .bco-badge-verde    { background:#dcfce7; color:#15803d; }
-    .bco-badge-amarillo { background:#fef3c7; color:#92400e; }
-    .bco-badge-rojo     { background:#fee2e2; color:#dc2626; }
-    .bco-badge-azul     { background:#dbeafe; color:#1d4ed8; }
-
-    /* Tarjetas ranking */
-    .bco-ranking { display:flex; flex-direction:column; gap:10px; margin-bottom:1.5rem; }
-    .bco-rank-card { display:flex; align-items:flex-start; gap:12px; border:1.5px solid var(--borde); border-radius:14px; padding:1rem 1.15rem; }
-    .bco-rank-card.top { border-color:var(--verde); background:#f0fdf4; }
-    .bco-rank-num { font-family:'Fraunces',serif; font-size:1.8rem; font-weight:700; color:var(--suave2); line-height:1; flex-shrink:0; min-width:30px; }
-    .bco-rank-card.top .bco-rank-num { color:var(--verde); }
-    .bco-rank-nombre { font-size:14px; font-weight:700; color:var(--negro); margin-bottom:2px; }
-    .bco-rank-tasa { font-size:13px; color:var(--texto); }
-    .bco-rank-coment { font-size:12px; color:var(--suave); margin-top:3px; line-height:1.5; }
-    .bco-rank-badges { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
-
-    /* Comparador interactivo */
-    .bco-comp-wrap { margin-bottom:.5rem; }
-    .bco-comp-titulo { font-size:14px; font-weight:700; color:var(--negro); margin-bottom:.75rem; }
-    .bco-comp-selects { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:1rem; }
-    .bco-comp-selects select { font-size:13px; padding:7px 10px; border:1.5px solid var(--borde); border-radius:8px; background:var(--blanco); color:var(--negro); }
-    .bco-comp-result { display:none; }
-    .bco-comp-result.visible { display:block; }
-    .bco-comp-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1rem; }
-    .bco-comp-card { border:1.5px solid var(--borde); border-radius:12px; padding:.85rem 1rem; text-align:center; }
-    .bco-comp-card.ganador { border-color:var(--verde); background:#f0fdf4; }
-    .bco-comp-banco { font-size:12px; font-weight:700; color:var(--negro); margin-bottom:.4rem; }
-    .bco-comp-tasa  { font-size:13px; font-weight:700; color:var(--negro); margin-bottom:2px; }
-    .bco-comp-sub   { font-size:11px; color:var(--suave); margin-top:2px; }
-    .bco-comp-dividendo { font-family:'Fraunces',serif; font-size:1.35rem; font-weight:700; color:var(--negro); margin-top:6px; }
-    .bco-comp-mes   { font-size:.75rem; font-family:var(--fuente); font-weight:400; color:var(--suave); margin-left:2px; }
-    .bco-comp-ahorro { background:#eff6ff; border:1.5px solid #bfdbfe; border-radius:10px; padding:.85rem 1rem; font-size:13px; color:var(--negro); line-height:1.7; }
-    .bco-comp-ahorro strong { color:#1d4ed8; }
-
-    /* Secciones desplegables de bancos */
-    .bco-seccion { border:1.5px solid var(--borde); border-radius:12px; margin-bottom:.75rem; overflow:hidden; background:var(--blanco); }
-    .bco-seccion-titulo { font-size:13.5px; font-weight:700; color:var(--negro); padding:.75rem 1rem; cursor:pointer; display:flex; align-items:center; justify-content:space-between; list-style:none; background:var(--fondo); user-select:none; }
-    .bco-seccion-titulo::-webkit-details-marker { display:none; }
-    .bco-seccion-titulo::after { content:'▾'; font-size:12px; color:var(--suave); flex-shrink:0; }
-    details.bco-seccion[open] .bco-seccion-titulo::after { content:'▴'; }
-    .bco-seccion-titulo:hover { background:#e8edf2; }
-    details.bco-seccion[open] .bco-seccion-titulo { border-bottom:1.5px solid var(--borde); }
-    .bco-seccion > *:not(summary) { padding:.75rem 1rem; }
-    .bco-seccion-hint { font-size:11px; font-weight:400; color:var(--suave); margin-left:auto; padding-right:.5rem; }
-
-    /* Bloque requisitos */
-    .bco-req-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1rem; }
-    .bco-req-item { background:var(--fondo); border-radius:10px; padding:.75rem 1rem; }
-    .bco-req-ico   { font-size:1.1rem; margin-bottom:4px; }
-    .bco-req-titulo { font-size:12px; font-weight:700; color:var(--negro); margin-bottom:3px; }
-    .bco-req-desc   { font-size:12px; color:var(--suave); line-height:1.5; }
-
-    /* Tendencias */
-    .bco-tendencias { display:flex; flex-direction:column; gap:8px; margin-bottom:1rem; }
-    .bco-tend-item { display:flex; gap:12px; align-items:flex-start; border:1.5px solid var(--borde); border-radius:10px; padding:.8rem 1rem; }
-    .bco-tend-ico  { font-size:1.3rem; flex-shrink:0; }
-    .bco-tend-titulo { font-size:13px; font-weight:700; color:var(--negro); margin-bottom:2px; }
-    .bco-tend-desc   { font-size:12.5px; color:var(--texto); line-height:1.5; }
-
-    /* Bloque resultado pantalla 3 */
-    .bco-resultado-bloque { border:1.5px solid #bfdbfe; border-radius:14px; padding:1rem 1.25rem; background:#eff6ff; margin-bottom:1.25rem; }
-    .bco-resultado-tag { font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:#1d4ed8; margin-bottom:.5rem; }
-    .bco-resultado-txt { font-size:13px; color:var(--negro); line-height:1.65; }
-
-    /* ── Chatbot panel hipotecario ── */
-    .bco-chat-wrap     { margin:1.25rem 0; }
-    .bco-chat-trigger  { display:flex; align-items:center; gap:10px; width:100%; background:linear-gradient(90deg,#1e3a5f,#2563eb); color:#fff; border:none; border-radius:14px; padding:.85rem 1.1rem; font-size:13.5px; font-weight:600; cursor:pointer; text-align:left; }
-    .bco-chat-trigger-ico { font-size:1.4rem; flex-shrink:0; }
-    .bco-chat-trigger-txt { flex:1; line-height:1.3; }
-    .bco-chat-trigger-arrow { font-size:11px; opacity:.7; transition:transform .2s; }
-    .bco-chat-wrap.abierto .bco-chat-trigger-arrow { transform:rotate(180deg); }
-    .bco-chat-panel    { display:none; background:#f0f6ff; border:1.5px solid #bfdbfe; border-radius:0 0 14px 14px; margin-top:-6px; overflow:hidden; }
-    .bco-chat-wrap.abierto .bco-chat-panel { display:block; }
-    .bco-chat-msgs     { padding:1rem 1rem .5rem; display:flex; flex-direction:column; gap:10px; }
-    .bco-chat-burbuja  { background:#fff; border:1px solid #e2eaf6; border-radius:12px 12px 12px 4px; padding:.7rem .9rem; font-size:13px; line-height:1.6; color:var(--negro); max-width:94%; }
-    .bco-chat-burbuja strong { color:#1d4ed8; }
-    .bco-chat-burbuja .bco-chat-dato { display:flex; align-items:center; gap:7px; margin-top:6px; font-size:12.5px; }
-    .bco-chat-burbuja .bco-chat-dato-ico { font-size:1rem; }
-    .bco-chat-acciones { display:flex; flex-wrap:wrap; gap:8px; padding:.5rem 1rem 1rem; }
-    .bco-chat-btn      { background:#fff; border:1.5px solid #93c5fd; border-radius:20px; color:#1d4ed8; font-size:12px; font-weight:600; padding:.4rem .9rem; cursor:pointer; transition:background .15s,color .15s; white-space:nowrap; }
-    .bco-chat-btn:hover{ background:#2563eb; color:#fff; border-color:#2563eb; }
-
-    @media(max-width:620px){
-      .bco-comp-selects { grid-template-columns:1fr; }
-      .bco-comp-grid    { grid-template-columns:1fr; }
-      .bco-req-grid     { grid-template-columns:1fr; }
-      .bco-hero-stats   { gap:8px; }
-    }
-    /* ════════════════════════════════════════════════════════════════════ */
-    .avc-card   { border: 1.5px solid var(--borde); border-radius: 14px; padding: 1.2rem 1.25rem; position: relative; }
-    .avc-mejor  { border-color: var(--verde); background: #FAFFF9; }
-    .avc-card-tag { font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--suave); margin-bottom: .6rem; }
-    .avc-mejor .avc-card-tag { color: var(--verde); }
-    .avc-monto  { font-family: 'Fraunces', serif; font-size: 1.55rem; font-weight: 600; color: var(--negro); line-height: 1; }
-    .avc-linea  { font-size: 12px; color: var(--suave); line-height: 1.6; }
-    .avc-fallo  { border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
-    .avc-fallo-titulo { font-size: 15px; font-weight: 600; margin-bottom: .5rem; color: var(--negro); }
-    .avc-fallo-txt  { font-size: 13.5px; line-height: 1.7; color: var(--texto); }
-    .avc-pros { margin-top: 1rem; display: flex; flex-direction: column; gap: 6px; }
-    .avc-pro  { font-size: 13px; display: flex; gap: 8px; align-items: flex-start; }
-    .avc-pro-ico { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
-    .avc-slider-wrap { margin-bottom: 1.5rem; }
-    .avc-slider-label { font-size: 12px; color: var(--suave); margin-bottom: 6px; display: flex; justify-content: space-between; }
-    .avc-slider-label strong { color: var(--negro); font-size: 14px; }
-    input[type="range"].avc-slider { width: 100%; accent-color: var(--negro); cursor: pointer; height: 44px; }
-
-    /* DESIGUALDAD */
-    .desigualdad { border: 1.5px solid var(--borde); border-radius: 14px; overflow: hidden; margin-bottom: 1.5rem; }
-    .desigualdad-header { padding: .9rem 1.5rem; background: var(--fondo); border-bottom: 1px solid var(--borde); font-size: 11px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: var(--suave); }
-    .desig-row { display: flex; align-items: center; gap: 12px; padding: .8rem 1.5rem; border-bottom: 1px solid var(--borde); }
-    .desig-row:last-child { border-bottom: none; }
-    .desig-nombre { font-size: 13px; color: var(--texto); min-width: 175px; }
-    .desig-barra-wrap { flex: 1; height: 6px; background: var(--fondo); border-radius: 3px; overflow: hidden; }
-    .desig-barra { height: 100%; border-radius: 3px; }
-    .desig-uf { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; color: var(--negro); min-width: 60px; text-align: right; }
-
-    /* HISTÓRICO */
-    .hist-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.5rem; }
-    .hist-card { border: 1.5px solid var(--borde); border-radius: 14px; padding: 1rem 1.2rem; }
-    .hist-anio { font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--suave); margin-bottom: .4rem; }
-    .hist-uf   { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 600; color: var(--negro); line-height: 1; }
-    .hist-sub  { font-size: 11.5px; color: var(--suave); margin-top: 3px; }
-    .hist-badge { display: inline-block; margin-top: 6px; padding: 2px 9px; border-radius: 10px; font-size: 10.5px; font-weight: 600; background: var(--rojo-l); color: var(--rojo); }
-
-    /* COMPARTIR */
-    .share-area { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 1.5rem; }
-    .btn-share { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid var(--borde); background: var(--blanco); color: var(--texto); font-family: 'DM Sans', sans-serif; transition: all .15s; text-decoration: none; }
-    .btn-share:hover { background: var(--negro); color: #fff; border-color: var(--negro); }
-    .btn-share-copy:hover { background: var(--verde) !important; border-color: var(--verde) !important; }
-  .btn-share:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; border-color: var(--azul); }
-
-    /* DIVIDER */
-    .divider { border: none; border-top: 1px solid var(--borde); margin: 2rem 0; }
-
-    /* LAYOUT LATERAL — pantallas anchas */
-    @media (min-width: 1100px) {
-      .side-explore {
-        display: flex !important;
-        flex-direction: column;
-        gap: 6px;
-        position: fixed;
-        top: 50%;
-        right: calc((100vw - 680px) / 2 - 205px);
-        transform: translateY(-50%);
-        width: 180px;
-      }
-      .side-explore-label {
-        font-size: 9px;
-        font-weight: 500;
-        letter-spacing: .09em;
-        text-transform: uppercase;
-        color: var(--suave2);
-        margin-bottom: 2px;
-        padding-left: 4px;
-      }
-      .side-explore .bypass-card {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        text-align: left;
-        padding: .55rem .75rem;
-        border-radius: 10px;
-        border-color: transparent;
-        background: transparent;
-      }
-      .side-explore .bypass-card:hover {
-        border-color: var(--borde);
-        background: var(--fondo);
-      }
-      .side-explore .bypass-card-ico { font-size: 1rem; margin-bottom: 0; flex-shrink: 0; opacity: .7; }
-      .side-explore .bypass-card-titulo { font-size: 12px; color: var(--suave); }
-      .side-explore .bypass-card-sub { display: none; }
-      /* Ocultar la sección inline en pantallas anchas */
-      .inline-explore { display: none !important; }
-
-      /* Panel subsidios lateral expandible */
-      .side-sub-panel {
-        display: none;
-        background: var(--fondo);
-        border: 1.5px solid var(--borde);
-        border-radius: 12px;
-        padding: .75rem .8rem;
-        margin-top: 2px;
-        width: 100%;
-      }
-      .side-sub-panel.abierto { display: block; }
-      .side-sub-input {
-        width: 100%;
-        box-sizing: border-box;
-        font-size: 12px;
-        padding: .45rem .6rem;
-        border: 1.5px solid var(--borde);
-        border-radius: 8px;
-        background: #fff;
-        color: var(--negro);
-        outline: none;
-        margin-bottom: 6px;
-      }
-      .side-sub-input:focus { border-color: var(--azul,#2563eb); }
-      .side-sub-checks {
-        display: flex;
-        gap: 5px;
-        margin-bottom: 8px;
-        flex-wrap: wrap;
-      }
-      .side-sub-check {
-        font-size: 10px;
-        font-weight: 600;
-        padding: 3px 8px;
-        border-radius: 20px;
-        border: 1.5px solid var(--borde);
-        cursor: pointer;
-        background: #fff;
-        color: var(--suave);
-        user-select: none;
-        display: flex;
-        align-items: center;
-        gap: 3px;
-      }
-      .side-sub-check.activo { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
-      .side-sub-check input { display: none; }
-      .side-sub-resultado { display: flex; flex-direction: column; gap: 6px; }
-      .side-sub-item {
-        border-radius: 8px;
-        padding: .5rem .65rem;
-        font-size: 11px;
-        line-height: 1.45;
-      }
-      .side-sub-item.verde  { background: #f0fdf4; border: 1px solid #86efac; }
-      .side-sub-item.amarillo { background: #fffbeb; border: 1px solid #fde68a; }
-      .side-sub-item-tag { font-size: 9.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 3px; }
-      .side-sub-item-tag.verde   { color: #16a34a; }
-      .side-sub-item-tag.amarillo{ color: #b45309; }
-      .side-sub-item-nombre { font-weight: 600; color: var(--negro); font-size: 11px; margin-bottom: 2px; }
-      .side-sub-item-dato  { color: var(--texto); }
-      .side-sub-item-dato strong { color: var(--negro); }
-      .side-sub-cta {
-        margin-top: 6px;
-        width: 100%;
-        background: var(--azul,#2563eb);
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: .45rem .6rem;
-        font-size: 11px;
-        font-weight: 600;
-        cursor: pointer;
-        text-align: center;
-      }
-      .side-sub-cta:hover { background: #1d4ed8; }
-    }
-
-    @media (max-width: 420px) {
-      .bypass-grid { grid-template-columns: 1fr; }
-      .bypass-card { display: flex; align-items: center; gap: 12px; text-align: left; padding: .75rem 1rem; }
-      .bypass-card-ico { font-size: 1.2rem; margin-bottom: 0; flex-shrink: 0; }
-    }
-    @media (max-width: 620px) {
-      .wrap { padding: 1.75rem 1.25rem 3rem; }
-      nav { padding: 1rem 1.25rem; }
-      .escenarios { grid-template-columns: 1fr; }
-      .metricas { grid-template-columns: 1fr; }
-      .metrica { border-right: none !important; }
-      .metrica:nth-last-child(-n+2) { border-bottom: 1px solid var(--borde) !important; }
-      .metrica:last-child { border-bottom: none !important; }
-      .avc-grid { grid-template-columns: 1fr; }
-      .stats-strip { flex-direction: column; }
-      .stat-item { border-right: none; border-bottom: 1px solid var(--borde); }
-      .stat-item:last-child { border-bottom: none; }
-      .hist-grid { grid-template-columns: 1fr 1fr; }
-      .desig-nombre { min-width: 120px; font-size: 12px; }
-      .edad-metricas { grid-template-columns: 1fr 1fr; }
-      .resumen-top-sep { display: none; }
-    }
-  </style>
-
-  <!-- Schema.org: WebSite -->
-  <script type="application/ld+json">
+<!DOCTYPE html><html lang=es><head><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><title>¿Cuánto cuesta una casa en Chile?</title><meta name=description content="Ingresa tu sueldo y región. Te decimos si puedes comprar una casa en Chile, qué subsidios tienes y cuántos años necesitas para el pie."><meta property=og:title content="¿Puedes comprarte una casa en Chile?"><meta property=og:description content="3 de cada 4 chilenos no puede comprar vivienda con su sueldo. Ingresa el tuyo y descubre tu realidad."><meta property=og:type content=website><meta content=https://cuantocuestaunacasa.cl/ property=og:url><meta property=og:image content=https://cuantocuestaunacasa.cl/og.png><meta name=twitter:card content=summary_large_image><meta name=twitter:title content="¿Puedes comprarte una casa en Chile?"><meta name=twitter:description content="3 de cada 4 chilenos no puede comprar vivienda con su sueldo. Ingresa el tuyo y descubre tu realidad."><meta name=twitter:image content=https://cuantocuestaunacasa.cl/og.png><meta name=google-site-verification content=N38iM0TXCfqVkn06TXqvxZXXInpPBYHMIJ8c0Z5ZEUU><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8151493924438623" crossorigin=anonymous></script><link href=https://cuantocuestaunacasa.cl/ rel=canonical><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel=stylesheet><style>:root{
+--negro: #111111;
+--texto: #1C1C1C;
+--suave: #666666;
+--suave2: #888888;
+--borde: #E5E5E5;
+--fondo: #F8F6F3;
+--blanco: #FFFFFF;
+--verde: #1A7A4A;
+--verde-l: #E8F5EE;
+--amarillo: #7D540A;
+--amarillo-l: #FEF6E4;
+--rojo: #C0392B;
+--rojo-l: #FDECEA;
+--azul: #1A5FA8;
+--azul-l: #EBF2FC;
+}
+*,*::before,*::after{box-sizing: border-box;margin: 0;padding: 0}
+html{scroll-behavior: smooth}
+body{font-family: 'DM Sans',sans-serif;background: var(--blanco);color: var(--texto);font-size: 16px;line-height: 1.6}
+nav{display: flex;align-items: center;justify-content: space-between;padding: 1.1rem 2rem;border-bottom: 1px solid var(--borde);position: sticky;top: 0;background: var(--blanco);z-index: 100}
+.nav-logo{font-family: 'Fraunces',serif;font-size: 1rem;font-weight: 600;color: var(--negro);cursor: pointer}
+.nav-logo:focus-visible{outline: 2px solid var(--azul);outline-offset: 3px;border-radius: 6px}
+.nav-logo em{color: var(--rojo);font-style: italic}
+.uf-chip{display: inline-flex;align-items: center;gap: 6px;padding: 5px 12px;background: var(--fondo);border: 1px solid var(--borde);border-radius: 20px;font-size: 12px;color: var(--suave)}
+.dot-live{width: 6px;height: 6px;border-radius: 50%;background: #4CAF50;animation: pulse 2s infinite;flex-shrink: 0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.wrap{max-width: 680px;margin: 0 auto;padding: 2.5rem 2rem 4rem}
+.wizard-steps{display: flex;align-items: center;margin-bottom: 2.5rem}
+.ws-item{display: flex;align-items: center;gap: 8px;font-size: 12px;color: var(--suave2);font-weight: 500}
+.ws-item.activo{color: var(--negro)}
+.ws-item.done{color: var(--verde)}
+.ws-num{width: 24px;height: 24px;border-radius: 50%;background: var(--borde);color: var(--suave);font-size: 11px;font-weight: 700;display: inline-flex;align-items: center;justify-content: center;flex-shrink: 0;transition: background .2s,color .2s}
+.ws-item.activo .ws-num{background: var(--negro);color: #fff}
+.ws-item.done .ws-num{background: var(--verde);color: #fff}
+.ws-linea{flex: 1;height: 1px;background: var(--borde);margin: 0 10px}
+.ws-linea.done{background: var(--verde)}
+.ws-label{display: none}
+@media (min-width: 480px){.ws-label{display: inline}}
+.screen{display: none}
+.screen.activa{display: block}
+.titulo-grande{font-family: 'Fraunces',serif;font-size: clamp(2rem,5vw,3.2rem);font-weight: 300;line-height: 1.1;color: var(--negro);margin-bottom: .4rem}
+.titulo-grande em{font-style: italic;color: var(--rojo)}
+.subtitulo{font-size: 15px;color: var(--suave);margin-bottom: 2rem}
+.stats-strip{display: flex;gap: 0;margin-bottom: 2.5rem;border: 1.5px solid var(--borde);border-radius: 14px;overflow: hidden}
+.stat-item{flex: 1;padding: 1rem 1.2rem;border-right: 1px solid var(--borde);text-align: center}
+.stat-item:last-child{border-right: none}
+.stat-num{font-family: 'Fraunces',serif;font-size: 1.8rem;font-weight: 600;color: var(--rojo);line-height: 1}
+.stat-txt{font-size: 11px;color: var(--suave);margin-top: 4px;line-height: 1.4}
+.campos{display: flex;gap: 12px;flex-wrap: wrap;margin-bottom: 1rem}
+.campo{display: flex;flex-direction: column;gap: 5px;flex: 1;min-width: 155px}
+.campo label{font-size: 11px;font-weight: 500;letter-spacing: .06em;text-transform: uppercase;color: var(--suave)}
+.campo select,
+.campo input[type="number"],
+.campo input[type="text"]{
+width: 100%;
+padding: 13px 16px;
+border: none;
+border-bottom: 2px solid var(--borde);
+border-radius: 0;
+background: transparent;
+color: var(--texto);
+font-family: 'DM Sans',sans-serif;
+font-size: 16px;
+appearance: none;
+transition: border-color .2s;
+}
+.campo select:focus,
+.campo input:focus{
+outline: none;
+border-bottom-color: var(--negro);
+}
+.campo .hint{font-size: 11px;color: var(--suave2);margin-top: 3px}
+.checks{display: flex;gap: 10px;flex-wrap: wrap;margin-bottom: 1.5rem}
+.check-btn{display: inline-flex;align-items: center;gap: 7px;padding: 8px 14px;border: 1.5px solid var(--borde);border-radius: 20px;font-size: 13px;cursor: pointer;background: var(--blanco);color: var(--texto);transition: border-color .15s,background .15s;user-select: none}
+.check-btn input[type="checkbox"]{display: none}
+.check-btn.activo{border-color: var(--negro);background: var(--negro);color: #fff}
+.sit-grupo{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;margin-bottom:4px}
+.sit-btn{flex:1;min-width:100px;padding:9px 12px;border:1.5px solid var(--borde);border-radius:22px;font-size:13px;font-weight:500;color:var(--suave);background:var(--blanco);cursor:pointer;text-align:center;transition:all .15s;font-family:inherit}
+.sit-btn:hover{border-color:var(--negro);color:var(--negro)}
+.sit-btn.activo{background:var(--negro);border-color:var(--negro);color:#fff}
+.sit-aviso{background:#fef9ec;border:1.5px solid #fcd34d;border-radius:10px;padding:.65rem .9rem;font-size:12.5px;color:#92400e;line-height:1.5;margin-top:.5rem;display:none}
+.sit-aviso.visible{display:block}
+.ahorro-selector{display:flex;gap:7px;flex-wrap:wrap;margin-top:5px}
+.ahorro-btn{flex:1;min-width:70px;padding:8px 10px;border:1.5px solid var(--borde);border-radius:20px;font-size:12.5px;font-weight:600;color:var(--suave);background:var(--blanco);cursor:pointer;text-align:center;transition:all .15s}
+.ahorro-btn:hover{border-color:var(--azul);color:var(--azul)}
+.ahorro-btn.activo{background:var(--negro);border-color:var(--negro);color:#fff}
+.btn-primary{display: flex;align-items: center;justify-content: center;gap: 8px;width: 100%;padding: 15px 24px;background: var(--negro);color: #fff;border: none;border-radius: 12px;font-family: 'DM Sans',sans-serif;font-size: 15px;font-weight: 500;cursor: pointer;transition: background .15s,transform .1s;margin-top: .5rem}
+.btn-primary:hover{background: #333}
+.btn-primary:active{transform: scale(.99)}
+.btn-back{display: inline-flex;align-items: center;gap: 6px;background: none;border: 1.5px solid var(--borde);border-radius: 10px;padding: 9px 16px;font-size: 13px;color: var(--suave);cursor: pointer;font-family: 'DM Sans',sans-serif;transition: border-color .15s,color .15s;margin-bottom: 1.5rem}
+.btn-back:hover{border-color: var(--negro);color: var(--negro)}
+.tabs-nav{display: flex;border-bottom: 1.5px solid var(--borde);margin-bottom: 1.75rem;overflow-x: auto;scrollbar-width: none}
+.tabs-nav::-webkit-scrollbar{display: none}
+.tab-btn{flex-shrink: 0;padding: 10px 16px;min-height: 44px;font-size: 13px;font-weight: 500;color: var(--suave);background: none;border: none;border-bottom: 2px solid transparent;cursor: pointer;font-family: 'DM Sans',sans-serif;transition: color .15s,border-color .15s;white-space: nowrap;margin-bottom: -1.5px}
+.tab-btn:hover{color: var(--negro)}
+.tab-btn.activo{color: var(--negro);border-bottom-color: var(--negro)}
+.tab-panel{display: none}
+.tab-panel.activo{display: block}
+.resumen-top{display: flex;gap: 10px;align-items: center;flex-wrap: wrap;padding: 12px 16px;background: var(--fondo);border: 1.5px solid var(--borde);border-radius: 12px;margin-bottom: 1.75rem}
+.resumen-top-item{display: flex;flex-direction: column;flex: 1;min-width: 100px}
+.resumen-top-label{font-size: 10px;font-weight: 500;letter-spacing: .06em;text-transform: uppercase;color: var(--suave)}
+.resumen-top-val{font-family: 'Fraunces',serif;font-size: 1.1rem;font-weight: 600;color: var(--negro)}
+.resumen-top-sep{width: 1px;height: 32px;background: var(--borde)}
+.btn-editar{background: none;border: 1.5px solid var(--borde);border-radius: 8px;padding: 5px 12px;font-size: 12px;color: var(--suave);cursor: pointer;font-family: 'DM Sans',sans-serif;transition: color .15s,border-color .15s;white-space: nowrap}
+.btn-editar:hover{color: var(--negro);border-color: var(--negro)}
+.btn-editar:focus-visible{outline: 2px solid var(--azul);outline-offset: 2px;border-color: var(--azul);color: var(--negro)}
+.resultado-bloque{border: 1.5px solid var(--borde);border-radius: 16px;overflow: hidden;margin-bottom: 1.5rem}
+.resultado-header{padding: 1rem 1.5rem;border-bottom: 1px solid var(--borde);background: var(--fondo);display: flex;align-items: center;justify-content: space-between;flex-wrap: wrap;gap: 6px}
+.resultado-header-titulo{font-size: 11px;font-weight: 500;letter-spacing: .06em;text-transform: uppercase;color: var(--suave)}
+.pct-grande{font-family: 'Fraunces',serif;font-size: 3rem;font-weight: 600;line-height: 1;color: var(--negro)}
+.barra-area{padding: 1.5rem 1.75rem;border-bottom: 1px solid var(--borde)}
+.barra-row{display: flex;align-items: baseline;gap: 14px;margin-bottom: 1rem}
+.pill{display: inline-block;padding: 4px 12px;border-radius: 20px;font-size: 12px;font-weight: 500}
+.pill-verde{background: var(--verde-l);color: var(--verde)}
+.pill-amarillo{background: var(--amarillo-l);color: var(--amarillo)}
+.pill-rojo{background: var(--rojo-l);color: var(--rojo)}
+.pill-azul{background: var(--azul-l);color: var(--azul)}
+.barra-desc{font-size: 13px;color: var(--suave)}
+.barra-track{height: 7px;background: var(--fondo);border-radius: 4px;overflow: hidden;border: 1px solid var(--borde)}
+.barra-fill{height: 100%;border-radius: 4px;transition: width .5s ease,background .4s}
+.barra-ticks{display: flex;justify-content: space-between;font-size: 11px;color: var(--suave2);margin-top: 4px}
+.metricas{display: grid;grid-template-columns: 1fr 1fr}
+.metrica{padding: 1.1rem 1.5rem;border-right: 1px solid var(--borde);border-bottom: 1px solid var(--borde)}
+.metrica:nth-child(2n){border-right: none}
+.metrica:nth-last-child(-n+2){border-bottom: none}
+.metrica-label{font-size: 11px;font-weight: 500;letter-spacing: .06em;text-transform: uppercase;color: var(--suave);margin-bottom: 5px}
+.metrica-valor{font-family: 'Fraunces',serif;font-size: 1.65rem;font-weight: 600;line-height: 1;color: var(--negro)}
+.metrica-sub{font-size: 11.5px;color: var(--suave);margin-top: 3px}
+.aviso{padding: 12px 16px;border-radius: 10px;font-size: 13px;line-height: 1.6;border-left: 3px solid;margin-bottom: 1.5rem}
+.aviso-verde{background: var(--verde-l);color: var(--verde);border-color: var(--verde)}
+.aviso-azul{background: var(--azul-l);color: var(--azul);border-color: var(--azul)}
+.aviso-neutro{background: var(--fondo);color: var(--suave);border-color: var(--borde)}
+.frase-impacto{background: var(--negro);color: #fff;border-radius: 14px;padding: 1.4rem 1.75rem;margin-bottom: 1.5rem}
+.frase-impacto .fi-label{font-size: 10px;letter-spacing: .09em;text-transform: uppercase;color: rgba(255,255,255,.4);margin-bottom: .4rem}
+.frase-impacto .fi-texto{font-family: 'Fraunces',serif;font-size: 1.2rem;font-weight: 300;line-height: 1.45}
+.frase-impacto .fi-texto em{color: #ff8a7a;font-style: italic}
+.frase-impacto .fi-texto strong{color: #fff}
+.edad-card{border: 2px solid var(--negro);border-radius: 14px;padding: 1.3rem 1.5rem;background: var(--negro);color: var(--blanco);margin-bottom: 1.5rem}
+.edad-card-header{display: flex;align-items: flex-start;gap: 12px;margin-bottom: 1.1rem}
+.edad-icono{font-size: 1.5rem;line-height: 1}
+.edad-titulo{font-family: 'Fraunces',serif;font-size: 1.05rem;font-weight: 600;color: var(--blanco);line-height: 1.2}
+.edad-sub{font-size: 12px;color: #aaa;margin-top: 3px}
+.edad-metricas{display: grid;grid-template-columns: repeat(3,1fr);border: 1px solid #333;border-radius: 10px;overflow: hidden;margin-bottom: .9rem}
+.edad-metrica{padding: .9rem 1rem;border-right: 1px solid #333}
+.edad-metrica:last-child{border-right: none}
+.edad-metrica-label{font-size: 10px;font-weight: 500;letter-spacing: .07em;text-transform: uppercase;color: #888;margin-bottom: 5px}
+.edad-metrica-valor{font-family: 'Fraunces',serif;font-size: 1.35rem;font-weight: 600;color: var(--blanco);line-height: 1}
+.edad-metrica-valor.rojo{color: #ff6b6b}
+.edad-metrica-valor.amarillo{color: #ffd166}
+.edad-metrica-valor.verde{color: #6bcb77}
+.edad-metrica-sub{font-size: 11px;color: #888;margin-top: 4px}
+.edad-veredicto{font-size: 13px;line-height: 1.7;color: #ccc;border-top: 1px solid #333;padding-top: .9rem}
+.edad-veredicto strong{color: var(--blanco)}
+.edad-veredicto em{color: #ffd166;font-style: normal}
+.seccion-titulo{font-family: 'Fraunces',serif;font-size: 1.2rem;font-weight: 300;color: var(--negro);margin-bottom: .4rem}
+.seccion-sub{font-size: 13px;color: var(--suave);margin-bottom: 1.25rem}
+.escenarios{display: grid;grid-template-columns: repeat(3,1fr);gap: 10px;margin-bottom: 1.5rem;align-items: start}
+.esc-card{border: 1.5px solid var(--borde);border-radius: 14px;padding: 1.1rem 1.15rem;position: relative;transition: box-shadow .15s}
+.esc-card:not(.esc-no-aplica){cursor: pointer}
+.esc-card:not(.esc-no-aplica):hover{box-shadow: 0 2px 10px rgba(0,0,0,.08)}
+.esc-card.destacado{border-color: var(--verde);background: #FAFFF9}
+.esc-card-tag{font-size: 10px;font-weight: 600;letter-spacing: .07em;text-transform: uppercase;color: var(--suave);margin-bottom: .5rem}
+.esc-card.destacado .esc-card-tag{color: var(--verde)}
+.esc-cuota{font-family: 'Fraunces',serif;font-size: 1.45rem;font-weight: 600;color: var(--negro);line-height: 1;margin-bottom: 3px}
+.esc-linea{font-size: 12px;color: var(--suave);line-height: 1.6}
+.esc-badge{position: absolute;top: -10px;right: 12px;background: var(--verde);color: #fff;font-size: 10px;font-weight: 600;padding: 2px 9px;border-radius: 10px}
+.esc-no-aplica{opacity: .45}
+.esc-expand-hint{font-size: 10px;color: var(--suave2);margin-top: 9px;text-align: center;letter-spacing: .02em}
+.esc-card-detalle{display: none;margin-top: 10px;padding-top: 10px;border-top: 1px dashed var(--borde)}
+.esc-card.expandido .esc-card-detalle{display: block}
+.det-fila{display: flex;justify-content: space-between;align-items: baseline;gap: 4px;font-size: 11px;padding: 2.5px 0}
+.det-fila .det-k{color: var(--suave);flex-shrink: 0}
+.det-fila .det-v{font-weight: 500;color: var(--texto);text-align: right}
+.det-sep{border: none;border-top: 1px solid var(--borde);margin: 5px 0}
+.sub-bypass{display: flex;align-items: center;gap: 10px;margin-top: 1rem}
+.sub-bypass hr{flex: 1;border: none;border-top: 1px solid var(--borde)}
+.sub-bypass span{font-size: 11px;color: var(--suave2);flex-shrink: 0}
+.bypass-grid{display: grid;grid-template-columns: repeat(3,1fr);gap: 8px;margin-top: .5rem}
+.bypass-card{border: 1.5px solid var(--borde);border-radius: 12px;padding: .9rem .6rem;cursor: pointer;text-align: center;transition: border-color .15s,background .15s;background: var(--blanco)}
+.bypass-card:hover{border-color: var(--negro);background: var(--fondo)}
+.bypass-card:focus-visible{outline: 2px solid var(--azul);outline-offset: 2px;border-color: var(--azul);background: var(--fondo)}
+.bypass-card-ico{font-size: 1.4rem;margin-bottom: 4px}
+.bypass-card-titulo{font-size: 12px;font-weight: 500;color: var(--negro);line-height: 1.3}
+.bypass-card-sub{font-size: 10px;color: var(--suave2);margin-top: 2px;line-height: 1.3}
+.sub-hero{background: linear-gradient(135deg,var(--azul) 0%,var(--verde) 100%);border-radius: 16px;padding: 1.5rem 1.6rem;color: #fff;margin-bottom: 1.75rem}
+.sub-hero-title{font-family: 'Fraunces',serif;font-size: clamp(1.4rem,4vw,2rem);font-weight: 300;line-height: 1.2;margin-bottom: .5rem}
+.sub-hero-title em{font-style: italic}
+.sub-hero-sub{font-size: 13px;opacity: .88;line-height: 1.5}
+.sub-form-box{border: 1.5px solid var(--borde);border-radius: 14px;padding: 1.2rem 1.4rem;margin-bottom: 1.25rem}
+.sub-filtros{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:1.25rem}
+.sub-filtro-btn{background:#fff;border:1.5px solid var(--borde);border-radius:20px;padding:.35rem .85rem;font-size:12px;font-weight:600;color:var(--suave);cursor:pointer;transition:all .15s}
+.sub-filtro-btn:hover{border-color:var(--azul);color:var(--azul)}
+.sub-filtro-btn.activo{background:var(--azul);border-color:var(--azul);color:#fff}
+.sub-filtro-btn:focus-visible{outline: 2px solid var(--azul);outline-offset: 2px;border-color: var(--azul);color: var(--azul)}
+.sub-ctx-bar{display:flex;align-items:center;gap:10px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:12px;padding:.75rem 1rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.sub-ctx-tag{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#1d4ed8;flex-shrink:0}
+.sub-ctx-txt{font-size:13px;color:var(--negro);flex:1;line-height:1.5}
+.sub-ctx-btn{background:#2563eb;color:#fff;border:none;border-radius:8px;padding:.35rem .8rem;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.sub-ctx-btn:hover{background:#1d4ed8}
+.sub-sin-ctx{font-size:12.5px;color:var(--suave);background:var(--fondo);border:1.5px dashed var(--borde);border-radius:10px;padding:.65rem 1rem;margin-bottom:1.1rem;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.sub-badge--califica{background:#dcfce7;color:#15803d;border:1px solid #86efac;border-radius:20px;font-size:10.5px;font-weight:700;padding:2px 9px}
+.sub-badge--nocalifica{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;border-radius:20px;font-size:10.5px;font-weight:700;padding:2px 9px}
+.sub-badge--simular{background:#fef9c3;color:#854d0e;border:1px solid #fde047;border-radius:20px;font-size:10.5px;font-weight:700;padding:2px 9px}
+.sub-card-grande{border: 1.5px solid var(--borde);border-radius: 14px;padding: 1.25rem 1.4rem;margin-bottom: 10px}
+.sub-card-grande.verde{border-color: var(--verde);background: var(--verde-l)}
+.sub-card-grande.amarillo{border-color: var(--amarillo);background: var(--amarillo-l)}
+.sub-card-label{font-size: 10px;font-weight: 700;letter-spacing: .08em;text-transform: uppercase;margin-bottom: 6px}
+.sub-card-label.verde{color: var(--verde)}
+.sub-card-label.amarillo{color: var(--amarillo)}
+.sub-metrics{display: flex;gap: 8px;flex-wrap: wrap;margin: .75rem 0}
+.sub-metric{flex: 1;min-width: 110px;background: #fff;border-radius: 10px;padding: .65rem .9rem}
+.sub-metric-label{font-size: 9px;font-weight: 600;letter-spacing: .06em;text-transform: uppercase;color: var(--suave);margin-bottom: 2px}
+.sub-metric-val{font-family: 'Fraunces',serif;font-size: 1.2rem;font-weight: 600;color: var(--negro);line-height: 1}
+.sub-metric-val.verde{color: var(--verde)}
+.sub-metric-sub{font-size: 10px;color: var(--suave);margin-top: 2px}
+.sub-universal{border: 1.5px solid var(--borde);border-radius: 12px;padding: .9rem 1.1rem;margin-bottom: 8px;display: flex;gap: 12px;align-items: flex-start}
+.sub-cta-completo{border: 1.5px solid var(--negro);border-radius: 14px;padding: 1.1rem 1.4rem;display: flex;align-items: center;justify-content: space-between;gap: 12px;flex-wrap: wrap;margin-top: 1.5rem}
+.subs-lista{display: flex;flex-direction: column;gap: 12px;margin-bottom: 1.5rem}
+.sub-cat-body.subs-lista{padding:10px 14px 14px;margin-bottom:0}
+.sub-item{border: 1.5px solid var(--borde);border-radius: 14px;padding: 1.1rem 1.25rem}
+.sub-item.aplica{border-color: var(--verde);background: #FAFFF9}
+.sub-item.no-aplica{opacity: .65}
+.sub-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:.65rem}
+.sub-header-left{display:flex;align-items:flex-start;gap:10px}
+.sub-icono{font-size:1.25rem;flex-shrink:0;margin-top:1px}
+.sub-nombre{font-size: 13.5px;font-weight: 600;color: var(--negro);line-height:1.35}
+.sub-monto{flex-shrink:0}
+.sub-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}
+.sub-badge--verde{background:#dcfce7;color:#15803d}
+.sub-badge--azul{background:#dbeafe;color:#1d4ed8}
+.sub-badge--rojo{background:#fee2e2;color:#dc2626}
+.sub-badge--gris{background:#f3f4f6;color:#6b7280}
+.sub-cat-details{border:1.5px solid var(--borde);border-radius:12px;margin:10px 0;overflow:hidden}
+.sub-cat-details[open]{border-color:var(--azul,#2563eb)}
+.sub-cat-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;background:var(--fondo,#f8f9fa);cursor:pointer;list-style:none;user-select:none}
+.sub-cat-summary::-webkit-details-marker{display:none}
+.sub-cat-details[open] .sub-cat-summary{background:#eff6ff;border-bottom:1.5px solid var(--borde)}
+.sub-cat-summary:hover{background:#e8f0fe}
+.sub-cat-chevron{font-size:.85rem;color:var(--suave);transition:transform .2s;flex-shrink:0}
+.sub-cat-details[open] .sub-cat-chevron{transform:rotate(180deg)}
+.sub-cat-body{padding:10px 0 4px}
+.sub-cat-header{display:flex;align-items:center;gap:10px}
+.sub-cat-header-left{display:flex;align-items:center;gap:10px}
+.sub-cat-emoji{font-size:1.4rem;flex-shrink:0}
+.sub-cat-titulo{font-weight:700;font-size:.93rem;color:var(--negro,#111)}
+.sub-cat-desc{font-size:.78rem;color:var(--suave,#6b7280);margin-top:2px}
+.sub-chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.sub-chip{background:#e0e7ff;color:#3730a3;font-size:.78rem;font-weight:600;border-radius:20px;padding:2px 10px}
+.sub-desc{font-size: 13px;color: var(--texto);line-height: 1.55;margin-bottom:.55rem}
+.sub-quien{font-size: 12.5px;color: var(--suave);line-height: 1.5;margin-bottom:.5rem}
+.sub-modal{font-size: 12px;color: var(--suave);margin-bottom:.5rem}
+.sub-fecha-tag{display:inline-block;font-size:11.5px;font-weight:500;color:#92400e;background:#fef3c7;border-radius:8px;padding:3px 10px;margin-bottom:.6rem}
+.sub-razones{background:var(--rojo-l);border-radius:10px;padding:.65rem 1rem;margin-bottom:.6rem}
+.sub-razones-titulo{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--rojo);margin-bottom:6px}
+.sub-razones ul{list-style:none;padding:0;margin:0;font-size:13px;line-height:1.6}
+.sub-razones ul li{display:flex;gap:8px;align-items:flex-start;margin-bottom:3px}
+.sub-req-wrap{background:var(--fondo);border-radius:10px;padding:.7rem 1rem;margin-bottom:.6rem}
+.sub-req-titulo{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--suave);margin-bottom:7px}
+.sub-req-lista{list-style:none;padding:0;margin:0;font-size:13px;color:var(--texto);line-height:1.6}
+.sub-req-lista li{display:flex;gap:8px;align-items:flex-start;margin-bottom:4px}
+.sub-req-bullet{flex-shrink:0;font-size:12px}
+.sub-links-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:.65rem}
+.sub-btn{display:inline-block;font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;text-decoration:none;transition:opacity .15s}
+.sub-btn--outline{border:1.5px solid var(--negro);color:var(--negro);background:transparent}
+.sub-btn--primary{background:var(--negro);color:#fff;border:1.5px solid var(--negro)}
+.sub-btn:hover{opacity:.75}
+.sub-calendario{background:#f8fafc;border:1.5px solid var(--borde);border-radius:14px;padding:1rem 1.25rem;margin-bottom:14px}
+.sub-cal-titulo{font-size:13px;font-weight:600;color:var(--negro);margin-bottom:.6rem}
+.sub-cal-grid{display:flex;flex-wrap:wrap;gap:8px}
+.sub-cal-item{display:flex;flex-direction:column;background:#fff;border:1px solid var(--borde);border-radius:8px;padding:5px 10px;min-width:120px}
+.sub-cal-mes{font-size:11.5px;font-weight:700;color:var(--negro)}
+.sub-cal-prog{font-size:11px;color:var(--suave)}
+.tabla-wrap{overflow-x: auto;margin-bottom: 1.5rem}
+table{width: 100%;border-collapse: collapse;font-size: 13px}
+th{text-align: left;font-size: 10px;font-weight: 500;letter-spacing: .07em;text-transform: uppercase;color: var(--suave);padding: 7px 10px;border-bottom: 1px solid var(--borde)}
+td{padding: 10px 10px;border-bottom: 1px solid var(--borde);vertical-align: middle}
+tr:last-child td{border-bottom: none}
+tr.fila-activa td{background: #FFF8F7}
+.pill-t{display: inline-block;padding: 2px 9px;border-radius: 10px;font-size: 10.5px;font-weight: 500}
+.avc-grid{display: grid;grid-template-columns: 1fr 1fr;gap: 10px;margin-bottom: 1.25rem}
+.bco-hero{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);color:#fff;border-radius:16px;padding:1.5rem 1.6rem;margin-bottom:1.5rem}
+.bco-hero-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#93c5fd;margin-bottom:.5rem}
+.bco-hero-titulo{font-family:'Fraunces',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:700;line-height:1.2;margin-bottom:.4rem}
+.bco-hero-sub{font-size:13px;color:#94a3b8;line-height:1.5}
+.bco-hero-stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:1.1rem}
+.bco-stat{background:rgba(255,255,255,.08);border-radius:10px;padding:.6rem 1rem}
+.bco-stat-val{font-family:'Fraunces',serif;font-size:1.35rem;font-weight:700;color:#fff}
+.bco-stat-lbl{font-size:11px;color:#94a3b8;margin-top:1px}
+.bco-grafico{margin-bottom:1.5rem}
+.bco-grafico-titulo{font-size:13px;font-weight:700;color:var(--negro);margin-bottom:.75rem}
+.bco-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.bco-bar-label{font-size:12px;color:var(--negro);min-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bco-bar-track{flex:1;height:20px;background:var(--fondo);border-radius:6px;overflow:hidden}
+.bco-bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:700;color:#fff;transition:width .6s ease}
+.bco-bar-fill.verde{background:#16a34a}
+.bco-bar-fill.amarillo{background:#d97706}
+.bco-bar-fill.rojo{background:#dc2626}
+.bco-bar-pct{font-size:12px;font-weight:700;min-width:38px;text-align:right}
+.bco-bar-pct.verde{color:#16a34a}
+.bco-bar-pct.amarillo{color:#d97706}
+.bco-bar-pct.rojo{color:#dc2626}
+.bco-tabla-wrap{overflow-x:auto;margin-bottom:1.5rem}
+.bco-tabla{width:100%;border-collapse:collapse;font-size:13px}
+.bco-tabla th{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--suave);padding:7px 10px;border-bottom:2px solid var(--borde);text-align:left;white-space:nowrap}
+.bco-tabla td{padding:10px;border-bottom:1px solid var(--borde);vertical-align:middle}
+.bco-tabla tr:last-child td{border-bottom:none}
+.bco-tabla tr:hover td{background:var(--fondo)}
+.bco-tabla tr.bco-tr-top td{background:#f0fdf4}
+.bco-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.bco-badge-verde{background:#dcfce7;color:#15803d}
+.bco-badge-amarillo{background:#fef3c7;color:#92400e}
+.bco-badge-rojo{background:#fee2e2;color:#dc2626}
+.bco-badge-azul{background:#dbeafe;color:#1d4ed8}
+.bco-ranking{display:flex;flex-direction:column;gap:10px;margin-bottom:1.5rem}
+.bco-rank-card{display:flex;align-items:flex-start;gap:12px;border:1.5px solid var(--borde);border-radius:14px;padding:1rem 1.15rem}
+.bco-rank-card.top{border-color:var(--verde);background:#f0fdf4}
+.bco-rank-num{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:var(--suave2);line-height:1;flex-shrink:0;min-width:30px}
+.bco-rank-card.top .bco-rank-num{color:var(--verde)}
+.bco-rank-nombre{font-size:14px;font-weight:700;color:var(--negro);margin-bottom:2px}
+.bco-rank-tasa{font-size:13px;color:var(--texto)}
+.bco-rank-coment{font-size:12px;color:var(--suave);margin-top:3px;line-height:1.5}
+.bco-rank-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.bco-comp-wrap{margin-bottom:.5rem}
+.bco-comp-titulo{font-size:14px;font-weight:700;color:var(--negro);margin-bottom:.75rem}
+.bco-comp-selects{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.bco-comp-selects select{font-size:13px;padding:7px 10px;border:1.5px solid var(--borde);border-radius:8px;background:var(--blanco);color:var(--negro)}
+.bco-comp-result{display:none}
+.bco-comp-result.visible{display:block}
+.bco-comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.bco-comp-card{border:1.5px solid var(--borde);border-radius:12px;padding:.85rem 1rem;text-align:center}
+.bco-comp-card.ganador{border-color:var(--verde);background:#f0fdf4}
+.bco-comp-banco{font-size:12px;font-weight:700;color:var(--negro);margin-bottom:.4rem}
+.bco-comp-tasa{font-size:13px;font-weight:700;color:var(--negro);margin-bottom:2px}
+.bco-comp-sub{font-size:11px;color:var(--suave);margin-top:2px}
+.bco-comp-dividendo{font-family:'Fraunces',serif;font-size:1.35rem;font-weight:700;color:var(--negro);margin-top:6px}
+.bco-comp-mes{font-size:.75rem;font-family:var(--fuente);font-weight:400;color:var(--suave);margin-left:2px}
+.bco-comp-ahorro{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:.85rem 1rem;font-size:13px;color:var(--negro);line-height:1.7}
+.bco-comp-ahorro strong{color:#1d4ed8}
+.bco-seccion{border:1.5px solid var(--borde);border-radius:12px;margin-bottom:.75rem;overflow:hidden;background:var(--blanco)}
+.bco-seccion-titulo{font-size:13.5px;font-weight:700;color:var(--negro);padding:.75rem 1rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;list-style:none;background:var(--fondo);user-select:none}
+.bco-seccion-titulo::-webkit-details-marker{display:none}
+.bco-seccion-titulo::after{content:'▾';font-size:12px;color:var(--suave);flex-shrink:0}
+details.bco-seccion[open] .bco-seccion-titulo::after{content:'▴'}
+.bco-seccion-titulo:hover{background:#e8edf2}
+details.bco-seccion[open] .bco-seccion-titulo{border-bottom:1.5px solid var(--borde)}
+.bco-seccion > *:not(summary){padding:.75rem 1rem}
+.bco-seccion-hint{font-size:11px;font-weight:400;color:var(--suave);margin-left:auto;padding-right:.5rem}
+.bco-req-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.bco-req-item{background:var(--fondo);border-radius:10px;padding:.75rem 1rem}
+.bco-req-ico{font-size:1.1rem;margin-bottom:4px}
+.bco-req-titulo{font-size:12px;font-weight:700;color:var(--negro);margin-bottom:3px}
+.bco-req-desc{font-size:12px;color:var(--suave);line-height:1.5}
+.bco-tendencias{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
+.bco-tend-item{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--borde);border-radius:10px;padding:.8rem 1rem}
+.bco-tend-ico{font-size:1.3rem;flex-shrink:0}
+.bco-tend-titulo{font-size:13px;font-weight:700;color:var(--negro);margin-bottom:2px}
+.bco-tend-desc{font-size:12.5px;color:var(--texto);line-height:1.5}
+.bco-resultado-bloque{border:1.5px solid #bfdbfe;border-radius:14px;padding:1rem 1.25rem;background:#eff6ff;margin-bottom:1.25rem}
+.bco-resultado-tag{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#1d4ed8;margin-bottom:.5rem}
+.bco-resultado-txt{font-size:13px;color:var(--negro);line-height:1.65}
+.bco-chat-wrap{margin:1.25rem 0}
+.bco-chat-trigger{display:flex;align-items:center;gap:10px;width:100%;background:linear-gradient(90deg,#1e3a5f,#2563eb);color:#fff;border:none;border-radius:14px;padding:.85rem 1.1rem;font-size:13.5px;font-weight:600;cursor:pointer;text-align:left}
+.bco-chat-trigger-ico{font-size:1.4rem;flex-shrink:0}
+.bco-chat-trigger-txt{flex:1;line-height:1.3}
+.bco-chat-trigger-arrow{font-size:11px;opacity:.7;transition:transform .2s}
+.bco-chat-wrap.abierto .bco-chat-trigger-arrow{transform:rotate(180deg)}
+.bco-chat-panel{display:none;background:#f0f6ff;border:1.5px solid #bfdbfe;border-radius:0 0 14px 14px;margin-top:-6px;overflow:hidden}
+.bco-chat-wrap.abierto .bco-chat-panel{display:block}
+.bco-chat-msgs{padding:1rem 1rem .5rem;display:flex;flex-direction:column;gap:10px}
+.bco-chat-burbuja{background:#fff;border:1px solid #e2eaf6;border-radius:12px 12px 12px 4px;padding:.7rem .9rem;font-size:13px;line-height:1.6;color:var(--negro);max-width:94%}
+.bco-chat-burbuja strong{color:#1d4ed8}
+.bco-chat-burbuja .bco-chat-dato{display:flex;align-items:center;gap:7px;margin-top:6px;font-size:12.5px}
+.bco-chat-burbuja .bco-chat-dato-ico{font-size:1rem}
+.bco-chat-acciones{display:flex;flex-wrap:wrap;gap:8px;padding:.5rem 1rem 1rem}
+.bco-chat-btn{background:#fff;border:1.5px solid #93c5fd;border-radius:20px;color:#1d4ed8;font-size:12px;font-weight:600;padding:.4rem .9rem;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.bco-chat-btn:hover{background:#2563eb;color:#fff;border-color:#2563eb}
+@media(max-width:620px){
+.bco-comp-selects{grid-template-columns:1fr}
+.bco-comp-grid{grid-template-columns:1fr}
+.bco-req-grid{grid-template-columns:1fr}
+.bco-hero-stats{gap:8px}
+}
+.avc-card{border: 1.5px solid var(--borde);border-radius: 14px;padding: 1.2rem 1.25rem;position: relative}
+.avc-mejor{border-color: var(--verde);background: #FAFFF9}
+.avc-card-tag{font-size: 10px;font-weight: 600;letter-spacing: .07em;text-transform: uppercase;color: var(--suave);margin-bottom: .6rem}
+.avc-mejor .avc-card-tag{color: var(--verde)}
+.avc-monto{font-family: 'Fraunces',serif;font-size: 1.55rem;font-weight: 600;color: var(--negro);line-height: 1}
+.avc-linea{font-size: 12px;color: var(--suave);line-height: 1.6}
+.avc-fallo{border-radius: 14px;padding: 1.25rem 1.5rem;margin-bottom: 1.25rem}
+.avc-fallo-titulo{font-size: 15px;font-weight: 600;margin-bottom: .5rem;color: var(--negro)}
+.avc-fallo-txt{font-size: 13.5px;line-height: 1.7;color: var(--texto)}
+.avc-pros{margin-top: 1rem;display: flex;flex-direction: column;gap: 6px}
+.avc-pro{font-size: 13px;display: flex;gap: 8px;align-items: flex-start}
+.avc-pro-ico{flex-shrink: 0;font-size: 15px;margin-top: 1px}
+.avc-slider-wrap{margin-bottom: 1.5rem}
+.avc-slider-label{font-size: 12px;color: var(--suave);margin-bottom: 6px;display: flex;justify-content: space-between}
+.avc-slider-label strong{color: var(--negro);font-size: 14px}
+input[type="range"].avc-slider{width: 100%;accent-color: var(--negro);cursor: pointer;height: 44px}
+.desigualdad{border: 1.5px solid var(--borde);border-radius: 14px;overflow: hidden;margin-bottom: 1.5rem}
+.desigualdad-header{padding: .9rem 1.5rem;background: var(--fondo);border-bottom: 1px solid var(--borde);font-size: 11px;font-weight: 500;letter-spacing: .07em;text-transform: uppercase;color: var(--suave)}
+.desig-row{display: flex;align-items: center;gap: 12px;padding: .8rem 1.5rem;border-bottom: 1px solid var(--borde)}
+.desig-row:last-child{border-bottom: none}
+.desig-nombre{font-size: 13px;color: var(--texto);min-width: 175px}
+.desig-barra-wrap{flex: 1;height: 6px;background: var(--fondo);border-radius: 3px;overflow: hidden}
+.desig-barra{height: 100%;border-radius: 3px}
+.desig-uf{font-family: 'Fraunces',serif;font-size: 1rem;font-weight: 600;color: var(--negro);min-width: 60px;text-align: right}
+.hist-grid{display: grid;grid-template-columns: repeat(3,1fr);gap: 10px;margin-bottom: 1.5rem}
+.hist-card{border: 1.5px solid var(--borde);border-radius: 14px;padding: 1rem 1.2rem}
+.hist-anio{font-size: 10px;font-weight: 600;letter-spacing: .07em;text-transform: uppercase;color: var(--suave);margin-bottom: .4rem}
+.hist-uf{font-family: 'Fraunces',serif;font-size: 1.4rem;font-weight: 600;color: var(--negro);line-height: 1}
+.hist-sub{font-size: 11.5px;color: var(--suave);margin-top: 3px}
+.hist-badge{display: inline-block;margin-top: 6px;padding: 2px 9px;border-radius: 10px;font-size: 10.5px;font-weight: 600;background: var(--rojo-l);color: var(--rojo)}
+.share-area{display: flex;align-items: center;gap: 10px;flex-wrap: wrap;margin-bottom: 1.5rem}
+.btn-share{display: inline-flex;align-items: center;gap: 7px;padding: 9px 18px;border-radius: 20px;font-size: 13px;font-weight: 500;cursor: pointer;border: 1.5px solid var(--borde);background: var(--blanco);color: var(--texto);font-family: 'DM Sans',sans-serif;transition: all .15s;text-decoration: none}
+.btn-share:hover{background: var(--negro);color: #fff;border-color: var(--negro)}
+.btn-share-copy:hover{background: var(--verde) !important;border-color: var(--verde) !important}
+.btn-share:focus-visible{outline: 2px solid var(--azul);outline-offset: 2px;border-color: var(--azul)}
+.divider{border: none;border-top: 1px solid var(--borde);margin: 2rem 0}
+@media (min-width: 1100px){
+.side-explore{
+display: flex !important;
+flex-direction: column;
+gap: 6px;
+position: fixed;
+top: 50%;
+right: calc((100vw - 680px) / 2 - 205px);
+transform: translateY(-50%);
+width: 180px;
+}
+.side-explore-label{
+font-size: 9px;
+font-weight: 500;
+letter-spacing: .09em;
+text-transform: uppercase;
+color: var(--suave2);
+margin-bottom: 2px;
+padding-left: 4px;
+}
+.side-explore .bypass-card{
+display: flex;
+align-items: center;
+gap: 9px;
+text-align: left;
+padding: .55rem .75rem;
+border-radius: 10px;
+border-color: transparent;
+background: transparent;
+}
+.side-explore .bypass-card:hover{
+border-color: var(--borde);
+background: var(--fondo);
+}
+.side-explore .bypass-card-ico{font-size: 1rem;margin-bottom: 0;flex-shrink: 0;opacity: .7}
+.side-explore .bypass-card-titulo{font-size: 12px;color: var(--suave)}
+.side-explore .bypass-card-sub{display: none}
+.inline-explore{display: none !important}
+.side-sub-panel{
+display: none;
+background: var(--fondo);
+border: 1.5px solid var(--borde);
+border-radius: 12px;
+padding: .75rem .8rem;
+margin-top: 2px;
+width: 100%;
+}
+.side-sub-panel.abierto{display: block}
+.side-sub-input{
+width: 100%;
+box-sizing: border-box;
+font-size: 12px;
+padding: .45rem .6rem;
+border: 1.5px solid var(--borde);
+border-radius: 8px;
+background: #fff;
+color: var(--negro);
+outline: none;
+margin-bottom: 6px;
+}
+.side-sub-input:focus{border-color: var(--azul,#2563eb)}
+.side-sub-checks{
+display: flex;
+gap: 5px;
+margin-bottom: 8px;
+flex-wrap: wrap;
+}
+.side-sub-check{
+font-size: 10px;
+font-weight: 600;
+padding: 3px 8px;
+border-radius: 20px;
+border: 1.5px solid var(--borde);
+cursor: pointer;
+background: #fff;
+color: var(--suave);
+user-select: none;
+display: flex;
+align-items: center;
+gap: 3px;
+}
+.side-sub-check.activo{background: #eff6ff;border-color: #93c5fd;color: #1d4ed8}
+.side-sub-check input{display: none}
+.side-sub-resultado{display: flex;flex-direction: column;gap: 6px}
+.side-sub-item{
+border-radius: 8px;
+padding: .5rem .65rem;
+font-size: 11px;
+line-height: 1.45;
+}
+.side-sub-item.verde{background: #f0fdf4;border: 1px solid #86efac}
+.side-sub-item.amarillo{background: #fffbeb;border: 1px solid #fde68a}
+.side-sub-item-tag{font-size: 9.5px;font-weight: 700;letter-spacing: .06em;text-transform: uppercase;margin-bottom: 3px}
+.side-sub-item-tag.verde{color: #16a34a}
+.side-sub-item-tag.amarillo{color: #b45309}
+.side-sub-item-nombre{font-weight: 600;color: var(--negro);font-size: 11px;margin-bottom: 2px}
+.side-sub-item-dato{color: var(--texto)}
+.side-sub-item-dato strong{color: var(--negro)}
+.side-sub-cta{
+margin-top: 6px;
+width: 100%;
+background: var(--azul,#2563eb);
+color: #fff;
+border: none;
+border-radius: 8px;
+padding: .45rem .6rem;
+font-size: 11px;
+font-weight: 600;
+cursor: pointer;
+text-align: center;
+}
+.side-sub-cta:hover{background: #1d4ed8}
+}
+@media (max-width: 420px){
+.bypass-grid{grid-template-columns: 1fr}
+.bypass-card{display: flex;align-items: center;gap: 12px;text-align: left;padding: .75rem 1rem}
+.bypass-card-ico{font-size: 1.2rem;margin-bottom: 0;flex-shrink: 0}
+}
+@media (max-width: 620px){
+.wrap{padding: 1.75rem 1.25rem 3rem}
+nav{padding: 1rem 1.25rem}
+.escenarios{grid-template-columns: 1fr}
+.metricas{grid-template-columns: 1fr}
+.metrica{border-right: none !important}
+.metrica:nth-last-child(-n+2){border-bottom: 1px solid var(--borde) !important}
+.metrica:last-child{border-bottom: none !important}
+.avc-grid{grid-template-columns: 1fr}
+.stats-strip{flex-direction: column}
+.stat-item{border-right: none;border-bottom: 1px solid var(--borde)}
+.stat-item:last-child{border-bottom: none}
+.hist-grid{grid-template-columns: 1fr 1fr}
+.desig-nombre{min-width: 120px;font-size: 12px}
+.edad-metricas{grid-template-columns: 1fr 1fr}
+.resumen-top-sep{display: none}
+}</style><script type=application/ld+json>
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -686,10 +565,7 @@
       "query-input": "required name=sueldo"
     }
   }
-  </script>
-
-  <!-- Schema.org: FAQPage -->
-  <script type="application/ld+json">
+  </script><script type=application/ld+json>
   {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -728,630 +604,7 @@
       {"@type":"Question","name":"¿Qué es la UF y por qué los precios de las casas se expresan en UF?","acceptedAnswer":{"@type":"Answer","text":"La Unidad de Fomento (UF) es una unidad de cuenta reajustable según el IPC mensual en Chile. Su valor cambia diariamente. Las propiedades se expresan en UF para mantener el valor real en el tiempo, independiente de la inflación. Puedes consultar el valor actual de la UF en el Banco Central o en mindicador.cl."}}
     ]
   }
-  </script>
-
-  <!-- Analytics -->
-  <script defer data-domain="cuantocuestaunacasa.cl" src="https://plausible.io/js/script.js"></script>
-</head>
-<body>
-
-<nav>
-  <span class="nav-logo" data-main-action="reload-page" role="button" tabindex="0" aria-label="Recargar calculadora">¿cuánto cuesta una <em>casa</em>?</span>
-  <div class="uf-chip"><span class="dot-live"></span>UF $<span id="uf-valor">—</span></div>
-</nav>
-
-<main>
-
-<div class="wrap">
-
-  <!-- INDICADOR PASOS -->
-  <div class="wizard-steps" aria-label="Progreso del formulario">
-    <div class="ws-item activo" id="ws1" aria-current="step"><span class="ws-num">1</span><span class="ws-label">Tus datos</span></div>
-    <div class="ws-linea" id="ws-l1"></div>
-    <div class="ws-item" id="ws2"><span class="ws-num">2</span><span class="ws-label">La vivienda</span></div>
-    <div class="ws-linea" id="ws-l2"></div>
-    <div class="ws-item" id="ws3"><span class="ws-num">3</span><span class="ws-label">Tu resultado</span></div>
-  </div>
-
-  <!-- PASO 1 -->
-  <div class="screen activa" id="screen-1">
-    <h1 class="titulo-grande">¿Puedes comprarte<br>una <em>casa aquí</em>?</h1>
-    <p class="subtitulo">Ingresa tu situación real en 2 pasos. Calculamos si puedes comprar, qué subsidios tienes y cuánto pagarías.</p>
-
-    <div class="stats-strip">
-      <div class="stat-item"><div class="stat-num">76%</div><div class="stat-txt">de los chilenos no puede comprar vivienda<br><span style="font-size:10px">Fuente: CChC 2024</span></div></div>
-      <div class="stat-item"><div class="stat-num">+120%</div><div class="stat-txt">subieron los precios en Santiago entre 2010–2025<br><span style="font-size:10px">Fuente: CChC Q3</span></div></div>
-      <div class="stat-item"><div class="stat-num">~23 años</div><div class="stat-txt">necesita un chileno promedio para juntar el pie<br><span style="font-size:10px">Sueldo mediano $611.162 · INE ESI 2024</span></div></div>
-    </div>
-
-    <div class="campos">
-      <div class="campo">
-        <label>Sueldo líquido mensual ($)</label>
-        <input type="text" inputmode="numeric" id="sueldo" value="900.000" autocomplete="off" data-format-clp="1">
-        <span class="hint">Lo que te depositan en la cuenta</span>
-      </div>
-      <div class="campo">
-        <label>Ahorro disponible hoy ($)</label>
-        <input type="text" inputmode="numeric" id="ahorro" value="5.000.000" autocomplete="off" data-format-clp="1">
-        <span class="hint">Para el pie de entrada</span>
-      </div>
-    </div>
-    <div class="campos">
-      <div class="campo">
-        <label>Sueldo codeudor ($) <span style="font-weight:300;font-size:10px">(opcional)</span></label>
-        <input type="text" inputmode="numeric" id="codeudor" value="" placeholder="Ej: 500.000" autocomplete="off" data-format-clp="1">
-        <span class="hint">Pareja o familiar que compra contigo</span>
-      </div>
-    </div>
-
-    <div class="campos">
-      <div class="campo">
-        <label for="region1">Región donde buscas</label>
-        <select id="region1">
-          <option value="RM">Región Metropolitana (Santiago)</option>
-          <option value="ANT">Antofagasta</option>
-          <option value="VAL">Valparaíso</option>
-          <option value="BIO">Biobío / Concepción</option>
-          <option value="COQ">Coquimbo / La Serena</option>
-          <option value="TAR">Tarapacá</option>
-          <option value="ARI">Arica y Parinacota</option>
-          <option value="ATA">Atacama</option>
-          <option value="OHI">O'Higgins</option>
-          <option value="MAU">Maule</option>
-          <option value="NUB">Ñuble</option>
-          <option value="ARA">La Araucanía</option>
-          <option value="RIO">Los Ríos</option>
-          <option value="LAG">Los Lagos</option>
-          <option value="AYS">Aysén</option>
-          <option value="MAG">Magallanes</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="campo">
-      <label>¿Cuál es tu situación?</label>
-      <div class="sit-grupo" id="sit-grupo">
-        <button type="button" class="sit-btn activo" id="sit-btn-primera" data-sit="primera">🏠 Primera vivienda</button>
-        <button type="button" class="sit-btn" id="sit-btn-segunda" data-sit="segunda">🏘 Segunda vivienda</button>
-        <button type="button" class="sit-btn" id="sit-btn-tengo" data-sit="tengo">🔑 Ya tengo casa</button>
-      </div>
-      <span class="hint" id="sit-hint">Accedes a todos los subsidios del Estado</span>
-      <div class="sit-aviso" id="sit-aviso"></div>
-      <input type="hidden" id="primera" value="si">
-    </div>
-
-
-
-  <button class="btn-primary" data-main-action="ir-paso-2">Siguiente → Ingresar la vivienda</button>
-
-    <div class="sub-bypass inline-explore">
-      <hr><span>o explora sin ingresar datos</span><hr>
-    </div>
-    <div class="bypass-grid inline-explore">
-      <div class="bypass-card" data-main-action="ir-regiones" role="button" tabindex="0" aria-label="Explorar precios por región">
-        <div class="bypass-card-ico">🗺</div>
-        <div class="bypass-card-titulo">Precios por región</div>
-        <div class="bypass-card-sub">Todas las regiones</div>
-      </div>
-      <div class="bypass-card" data-main-action="ir-arrendar" role="button" tabindex="0" aria-label="Explorar arrendar versus comprar">
-        <div class="bypass-card-ico">⚖️</div>
-        <div class="bypass-card-titulo">Arrendar vs Comprar</div>
-        <div class="bypass-card-sub">¿Qué te conviene?</div>
-      </div>
-      <div class="bypass-card" data-main-action="ir-bancos" role="button" tabindex="0" aria-label="Explorar estudio de bancos 2026">
-        <div class="bypass-card-ico">🏦</div>
-        <div class="bypass-card-titulo">Tasas bancos 2026</div>
-        <div class="bypass-card-sub">Estudio hipotecario CMF</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PASO 2 -->
-  <div class="screen" id="screen-2">
-    <button class="btn-back" data-main-action="ir-paso-1">← Volver a mis datos</button>
-    <h1 class="titulo-grande" style="font-size:clamp(1.6rem,4vw,2.4rem);margin-bottom:.4rem">¿Qué vivienda buscas?</h1>
-    <p class="subtitulo">Indica el tipo y tamaño de lo que buscas. Puedes cambiar estos datos después.</p>
-
-    <div class="campos">
-      <div class="campo">
-        <label>Región</label>
-        <select id="region">
-          <option value="RM">Región Metropolitana (Santiago)</option>
-          <option value="ANT">Antofagasta</option>
-          <option value="VAL">Valparaíso</option>
-          <option value="BIO">Biobío / Concepción</option>
-          <option value="COQ">Coquimbo / La Serena</option>
-          <option value="TAR">Tarapacá</option>
-          <option value="ARI">Arica y Parinacota</option>
-          <option value="ATA">Atacama</option>
-          <option value="OHI">O'Higgins</option>
-          <option value="MAU">Maule</option>
-          <option value="NUB">Ñuble</option>
-          <option value="ARA">La Araucanía</option>
-          <option value="RIO">Los Ríos</option>
-          <option value="LAG">Los Lagos</option>
-          <option value="AYS">Aysén</option>
-          <option value="MAG">Magallanes</option>
-        </select>
-      </div>
-      <div class="campo">
-        <label>Tipo</label>
-        <select id="tipo">
-          <option value="depto">Departamento nuevo</option>
-          <option value="casa">Casa nueva</option>
-          <option value="usada">Vivienda usada</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- PRECIO: toggle m² / precio directo -->
-    <div class="campo" style="margin-bottom:1rem">
-      <label>¿Cómo ingresas el precio?</label>
-      <div class="sit-grupo" style="margin-top:6px;margin-bottom:4px">
-        <button type="button" class="sit-btn" id="modo-btn-m2" data-modo-precio="m2">📐 Por m²</button>
-        <button type="button" class="sit-btn activo" id="modo-btn-precio" data-modo-precio="precio">💰 Precio directo</button>
-      </div>
-    </div>
-
-    <div id="bloque-m2" style="display:none">
-      <div class="campos">
-        <div class="campo">
-          <label>Superficie (m²)</label>
-          <input type="number" id="m2" value="55" step="5" min="20" data-input-action="actualizar-precio-estimado">
-          <span class="hint" id="hint-precio-estimado">—</span>
-        </div>
-      </div>
-    </div>
-
-    <div id="bloque-precio">
-      <div class="campos">
-        <div class="campo">
-          <label>Precio de la vivienda ($)</label>
-          <input type="text" inputmode="numeric" id="precio-directo" placeholder="Ej: 80.000.000" autocomplete="off" data-input-action="precio-directo">
-          <span class="hint" id="hint-m2-estimado">—</span>
-        </div>
-        <div class="campo">
-          <label>o en UF</label>
-          <input type="number" id="precio-directo-uf" placeholder="Ej: 2.000" step="10" min="100" data-input-action="precio-uf">
-          <span class="hint">1 UF = $<span id="uf-hint-val">—</span></span>
-        </div>
-      </div>
-    </div>
-    <div class="campos" style="margin-top:2px">
-      <div class="campo">
-        <label for="tasa">Tasa anual (%)</label>
-        <input type="number" id="tasa" value="4.1" step="0.1" min="1" max="15">
-        <span class="hint">Bco. Central feb. 2026 · tasa fija</span>
-      </div>
-      <div class="campo">
-        <label for="plazo">Plazo (años)</label>
-        <input type="number" id="plazo" value="25" step="5" min="5" max="40">
-      </div>
-      <div class="campo">
-        <label for="pie">Pie mínimo (%)</label>
-        <input type="number" id="pie" value="20" step="5" min="10" max="80">
-        <span class="hint">Con FOGAES puede ser 10%</span>
-      </div>
-    </div>
-
-    <button class="btn-primary" style="margin-top:1.25rem" data-main-action="ir-resultados">Ver mi resultado →</button>
-  </div>
-
-  <!-- PASO 3: RESULTADOS -->
-  <div class="screen" id="screen-3">
-
-    <div class="resumen-top" id="resumen-top"></div>
-
-    <div class="tabs-nav" role="tablist">
-      <button class="tab-btn activo" role="tab" aria-selected="true" aria-controls="tab-analisis" data-tab="tab-analisis">📊 Mi análisis</button>
-      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-subsidios" data-tab="tab-subsidios">🏛 Subsidios</button>
-      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-arrendar" data-tab="tab-arrendar">⚖️ Arrendar vs Comprar</button>
-      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-regiones" data-tab="tab-regiones">🗺 Regiones</button>
-      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-bancos" data-tab="tab-bancos">🏦 Bancos 2026</button>
-    </div>
-
-    <!-- TAB ANÁLISIS -->
-    <div class="tab-panel activo" id="tab-analisis" role="tabpanel">
-
-      <div class="resultado-bloque">
-        <div class="resultado-header">
-          <span class="resultado-header-titulo">% del sueldo en dividendo</span>
-          <span id="label-region-header" style="font-size:12px;color:var(--suave)">—</span>
-        </div>
-        <div class="barra-area">
-          <div class="barra-row">
-            <span class="pct-grande" id="barra-pct">—</span>
-            <div>
-              <span class="pill pill-amarillo" id="semaforo-badge">—</span><br>
-              <span class="barra-desc" id="texto-semaforo"></span>
-            </div>
-          </div>
-          <div class="barra-track"><div class="barra-fill" id="barra" style="width:0%"></div></div>
-          <div class="barra-ticks"><span>0%</span><span>30% recomendado</span><span>100%</span></div>
-        </div>
-        <div class="metricas">
-          <div class="metrica"><div class="metrica-label">Cuota mensual</div><div class="metrica-valor" id="m-cuota">—</div><div class="metrica-sub" id="m-cuota-sub">—</div></div>
-          <div class="metrica"><div class="metrica-label">Precio total</div><div class="metrica-valor" id="m-precio">—</div><div class="metrica-sub" id="m-precio-uf">—</div></div>
-          <div class="metrica"><div class="metrica-label">Pie requerido</div><div class="metrica-valor" id="m-pie">—</div><div class="metrica-sub" id="m-pie-sub">—</div></div>
-          <div class="metrica"><div class="metrica-label">Máx. crédito aprobable</div><div class="metrica-valor" id="m-maxcredito">—</div><div class="metrica-sub" id="m-maxcredito-sub">con tu sueldo</div></div>
-        </div>
-      </div>
-
-      <div class="aviso" id="aviso-ahorro" style="display:none"></div>
-
-      <div class="frase-impacto" id="frase-impacto" style="display:none">
-        <div class="fi-label">Tu situación en perspectiva</div>
-        <div class="fi-texto" id="frase-texto"></div>
-      </div>
-
-      <hr class="divider">
-      <p class="seccion-titulo">¿Cuánto pagarías según tu situación?</p>
-      <p class="seccion-sub" id="esc-sub-desc">3 formas de comprar esta vivienda.</p>
-      <div class="escenarios" id="escenarios-grid"></div>
-
-      <hr class="divider">
-      <p class="seccion-titulo">¿Cuánto ha subido el precio?</p>
-      <p class="seccion-sub" id="hist-sub">Referencia RM · Depto 55 m² en Santiago · Sueldos en ese período subieron ~40%</p>
-      <div class="hist-grid">
-        <div class="hist-card"><div class="hist-anio">2010</div><div class="hist-uf">1.925 UF</div><div class="hist-sub">~$74 mill. <span style="font-size:10px;color:var(--suave2)">(en pesos hoy)</span></div><div style="font-size:12px;color:var(--suave2);margin-top:6px">Ahorrar el pie tomaba ~6 años</div></div>
-        <div class="hist-card"><div class="hist-anio">2018</div><div class="hist-uf">2.970 UF</div><div class="hist-sub">~$114 mill. <span style="font-size:10px;color:var(--suave2)">(en pesos hoy)</span></div><span class="hist-badge">+54%</span><div style="font-size:12px;color:var(--suave2);margin-top:6px">Juntar el pie tomaba ~9 años</div></div>
-        <div class="hist-card" style="border-color:var(--rojo)"><div class="hist-anio">2025</div><div class="hist-uf">4.235 UF</div><div class="hist-sub" style="color:var(--rojo)">~$163 millones</div><span class="hist-badge">+120%</span><div style="font-size:12px;color:var(--rojo);margin-top:6px;font-weight:500">Hoy el pie toma ~23 años</div></div>
-      </div>
-      <div class="aviso aviso-neutro">📌 <strong>Las casas subieron 3 veces más que los sueldos.</strong> En 2010 una familia de clase media podía comprar ahorrando 6 años. Hoy necesita ~23.</div>
-
-      <hr class="divider">
-      <p class="seccion-titulo">Comparte tu resultado</p>
-      <div class="share-area" style="margin-top:.75rem">
-        <a class="btn-share" id="btn-tw" href="#" target="_blank">𝕏 Twitter / X</a>
-        <button class="btn-share btn-share-copy" data-main-action="copiar-link">📋 Copiar link</button>
-      </div>
-
-      <!-- BLOQUE ESTUDIO BANCOS 2026 -->
-      <div class="bco-resultado-bloque" style="margin-top:1.25rem">
-        <div class="bco-resultado-tag">🏦 Estudio Hipotecario Chile 2026 · CMF</div>
-        <div class="bco-resultado-txt">
-          El banco con la <strong>tasa fija más baja hoy</strong> es <strong>Banco Itaú (3,39%)</strong>.<br>
-          El banco con el <strong>dividendo más bajo registrado por la CMF</strong> es <strong>Banco Internacional ($892.377 / 22,40 UF)</strong>.<br>
-          Promedio de mercado: <strong>4,35%</strong>. Compara los 11 bancos y calcula cuánto ahorrarías.
-        </div>
-        <div style="margin-top:.75rem">
-          <button class="btn-share" style="font-size:12px;padding:6px 14px" data-main-action="ir-bancos">🏦 Ver estudio completo →</button>
-        </div>
-      </div>
-
-    </div><!-- /tab-analisis -->
-
-    <!-- TAB SUBSIDIOS -->
-    <div class="tab-panel" id="tab-subsidios" role="tabpanel">
-      <p class="seccion-titulo">¿A qué ayudas del Estado calificas?</p>
-      <p class="seccion-sub">Los que califican aparecen primero, con requisitos y cómo postular.</p>
-      <div class="subs-lista" id="subs-lista"></div>
-    </div>
-
-    <!-- TAB ARRENDAR -->
-    <div class="tab-panel" id="tab-arrendar" role="tabpanel">
-      <p class="seccion-titulo">¿Te conviene arrendar o comprar?</p>
-      <p class="seccion-sub">Compara cuánto pagas al mes según lo que encuentras en arriendo.</p>
-      <div class="avc-slider-wrap">
-        <div class="avc-slider-label"><span>¿Cuánto pagarías de arriendo?</span><strong>$<span id="arriendo-display">—</span>/mes</strong></div>
-        <input type="range" class="avc-slider" id="arriendo-slider" min="100000" max="2000000" step="10000" value="450000" data-input-action="arriendo-slider">
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--suave2);margin-top:3px"><span>$100.000</span><span>$2.000.000</span></div>
-      </div>
-      <div id="avc-bloque"></div>
-    </div>
-
-    <!-- TAB REGIONES -->
-    <div class="tab-panel" id="tab-regiones" role="tabpanel">
-      <p class="seccion-titulo">Todas las regiones</p>
-      <p class="seccion-sub" id="tabla-sub">Departamento 55 m² · dividendo con pie 20%, 25 años, 4,3%</p>
-      <div class="tabla-wrap">
-        <table>
-          <thead><tr>
-            <th>Región</th><th>Precio por m²</th><th>¿Cuánto cuesta?</th>
-            <th>Dividendo mensual</th><th>Entrada requerida</th><th>¿Lo puedes pagar?</th>
-          </tr></thead>
-          <tbody id="tbody-regiones"></tbody>
-        </table>
-      </div>
-      <hr class="divider">
-      <p class="seccion-titulo">La brecha regional</p>
-      <p class="seccion-sub">Precio depto 55 m² en UF — de más barato a más caro</p>
-      <div class="desigualdad" id="desigualdad-visual"></div>
-    </div>
-
-    <!-- TAB BANCOS -->
-    <div class="tab-panel" id="tab-bancos" role="tabpanel">
-      <!-- Hero embebido en tab -->
-      <div class="bco-hero" style="margin-bottom:1.25rem">
-        <div class="bco-hero-tag">📌 Datos CMF al 28-03-2026</div>
-        <div class="bco-hero-titulo" style="font-size:1.25rem">Estudio Hipotecario Bancos 2026</div>
-        <div class="bco-hero-sub">Comparación de 11 bancos chilenos: tasas, CAE y dividendos reales.</div>
-        <div class="bco-hero-stats">
-          <div class="bco-stat"><div class="bco-stat-val">3,39%</div><div class="bco-stat-lbl">Mejor tasa (Itaú)</div></div>
-          <div class="bco-stat"><div class="bco-stat-val">4,35%</div><div class="bco-stat-lbl">Promedio mercado</div></div>
-          <div class="bco-stat"><div class="bco-stat-val">$892.377</div><div class="bco-stat-lbl">Mejor dividendo CMF</div></div>
-        </div>
-      </div>
-      <!-- Chatbot en tab (colapsado por defecto) -->
-      <div class="bco-chat-wrap" id="tab-bco-chat-wrap">
-  <button class="bco-chat-trigger" data-bco-action="toggle-tab-chat" aria-expanded="false" aria-controls="tab-bco-chat-panel">
-          <span class="bco-chat-trigger-ico">🤖</span>
-          <span class="bco-chat-trigger-txt">
-            <span style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.7">Asistente hipotecario</span><br>
-            ¿Cuál banco conviene hoy?
-          </span>
-          <span class="bco-chat-trigger-arrow">▼</span>
-        </button>
-        <div class="bco-chat-panel" id="tab-bco-chat-panel">
-          <div class="bco-chat-msgs">
-            <div class="bco-chat-burbuja" id="tab-bco-chat-resumen"></div>
-            <div class="bco-chat-burbuja" id="tab-bco-chat-insight"></div>
-          </div>
-          <div class="bco-chat-acciones">
-            <button class="bco-chat-btn" id="tab-bco-chat-cta-comp" data-bco-action="sugerir-tab">⚖️ Comparar recomendados</button>
-            <button class="bco-chat-btn" data-bco-action="abrir-bancos">↗ Ver pantalla completa</button>
-            <button class="bco-chat-btn" data-bco-action="ir-paso1">🏠 Simular mi sueldo</button>
-          </div>
-        </div>
-      </div>
-      <details class="bco-seccion" open>
-        <summary class="bco-seccion-titulo">📊 Tasas fijas — comparador visual <span class="bco-seccion-hint">Menor es mejor</span></summary>
-        <div class="bco-grafico" id="tab-bco-grafico"></div>
-      </details>
-      <details class="bco-seccion">
-        <summary class="bco-seccion-titulo">📋 Tabla comparativa completa <span class="bco-seccion-hint">11 bancos · CMF 2026</span></summary>
-        <div class="bco-tabla-wrap"><table class="bco-tabla" id="tab-bco-tabla"></table></div>
-      </details>
-      <details class="bco-seccion">
-        <summary class="bco-seccion-titulo">🏆 Ranking mejores bancos 2026 <span class="bco-seccion-hint">Por tasa + dividendo</span></summary>
-        <div class="bco-ranking" id="tab-bco-ranking"></div>
-      </details>
-      <hr class="divider">
-      <details class="bco-seccion" open>
-        <summary class="bco-seccion-titulo">⚖️ Comparador interactivo <span class="bco-seccion-hint">Elige 2 bancos</span></summary>
-        <p class="seccion-sub" style="margin-top:.5rem">Selecciona 2 bancos y calcula cuánto ahorrarías.</p>
-        <div class="bco-comp-wrap">
-          <div class="bco-comp-selects">
-            <select id="tab-bco-sel-1" data-bco-select="tab"><option value="">— Banco A —</option></select>
-            <select id="tab-bco-sel-2" data-bco-select="tab"><option value="">— Banco B —</option></select>
-          </div>
-          <div class="bco-comp-result" id="tab-bco-comp-result">
-            <div class="bco-comp-grid" id="tab-bco-comp-grid"></div>
-            <div class="bco-comp-ahorro" id="tab-bco-comp-ahorro"></div>
-          </div>
-        </div>
-      </details>
-      <hr class="divider">
-      <details class="bco-seccion">
-        <summary class="bco-seccion-titulo">📋 Requisitos 2026 <span class="bco-seccion-hint">Lo que piden los bancos</span></summary>
-        <div class="bco-req-grid" id="tab-bco-req-grid"></div>
-      </details>
-      <hr class="divider">
-      <details class="bco-seccion">
-        <summary class="bco-seccion-titulo">📈 Tendencias del mercado</summary>
-        <div class="bco-tendencias" id="tab-bco-tendencias"></div>
-      </details>
-      <div style="margin-top:1rem">
-  <button class="btn-share" style="font-size:12px;padding:7px 16px" data-bco-action="abrir-bancos">↗ Ver pantalla completa</button>
-      </div>
-    </div>
-
-  </div><!-- /screen-3 -->
-
-  <!-- ══ PANTALLA ESTUDIO HIPOTECARIO BANCOS 2026 ══════════════════════ -->
-  <div class="screen" id="screen-bancos">
-    <button class="btn-back" data-main-action="volver-screen">← Volver</button>
-
-    <!-- HERO -->
-    <div class="bco-hero">
-      <div class="bco-hero-tag">📌 Informe Oficial · Datos CMF al 28-03-2026</div>
-      <div class="bco-hero-titulo">Estudio Hipotecario<br>Bancos Chilenos 2026</div>
-      <div class="bco-hero-sub">Comparación real de 11 bancos: tasas fijas, CAE y dividendos según CMF Chile. Datos verificados marzo 2026.</div>
-      <div class="bco-hero-stats">
-        <div class="bco-stat"><div class="bco-stat-val">3,39%</div><div class="bco-stat-lbl">Tasa mínima (Itaú)</div></div>
-        <div class="bco-stat"><div class="bco-stat-val">4,35%</div><div class="bco-stat-lbl">Promedio mercado</div></div>
-        <div class="bco-stat"><div class="bco-stat-val">$892.377</div><div class="bco-stat-lbl">Mejor dividendo CMF</div></div>
-        <div class="bco-stat"><div class="bco-stat-val">11</div><div class="bco-stat-lbl">Bancos comparados</div></div>
-      </div>
-    </div>
-
-    <!-- CHATBOT QUICK-PANEL -->
-    <div class="bco-chat-wrap" id="bco-chat-wrap">
-  <button class="bco-chat-trigger" data-bco-action="toggle-full-chat" aria-expanded="false" aria-controls="bco-chat-panel">
-        <span class="bco-chat-trigger-ico">🤖</span>
-        <span class="bco-chat-trigger-txt">
-          <span style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.7">Asistente hipotecario</span><br>
-          ¿Cuál banco conviene hoy? — pregunta rápida
-        </span>
-        <span class="bco-chat-trigger-arrow">▼</span>
-      </button>
-      <div class="bco-chat-panel" id="bco-chat-panel">
-        <div class="bco-chat-msgs">
-          <div class="bco-chat-burbuja" id="bco-chat-resumen"></div>
-          <div class="bco-chat-burbuja" id="bco-chat-insight"></div>
-        </div>
-        <div class="bco-chat-acciones">
-          <button class="bco-chat-btn" id="bco-chat-cta-comp" data-bco-action="sugerir-full">⚖️ Comparar recomendados</button>
-          <button class="bco-chat-btn" data-bco-action="scroll" data-target="bco-ranking">🏆 Ver ranking completo</button>
-          <button class="bco-chat-btn" data-bco-action="scroll" data-target="bco-comp-wrap">⚖️ Comparar 2 bancos</button>
-          <button class="bco-chat-btn" data-bco-action="scroll" data-target="bco-grafico">📊 Ver gráfico tasas</button>
-          <button class="bco-chat-btn" data-bco-action="scroll" data-target="bco-req-grid">📋 Requisitos 2026</button>
-          <button class="bco-chat-btn" data-bco-action="ir-paso1">🏠 Simular con mi sueldo</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- GRÁFICO DE BARRAS -->
-    <details class="bco-seccion" open>
-      <summary class="bco-seccion-titulo">📊 Tasas fijas — comparador visual <span class="bco-seccion-hint">Menor es mejor</span></summary>
-      <p class="seccion-sub" style="margin-top:.5rem">Verde &lt;4% · Amarillo 4%–5% · Rojo &gt;5%</p>
-      <div class="bco-grafico" id="bco-grafico"></div>
-    </details>
-
-    <!-- TABLA COMPARATIVA -->
-    <details class="bco-seccion">
-      <summary class="bco-seccion-titulo">📋 Tabla comparativa completa <span class="bco-seccion-hint">11 bancos · CMF 2026</span></summary>
-      <p class="seccion-sub" style="margin-top:.5rem">Datos CMF · Crédito de 2.000 UF a 20 años con pie 20%</p>
-      <div class="bco-tabla-wrap">
-        <table class="bco-tabla" id="bco-tabla"></table>
-      </div>
-    </details>
-
-    <!-- RANKING -->
-    <details class="bco-seccion">
-      <summary class="bco-seccion-titulo">🏆 Ranking mejores bancos marzo 2026 <span class="bco-seccion-hint">Por tasa + dividendo</span></summary>
-      <div class="bco-ranking" id="bco-ranking"></div>
-    </details>
-
-    <hr class="divider">
-
-    <!-- COMPARADOR INTERACTIVO -->
-    <details class="bco-seccion" open>
-      <summary class="bco-seccion-titulo">⚖️ Comparador interactivo <span class="bco-seccion-hint">Elige 2 bancos</span></summary>
-      <p class="seccion-sub" style="margin-top:.5rem">Selecciona 2 bancos y calcula cuánto ahorrarías eligiendo el mejor.</p>
-      <div class="bco-comp-wrap" id="bco-comp-wrap">
-        <div class="bco-comp-selects">
-          <select id="bco-sel-1" data-bco-select="full"><option value="">— Banco A —</option></select>
-          <select id="bco-sel-2" data-bco-select="full"><option value="">— Banco B —</option></select>
-        </div>
-        <div class="bco-comp-result" id="bco-comp-result">
-          <div class="bco-comp-grid" id="bco-comp-grid"></div>
-          <div class="bco-comp-ahorro" id="bco-comp-ahorro"></div>
-        </div>
-      </div>
-    </details>
-
-    <hr class="divider">
-
-    <!-- REQUISITOS -->
-    <details class="bco-seccion">
-      <summary class="bco-seccion-titulo">📋 Requisitos para crédito hipotecario 2026 <span class="bco-seccion-hint">Lo que piden los bancos</span></summary>
-      <div class="bco-req-grid" id="bco-req-grid"></div>
-      <div class="aviso aviso-neutro" style="margin-top:.5rem">📌 Cada banco puede variar en detalle. Siempre consulta directamente. Datos de referencia de mercado 2026.</div>
-    </details>
-
-    <hr class="divider">
-
-    <!-- TENDENCIAS -->
-    <details class="bco-seccion">
-      <summary class="bco-seccion-titulo">📈 Tendencias del mercado hipotecario 2026</summary>
-      <div class="bco-tendencias" id="bco-tendencias"></div>
-    </details>
-
-  </div><!-- /screen-bancos -->
-  <div class="screen" id="screen-regiones">
-    <button class="btn-back" data-main-action="volver-screen">← Volver</button>
-    <h1 class="titulo-grande" style="font-size:clamp(1.6rem,4vw,2.4rem)">Precios por <em>región</em></h1>
-    <p class="subtitulo" id="pub-reg-sub">Departamento 55 m² · dividendo con pie 20%, 25 años, tasa 4.1% anual</p>
-    <div class="campos" style="margin-bottom:1rem">
-      <div class="campo">
-        <label for="pub-tipo">Tipo de vivienda</label>
-        <select id="pub-tipo" data-change-action="render-public-regiones">
-          <option value="depto">Departamento</option>
-          <option value="casa">Casa</option>
-          <option value="usada">Usada</option>
-        </select>
-      </div>
-      <div class="campo">
-        <label for="pub-m2">Superficie (m²)</label>
-        <input type="number" id="pub-m2" value="55" min="30" max="200" step="5" data-input-action="render-public-regiones">
-      </div>
-    </div>
-    <div id="pub-regiones-content"></div>
-    <div class="sub-cta-completo" style="margin-top:1.5rem">
-      <div>
-        <div style="font-weight:500;font-size:14px;color:var(--negro)">¿Quieres ver qué puedes pagar tú?</div>
-        <div style="font-size:12px;color:var(--suave);margin-top:2px">Ingresa tu sueldo para ver si puedes cubrir el dividendo en cada región</div>
-      </div>
-      <button class="btn-primary" style="width:auto;padding:12px 20px;flex-shrink:0" data-main-action="ir-calculadora">Calculadora completa →</button>
-    </div>
-  </div><!-- /screen-regiones -->
-
-  <!-- PANTALLA ARRENDAR VS COMPRAR -->
-  <div class="screen" id="screen-arrendar">
-    <button class="btn-back" data-main-action="volver-screen">← Volver</button>
-    <h1 class="titulo-grande" style="font-size:clamp(1.6rem,4vw,2.4rem)">¿Arrendar o <em>comprar?</em></h1>
-    <p class="subtitulo">Ingresa el precio de la vivienda que te interesa y lo que pagarías de arriendo.</p>
-    <div class="sub-form-box">
-      <div class="campos">
-        <div class="campo">
-          <label for="pub-precio">Precio de la vivienda ($)</label>
-          <input type="text" inputmode="numeric" id="pub-precio" placeholder="Ej: 150.000.000" autocomplete="off" data-input-action="pub-precio">
-          <span class="hint" id="pub-div-hint">Calcularemos el dividendo estimado</span>
-        </div>
-        <div class="campo">
-          <label for="pub-arriendo">Arriendo mensual ($)</label>
-          <input type="text" inputmode="numeric" id="pub-arriendo" placeholder="Ej: 400.000" autocomplete="off" data-input-action="pub-arriendo">
-          <span class="hint">Lo que pagarías de arriendo hoy</span>
-        </div>
-      </div>
-    </div>
-    <div id="pub-avc-resultado"></div>
-    <div class="sub-cta-completo" style="margin-top:1.5rem">
-      <div>
-        <div style="font-weight:500;font-size:14px;color:var(--negro)">¿Quieres calcular tu dividendo exacto?</div>
-        <div style="font-size:12px;color:var(--suave);margin-top:2px">Con tu sueldo, región y tipo de vivienda</div>
-      </div>
-      <button class="btn-primary" style="width:auto;padding:12px 20px;flex-shrink:0" data-main-action="ir-calculadora">Calculadora completa →</button>
-    </div>
-  </div><!-- /screen-arrendar -->
-
-  <!-- PANTALLA SUBSIDIOS INTERACTIVOS -->
-  <div class="screen" id="screen-subsidios">
-    <button class="btn-back" data-main-action="volver-subsidios">← Volver</button>
-
-    <div class="sub-hero">
-      <div class="sub-hero-title">Subsidios del Estado<br>para <em>vivienda 2026</em></div>
-      <div class="sub-hero-sub">Todos los programas oficiales MINVU — con tu situación real si ya usaste la calculadora, o explorando libremente si recién llegas.</div>
-    </div>
-
-    <!-- Filtros rápidos + contexto del simulador -->
-    <div id="sub-contexto-bar"></div>
-
-    <!-- Filtros de categoría -->
-    <div class="sub-filtros" id="sub-filtros">
-      <button class="sub-filtro-btn activo" data-cat="todos">Todos</button>
-      <button class="sub-filtro-btn" data-cat="compra">🏠 Compra</button>
-      <button class="sub-filtro-btn" data-cat="arriendo">🏘️ Arriendo</button>
-      <button class="sub-filtro-btn" data-cat="construccion">🏗️ Construcción</button>
-      <button class="sub-filtro-btn" data-cat="mejoramiento">🔨 Mejoramiento</button>
-      <button class="sub-filtro-btn" data-cat="rural">🌾 Rural</button>
-      <button class="sub-filtro-btn" data-cat="integracion">🤝 Integración</button>
-    </div>
-
-    <!-- Contenedor de tarjetas -->
-    <div id="sub-interactivos-lista"></div>
-
-  </div><!-- /screen-subsidios -->
-
-</div><!-- /wrap -->
-
-<!-- PANEL LATERAL (visible solo en pantallas ≥ 1100px, fixed a la derecha) -->
-<aside class="side-explore" style="display:none">
-  <div class="side-explore-label">Explorar</div>
-
-  <div class="bypass-card" data-main-action="ir-regiones" role="button" tabindex="0" aria-label="Explorar precios por región">
-    <div class="bypass-card-ico">🗺</div>
-    <div><div class="bypass-card-titulo">Por región</div><div class="bypass-card-sub">Precios en Chile</div></div>
-  </div>
-  <div class="bypass-card" data-main-action="ir-arrendar" role="button" tabindex="0" aria-label="Explorar arrendar versus comprar">
-    <div class="bypass-card-ico">⚖️</div>
-    <div><div class="bypass-card-titulo">Arrendar vs Comprar</div><div class="bypass-card-sub">¿Qué te conviene?</div></div>
-  </div>
-  <div class="bypass-card" data-main-action="ir-bancos" role="button" tabindex="0" aria-label="Explorar estudio de bancos 2026">
-    <div class="bypass-card-ico">🏦</div>
-    <div><div class="bypass-card-titulo">Bancos 2026</div><div class="bypass-card-sub">Tasas hipotecarias</div></div>
-  </div>
-</aside>
-
-</main>
-
-<footer style="max-width:680px;margin:0 auto;padding:1.5rem 2rem 3rem;font-size:11.5px;color:var(--suave);line-height:1.9;border-top:1px solid var(--borde)">
-  <p>Fuentes: <a href="https://cchc.cl" target="_blank" style="color:var(--suave)">CChC Q3 2025</a> · <a href="https://cmfchile.cl" target="_blank" style="color:var(--suave)">CMF mar. 2026</a> · <a href="https://bcentral.cl" target="_blank" style="color:var(--suave)">Banco Central</a> · <a href="https://minvu.gob.cl" target="_blank" style="color:var(--suave)">Minvu subsidios 2026</a> · UF: <a href="https://mindicador.cl" target="_blank" style="color:var(--suave)">mindicador.cl</a></p>
-  <p>Valores referenciales. Los precios varían por comuna y banco. Subsidios sujetos a cupos.</p>
-</footer>
-
-<script>
+  </script><script defer data-domain=cuantocuestaunacasa.cl src=https://plausible.io/js/script.js></script></head><body><nav><span class=nav-logo data-main-action=reload-page role=button tabindex=0 aria-label="Recargar calculadora">¿cuánto cuesta una <em>casa</em>?</span><div class=uf-chip><span class=dot-live></span>UF $<span id=uf-valor>—</span></div></nav><main><div class=wrap><div class=wizard-steps aria-label="Progreso del formulario"><div class="ws-item activo" id=ws1 aria-current=step><span class=ws-num>1</span><span class=ws-label>Tus datos</span></div><div class=ws-linea id=ws-l1></div><div class=ws-item id=ws2><span class=ws-num>2</span><span class=ws-label>La vivienda</span></div><div class=ws-linea id=ws-l2></div><div class=ws-item id=ws3><span class=ws-num>3</span><span class=ws-label>Tu resultado</span></div></div><div class="screen activa" id=screen-1><h1 class=titulo-grande>¿Puedes comprarte<br>una <em>casa aquí</em>?</h1><p class=subtitulo>Ingresa tu situación real en 2 pasos. Calculamos si puedes comprar, qué subsidios tienes y cuánto pagarías.</p><div class=stats-strip><div class=stat-item><div class=stat-num>76%</div><div class=stat-txt>de los chilenos no puede comprar vivienda<br><span style=font-size:10px>Fuente: CChC 2024</span></div></div><div class=stat-item><div class=stat-num>+120%</div><div class=stat-txt>subieron los precios en Santiago entre 2010–2025<br><span style=font-size:10px>Fuente: CChC Q3</span></div></div><div class=stat-item><div class=stat-num>~23 años</div><div class=stat-txt>necesita un chileno promedio para juntar el pie<br><span style=font-size:10px>Sueldo mediano $611.162 · INE ESI 2024</span></div></div></div><div class=campos><div class=campo><label>Sueldo líquido mensual ($)</label><input type=text inputmode=numeric id=sueldo value=900.000 autocomplete=off data-format-clp=1><span class=hint>Lo que te depositan en la cuenta</span></div><div class=campo><label>Ahorro disponible hoy ($)</label><input type=text inputmode=numeric id=ahorro value=5.000.000 autocomplete=off data-format-clp=1><span class=hint>Para el pie de entrada</span></div></div><div class=campos><div class=campo><label>Sueldo codeudor ($) <span style=font-weight:300;font-size:10px>(opcional)</span></label><input type=text inputmode=numeric id=codeudor value placeholder="Ej: 500.000" autocomplete=off data-format-clp=1><span class=hint>Pareja o familiar que compra contigo</span></div></div><div class=campos><div class=campo><label for=region1>Región donde buscas</label><select id=region1><option value=RM>Región Metropolitana (Santiago)</option><option value=ANT>Antofagasta</option><option value=VAL>Valparaíso</option><option value=BIO>Biobío / Concepción</option><option value=COQ>Coquimbo / La Serena</option><option value=TAR>Tarapacá</option><option value=ARI>Arica y Parinacota</option><option value=ATA>Atacama</option><option value=OHI>O'Higgins</option><option value=MAU>Maule</option><option value=NUB>Ñuble</option><option value=ARA>La Araucanía</option><option value=RIO>Los Ríos</option><option value=LAG>Los Lagos</option><option value=AYS>Aysén</option><option value=MAG>Magallanes</option></select></div></div><div class=campo><label>¿Cuál es tu situación?</label><div class=sit-grupo id=sit-grupo><button type=button class="sit-btn activo" id=sit-btn-primera data-sit=primera>🏠 Primera vivienda</button><button type=button class=sit-btn id=sit-btn-segunda data-sit=segunda>🏘 Segunda vivienda</button><button type=button class=sit-btn id=sit-btn-tengo data-sit=tengo>🔑 Ya tengo casa</button></div><span class=hint id=sit-hint>Accedes a todos los subsidios del Estado</span><div class=sit-aviso id=sit-aviso></div><input type=hidden id=primera value=si></div><button class=btn-primary data-main-action=ir-paso-2>Siguiente → Ingresar la vivienda</button><div class="sub-bypass inline-explore"><hr><span>o explora sin ingresar datos</span><hr></div><div class="bypass-grid inline-explore"><div class=bypass-card data-main-action=ir-regiones role=button tabindex=0 aria-label="Explorar precios por región"><div class=bypass-card-ico>🗺</div><div class=bypass-card-titulo>Precios por región</div><div class=bypass-card-sub>Todas las regiones</div></div><div class=bypass-card data-main-action=ir-arrendar role=button tabindex=0 aria-label="Explorar arrendar versus comprar"><div class=bypass-card-ico>⚖️</div><div class=bypass-card-titulo>Arrendar vs Comprar</div><div class=bypass-card-sub>¿Qué te conviene?</div></div><div class=bypass-card data-main-action=ir-bancos role=button tabindex=0 aria-label="Explorar estudio de bancos 2026"><div class=bypass-card-ico>🏦</div><div class=bypass-card-titulo>Tasas bancos 2026</div><div class=bypass-card-sub>Estudio hipotecario CMF</div></div></div></div><div class=screen id=screen-2><button class=btn-back data-main-action=ir-paso-1>← Volver a mis datos</button><h1 class=titulo-grande style=font-size:clamp(1.6rem,4vw,2.4rem);margin-bottom:.4rem>¿Qué vivienda buscas?</h1><p class=subtitulo>Indica el tipo y tamaño de lo que buscas. Puedes cambiar estos datos después.</p><div class=campos><div class=campo><label>Región</label><select id=region><option value=RM>Región Metropolitana (Santiago)</option><option value=ANT>Antofagasta</option><option value=VAL>Valparaíso</option><option value=BIO>Biobío / Concepción</option><option value=COQ>Coquimbo / La Serena</option><option value=TAR>Tarapacá</option><option value=ARI>Arica y Parinacota</option><option value=ATA>Atacama</option><option value=OHI>O'Higgins</option><option value=MAU>Maule</option><option value=NUB>Ñuble</option><option value=ARA>La Araucanía</option><option value=RIO>Los Ríos</option><option value=LAG>Los Lagos</option><option value=AYS>Aysén</option><option value=MAG>Magallanes</option></select></div><div class=campo><label>Tipo</label><select id=tipo><option value=depto>Departamento nuevo</option><option value=casa>Casa nueva</option><option value=usada>Vivienda usada</option></select></div></div><div class=campo style=margin-bottom:1rem><label>¿Cómo ingresas el precio?</label><div class=sit-grupo style=margin-top:6px;margin-bottom:4px><button type=button class=sit-btn id=modo-btn-m2 data-modo-precio=m2>📐 Por m²</button><button type=button class="sit-btn activo" id=modo-btn-precio data-modo-precio=precio>💰 Precio directo</button></div></div><div id=bloque-m2 style=display:none><div class=campos><div class=campo><label>Superficie (m²)</label><input type=number id=m2 value=55 step=5 min=20 data-input-action=actualizar-precio-estimado><span class=hint id=hint-precio-estimado>—</span></div></div></div><div id=bloque-precio><div class=campos><div class=campo><label>Precio de la vivienda ($)</label><input type=text inputmode=numeric id=precio-directo placeholder="Ej: 80.000.000" autocomplete=off data-input-action=precio-directo><span class=hint id=hint-m2-estimado>—</span></div><div class=campo><label>o en UF</label><input type=number id=precio-directo-uf placeholder="Ej: 2.000" step=10 min=100 data-input-action=precio-uf><span class=hint>1 UF = $<span id=uf-hint-val>—</span></span></div></div></div><div class=campos style=margin-top:2px><div class=campo><label for=tasa>Tasa anual (%)</label><input type=number id=tasa value=4.1 step=0.1 min=1 max=15><span class=hint>Bco. Central feb. 2026 · tasa fija</span></div><div class=campo><label for=plazo>Plazo (años)</label><input type=number id=plazo value=25 step=5 min=5 max=40></div><div class=campo><label for=pie>Pie mínimo (%)</label><input type=number id=pie value=20 step=5 min=10 max=80><span class=hint>Con FOGAES puede ser 10%</span></div></div><button class=btn-primary style=margin-top:1.25rem data-main-action=ir-resultados>Ver mi resultado →</button></div><div class=screen id=screen-3><div class=resumen-top id=resumen-top></div><div class=tabs-nav role=tablist><button class="tab-btn activo" role=tab aria-selected=true aria-controls=tab-analisis data-tab=tab-analisis>📊 Mi análisis</button><button class=tab-btn role=tab aria-selected=false aria-controls=tab-subsidios data-tab=tab-subsidios>🏛 Subsidios</button><button class=tab-btn role=tab aria-selected=false aria-controls=tab-arrendar data-tab=tab-arrendar>⚖️ Arrendar vs Comprar</button><button class=tab-btn role=tab aria-selected=false aria-controls=tab-regiones data-tab=tab-regiones>🗺 Regiones</button><button class=tab-btn role=tab aria-selected=false aria-controls=tab-bancos data-tab=tab-bancos>🏦 Bancos 2026</button></div><div class="tab-panel activo" id=tab-analisis role=tabpanel><div class=resultado-bloque><div class=resultado-header><span class=resultado-header-titulo>% del sueldo en dividendo</span><span id=label-region-header style=font-size:12px;color:var(--suave)>—</span></div><div class=barra-area><div class=barra-row><span class=pct-grande id=barra-pct>—</span><div><span class="pill pill-amarillo" id=semaforo-badge>—</span><br><span class=barra-desc id=texto-semaforo></span></div></div><div class=barra-track><div class=barra-fill id=barra style=width:0%></div></div><div class=barra-ticks><span>0%</span><span>30% recomendado</span><span>100%</span></div></div><div class=metricas><div class=metrica><div class=metrica-label>Cuota mensual</div><div class=metrica-valor id=m-cuota>—</div><div class=metrica-sub id=m-cuota-sub>—</div></div><div class=metrica><div class=metrica-label>Precio total</div><div class=metrica-valor id=m-precio>—</div><div class=metrica-sub id=m-precio-uf>—</div></div><div class=metrica><div class=metrica-label>Pie requerido</div><div class=metrica-valor id=m-pie>—</div><div class=metrica-sub id=m-pie-sub>—</div></div><div class=metrica><div class=metrica-label>Máx. crédito aprobable</div><div class=metrica-valor id=m-maxcredito>—</div><div class=metrica-sub id=m-maxcredito-sub>con tu sueldo</div></div></div></div><div class=aviso id=aviso-ahorro style=display:none></div><div id=bloque-edad style=display:none><div class=edad-card><div class=edad-card-header><span class=edad-icono>🕐</span><div><div class=edad-titulo>Tu crédito según tu edad</div><div class=edad-sub id=edad-subtitulo></div></div></div><div class=edad-metricas id=edad-metricas></div><div class=edad-veredicto id=edad-veredicto></div></div></div><div class=frase-impacto id=frase-impacto style=display:none><div class=fi-label>Tu situación en perspectiva</div><div class=fi-texto id=frase-texto></div></div><hr class=divider><p class=seccion-titulo>¿Cuánto pagarías según tu situación?</p><p class=seccion-sub id=esc-sub-desc>3 formas de comprar esta vivienda.</p><div class=escenarios id=escenarios-grid></div><hr class=divider><p class=seccion-titulo>¿Cuánto ha subido el precio?</p><p class=seccion-sub id=hist-sub>Referencia RM · Depto 55 m² en Santiago · Sueldos en ese período subieron ~40%</p><div class=hist-grid><div class=hist-card><div class=hist-anio>2010</div><div class=hist-uf>1.925 UF</div><div class=hist-sub>~$74 mill. <span style=font-size:10px;color:var(--suave2)>(en pesos hoy)</span></div><div style=font-size:12px;color:var(--suave2);margin-top:6px>Ahorrar el pie tomaba ~6 años</div></div><div class=hist-card><div class=hist-anio>2018</div><div class=hist-uf>2.970 UF</div><div class=hist-sub>~$114 mill. <span style=font-size:10px;color:var(--suave2)>(en pesos hoy)</span></div><span class=hist-badge>+54%</span><div style=font-size:12px;color:var(--suave2);margin-top:6px>Juntar el pie tomaba ~9 años</div></div><div class=hist-card style=border-color:var(--rojo)><div class=hist-anio>2025</div><div class=hist-uf>4.235 UF</div><div class=hist-sub style=color:var(--rojo)>~$163 millones</div><span class=hist-badge>+120%</span><div style=font-size:12px;color:var(--rojo);margin-top:6px;font-weight:500>Hoy el pie toma ~23 años</div></div></div><div class="aviso aviso-neutro">📌 <strong>Las casas subieron 3 veces más que los sueldos.</strong> En 2010 una familia de clase media podía comprar ahorrando 6 años. Hoy necesita ~23.</div><hr class=divider><p class=seccion-titulo>Comparte tu resultado</p><div class=share-area style=margin-top:.75rem><a class=btn-share id=btn-tw href=# target=_blank>𝕏 Twitter / X</a><button class="btn-share btn-share-copy" data-main-action=copiar-link>📋 Copiar link</button></div><div class=bco-resultado-bloque style=margin-top:1.25rem><div class=bco-resultado-tag>🏦 Estudio Hipotecario Chile 2026 · CMF</div><div class=bco-resultado-txt> El banco con la <strong>tasa fija más baja hoy</strong> es <strong>Banco Itaú (3,39%)</strong>.<br> El banco con el <strong>dividendo más bajo registrado por la CMF</strong> es <strong>Banco Internacional ($892.377 / 22,40 UF)</strong>.<br> Promedio de mercado: <strong>4,35%</strong>. Compara los 11 bancos y calcula cuánto ahorrarías. </div><div style=margin-top:.75rem><button class=btn-share style="font-size:12px;padding:6px 14px" data-main-action=ir-bancos>🏦 Ver estudio completo →</button></div></div></div><div class=tab-panel id=tab-subsidios role=tabpanel><p class=seccion-titulo>¿A qué ayudas del Estado calificas?</p><p class=seccion-sub>Los que califican aparecen primero, con requisitos y cómo postular.</p><div class=subs-lista id=subs-lista></div></div><div class=tab-panel id=tab-arrendar role=tabpanel><p class=seccion-titulo>¿Te conviene arrendar o comprar?</p><p class=seccion-sub>Compara cuánto pagas al mes según lo que encuentras en arriendo.</p><div class=avc-slider-wrap><div class=avc-slider-label><span>¿Cuánto pagarías de arriendo?</span><strong>$<span id=arriendo-display>—</span>/mes</strong></div><input type=range class=avc-slider id=arriendo-slider min=100000 max=2000000 step=10000 value=450000 data-input-action=arriendo-slider><div style=display:flex;justify-content:space-between;font-size:11px;color:var(--suave2);margin-top:3px><span>$100.000</span><span>$2.000.000</span></div></div><div id=avc-bloque></div></div><div class=tab-panel id=tab-regiones role=tabpanel><p class=seccion-titulo>Todas las regiones</p><p class=seccion-sub id=tabla-sub>Departamento 55 m² · dividendo con pie 20%, 25 años, 4,3%</p><div class=tabla-wrap><table><thead><tr><th>Región</th><th>Precio por m²</th><th>¿Cuánto cuesta?</th><th>Dividendo mensual</th><th>Entrada requerida</th><th>¿Lo puedes pagar?</th></tr></thead><tbody id=tbody-regiones></tbody></table></div><hr class=divider><p class=seccion-titulo>La brecha regional</p><p class=seccion-sub>Precio depto 55 m² en UF — de más barato a más caro</p><div class=desigualdad id=desigualdad-visual></div></div><div class=tab-panel id=tab-bancos role=tabpanel><div class=bco-hero style=margin-bottom:1.25rem><div class=bco-hero-tag>📌 Datos CMF al 28-03-2026</div><div class=bco-hero-titulo style=font-size:1.25rem>Estudio Hipotecario Bancos 2026</div><div class=bco-hero-sub>Comparación de 11 bancos chilenos: tasas, CAE y dividendos reales.</div><div class=bco-hero-stats><div class=bco-stat><div class=bco-stat-val>3,39%</div><div class=bco-stat-lbl>Mejor tasa (Itaú)</div></div><div class=bco-stat><div class=bco-stat-val>4,35%</div><div class=bco-stat-lbl>Promedio mercado</div></div><div class=bco-stat><div class=bco-stat-val>$892.377</div><div class=bco-stat-lbl>Mejor dividendo CMF</div></div></div></div><div class=bco-chat-wrap id=tab-bco-chat-wrap><button class=bco-chat-trigger data-bco-action=toggle-tab-chat aria-expanded=false aria-controls=tab-bco-chat-panel><span class=bco-chat-trigger-ico>🤖</span><span class=bco-chat-trigger-txt><span style=font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.7>Asistente hipotecario</span><br> ¿Cuál banco conviene hoy? </span><span class=bco-chat-trigger-arrow>▼</span></button><div class=bco-chat-panel id=tab-bco-chat-panel><div class=bco-chat-msgs><div class=bco-chat-burbuja id=tab-bco-chat-resumen></div><div class=bco-chat-burbuja id=tab-bco-chat-insight></div></div><div class=bco-chat-acciones><button class=bco-chat-btn id=tab-bco-chat-cta-comp data-bco-action=sugerir-tab>⚖️ Comparar recomendados</button><button class=bco-chat-btn data-bco-action=abrir-bancos>↗ Ver pantalla completa</button><button class=bco-chat-btn data-bco-action=ir-paso1>🏠 Simular mi sueldo</button></div></div></div><details class=bco-seccion open><summary class=bco-seccion-titulo>📊 Tasas fijas — comparador visual <span class=bco-seccion-hint>Menor es mejor</span></summary><div class=bco-grafico id=tab-bco-grafico></div></details><details class=bco-seccion><summary class=bco-seccion-titulo>📋 Tabla comparativa completa <span class=bco-seccion-hint>11 bancos · CMF 2026</span></summary><div class=bco-tabla-wrap><table class=bco-tabla id=tab-bco-tabla></table></div></details><details class=bco-seccion><summary class=bco-seccion-titulo>🏆 Ranking mejores bancos 2026 <span class=bco-seccion-hint>Por tasa + dividendo</span></summary><div class=bco-ranking id=tab-bco-ranking></div></details><hr class=divider><details class=bco-seccion open><summary class=bco-seccion-titulo>⚖️ Comparador interactivo <span class=bco-seccion-hint>Elige 2 bancos</span></summary><p class=seccion-sub style=margin-top:.5rem>Selecciona 2 bancos y calcula cuánto ahorrarías.</p><div class=bco-comp-wrap><div class=bco-comp-selects><select id=tab-bco-sel-1 data-bco-select=tab><option value>— Banco A —</option></select><select id=tab-bco-sel-2 data-bco-select=tab><option value>— Banco B —</option></select></div><div class=bco-comp-result id=tab-bco-comp-result><div class=bco-comp-grid id=tab-bco-comp-grid></div><div class=bco-comp-ahorro id=tab-bco-comp-ahorro></div></div></div></details><hr class=divider><details class=bco-seccion><summary class=bco-seccion-titulo>📋 Requisitos 2026 <span class=bco-seccion-hint>Lo que piden los bancos</span></summary><div class=bco-req-grid id=tab-bco-req-grid></div></details><hr class=divider><details class=bco-seccion><summary class=bco-seccion-titulo>📈 Tendencias del mercado</summary><div class=bco-tendencias id=tab-bco-tendencias></div></details><div style=margin-top:1rem><button class=btn-share style="font-size:12px;padding:7px 16px" data-bco-action=abrir-bancos>↗ Ver pantalla completa</button></div></div></div><div class=screen id=screen-bancos><button class=btn-back data-main-action=volver-screen>← Volver</button><div class=bco-hero><div class=bco-hero-tag>📌 Informe Oficial · Datos CMF al 28-03-2026</div><div class=bco-hero-titulo>Estudio Hipotecario<br>Bancos Chilenos 2026</div><div class=bco-hero-sub>Comparación real de 11 bancos: tasas fijas, CAE y dividendos según CMF Chile. Datos verificados marzo 2026.</div><div class=bco-hero-stats><div class=bco-stat><div class=bco-stat-val>3,39%</div><div class=bco-stat-lbl>Tasa mínima (Itaú)</div></div><div class=bco-stat><div class=bco-stat-val>4,35%</div><div class=bco-stat-lbl>Promedio mercado</div></div><div class=bco-stat><div class=bco-stat-val>$892.377</div><div class=bco-stat-lbl>Mejor dividendo CMF</div></div><div class=bco-stat><div class=bco-stat-val>11</div><div class=bco-stat-lbl>Bancos comparados</div></div></div></div><div class=bco-chat-wrap id=bco-chat-wrap><button class=bco-chat-trigger data-bco-action=toggle-full-chat aria-expanded=false aria-controls=bco-chat-panel><span class=bco-chat-trigger-ico>🤖</span><span class=bco-chat-trigger-txt><span style=font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.7>Asistente hipotecario</span><br> ¿Cuál banco conviene hoy? — pregunta rápida </span><span class=bco-chat-trigger-arrow>▼</span></button><div class=bco-chat-panel id=bco-chat-panel><div class=bco-chat-msgs><div class=bco-chat-burbuja id=bco-chat-resumen></div><div class=bco-chat-burbuja id=bco-chat-insight></div></div><div class=bco-chat-acciones><button class=bco-chat-btn id=bco-chat-cta-comp data-bco-action=sugerir-full>⚖️ Comparar recomendados</button><button class=bco-chat-btn data-bco-action=scroll data-target=bco-ranking>🏆 Ver ranking completo</button><button class=bco-chat-btn data-bco-action=scroll data-target=bco-comp-wrap>⚖️ Comparar 2 bancos</button><button class=bco-chat-btn data-bco-action=scroll data-target=bco-grafico>📊 Ver gráfico tasas</button><button class=bco-chat-btn data-bco-action=scroll data-target=bco-req-grid>📋 Requisitos 2026</button><button class=bco-chat-btn data-bco-action=ir-paso1>🏠 Simular con mi sueldo</button></div></div></div><details class=bco-seccion open><summary class=bco-seccion-titulo>📊 Tasas fijas — comparador visual <span class=bco-seccion-hint>Menor es mejor</span></summary><p class=seccion-sub style=margin-top:.5rem>Verde &lt;4% · Amarillo 4%–5% · Rojo &gt;5%</p><div class=bco-grafico id=bco-grafico></div></details><details class=bco-seccion><summary class=bco-seccion-titulo>📋 Tabla comparativa completa <span class=bco-seccion-hint>11 bancos · CMF 2026</span></summary><p class=seccion-sub style=margin-top:.5rem>Datos CMF · Crédito de 2.000 UF a 20 años con pie 20%</p><div class=bco-tabla-wrap><table class=bco-tabla id=bco-tabla></table></div></details><details class=bco-seccion><summary class=bco-seccion-titulo>🏆 Ranking mejores bancos marzo 2026 <span class=bco-seccion-hint>Por tasa + dividendo</span></summary><div class=bco-ranking id=bco-ranking></div></details><hr class=divider><details class=bco-seccion open><summary class=bco-seccion-titulo>⚖️ Comparador interactivo <span class=bco-seccion-hint>Elige 2 bancos</span></summary><p class=seccion-sub style=margin-top:.5rem>Selecciona 2 bancos y calcula cuánto ahorrarías eligiendo el mejor.</p><div class=bco-comp-wrap id=bco-comp-wrap><div class=bco-comp-selects><select id=bco-sel-1 data-bco-select=full><option value>— Banco A —</option></select><select id=bco-sel-2 data-bco-select=full><option value>— Banco B —</option></select></div><div class=bco-comp-result id=bco-comp-result><div class=bco-comp-grid id=bco-comp-grid></div><div class=bco-comp-ahorro id=bco-comp-ahorro></div></div></div></details><hr class=divider><details class=bco-seccion><summary class=bco-seccion-titulo>📋 Requisitos para crédito hipotecario 2026 <span class=bco-seccion-hint>Lo que piden los bancos</span></summary><div class=bco-req-grid id=bco-req-grid></div><div class="aviso aviso-neutro" style=margin-top:.5rem>📌 Cada banco puede variar en detalle. Siempre consulta directamente. Datos de referencia de mercado 2026.</div></details><hr class=divider><details class=bco-seccion><summary class=bco-seccion-titulo>📈 Tendencias del mercado hipotecario 2026</summary><div class=bco-tendencias id=bco-tendencias></div></details></div><div class=screen id=screen-regiones><button class=btn-back data-main-action=volver-screen>← Volver</button><h1 class=titulo-grande style=font-size:clamp(1.6rem,4vw,2.4rem)>Precios por <em>región</em></h1><p class=subtitulo id=pub-reg-sub>Departamento 55 m² · dividendo con pie 20%, 25 años, tasa 4.1% anual</p><div class=campos style=margin-bottom:1rem><div class=campo><label for=pub-tipo>Tipo de vivienda</label><select id=pub-tipo data-change-action=render-public-regiones><option value=depto>Departamento</option><option value=casa>Casa</option><option value=usada>Usada</option></select></div><div class=campo><label for=pub-m2>Superficie (m²)</label><input type=number id=pub-m2 value=55 min=30 max=200 step=5 data-input-action=render-public-regiones></div></div><div id=pub-regiones-content></div><div class=sub-cta-completo style=margin-top:1.5rem><div><div style=font-weight:500;font-size:14px;color:var(--negro)>¿Quieres ver qué puedes pagar tú?</div><div style=font-size:12px;color:var(--suave);margin-top:2px>Ingresa tu sueldo para ver si puedes cubrir el dividendo en cada región</div></div><button class=btn-primary style="width:auto;padding:12px 20px;flex-shrink:0" data-main-action=ir-calculadora>Calculadora completa →</button></div></div><div class=screen id=screen-arrendar><button class=btn-back data-main-action=volver-screen>← Volver</button><h1 class=titulo-grande style=font-size:clamp(1.6rem,4vw,2.4rem)>¿Arrendar o <em>comprar?</em></h1><p class=subtitulo>Ingresa el precio de la vivienda que te interesa y lo que pagarías de arriendo.</p><div class=sub-form-box><div class=campos><div class=campo><label for=pub-precio>Precio de la vivienda ($)</label><input type=text inputmode=numeric id=pub-precio placeholder="Ej: 150.000.000" autocomplete=off data-input-action=pub-precio><span class=hint id=pub-div-hint>Calcularemos el dividendo estimado</span></div><div class=campo><label for=pub-arriendo>Arriendo mensual ($)</label><input type=text inputmode=numeric id=pub-arriendo placeholder="Ej: 400.000" autocomplete=off data-input-action=pub-arriendo><span class=hint>Lo que pagarías de arriendo hoy</span></div></div></div><div id=pub-avc-resultado></div><div class=sub-cta-completo style=margin-top:1.5rem><div><div style=font-weight:500;font-size:14px;color:var(--negro)>¿Quieres calcular tu dividendo exacto?</div><div style=font-size:12px;color:var(--suave);margin-top:2px>Con tu sueldo, región y tipo de vivienda</div></div><button class=btn-primary style="width:auto;padding:12px 20px;flex-shrink:0" data-main-action=ir-calculadora>Calculadora completa →</button></div></div><div class=screen id=screen-subsidios><button class=btn-back data-main-action=volver-subsidios>← Volver</button><div class=sub-hero><div class=sub-hero-title>Subsidios del Estado<br>para <em>vivienda 2026</em></div><div class=sub-hero-sub>Todos los programas oficiales MINVU — con tu situación real si ya usaste la calculadora, o explorando libremente si recién llegas.</div></div><div id=sub-contexto-bar></div><div class=sub-filtros id=sub-filtros><button class="sub-filtro-btn activo" data-cat=todos>Todos</button><button class=sub-filtro-btn data-cat=compra>🏠 Compra</button><button class=sub-filtro-btn data-cat=arriendo>🏘️ Arriendo</button><button class=sub-filtro-btn data-cat=construccion>🏗️ Construcción</button><button class=sub-filtro-btn data-cat=mejoramiento>🔨 Mejoramiento</button><button class=sub-filtro-btn data-cat=rural>🌾 Rural</button><button class=sub-filtro-btn data-cat=integracion>🤝 Integración</button></div><div id=sub-interactivos-lista></div></div></div><aside class=side-explore style=display:none><div class=side-explore-label>Explorar</div><div class=bypass-card data-main-action=ir-regiones role=button tabindex=0 aria-label="Explorar precios por región"><div class=bypass-card-ico>🗺</div><div><div class=bypass-card-titulo>Por región</div><div class=bypass-card-sub>Precios en Chile</div></div></div><div class=bypass-card data-main-action=ir-arrendar role=button tabindex=0 aria-label="Explorar arrendar versus comprar"><div class=bypass-card-ico>⚖️</div><div><div class=bypass-card-titulo>Arrendar vs Comprar</div><div class=bypass-card-sub>¿Qué te conviene?</div></div></div><div class=bypass-card data-main-action=ir-bancos role=button tabindex=0 aria-label="Explorar estudio de bancos 2026"><div class=bypass-card-ico>🏦</div><div><div class=bypass-card-titulo>Bancos 2026</div><div class=bypass-card-sub>Tasas hipotecarias</div></div></div></aside></main><footer style="max-width:680px;margin:0 auto;padding:1.5rem 2rem 3rem;font-size:11.5px;color:var(--suave);line-height:1.9;border-top:1px solid var(--borde)"><p>Fuentes: <a href=https://cchc.cl target=_blank style=color:var(--suave)>CChC Q3 2025</a> · <a href=https://cmfchile.cl target=_blank style=color:var(--suave)>CMF mar. 2026</a> · <a href=https://bcentral.cl target=_blank style=color:var(--suave)>Banco Central</a> · <a href=https://minvu.gob.cl target=_blank style=color:var(--suave)>Minvu subsidios 2026</a> · UF: <a href=https://mindicador.cl target=_blank style=color:var(--suave)>mindicador.cl</a></p><p>Valores referenciales. Los precios varían por comuna y banco. Subsidios sujetos a cupos.</p></footer><script>
 const REGIONES = {
   RM:  { nombre:"Región Metropolitana", depto:77,  casa:63,  usada:62 },
   ANT: { nombre:"Antofagasta",          depto:68,  casa:52,  usada:50 },
@@ -2315,12 +1568,14 @@ function calcular(){
   const sueldo=parseCLP('sueldo');
   const ahorroHoy=parseCLP('ahorro');
   const codeudor=parseCLP('codeudor');
+  const edad=0;
   const primera=document.getElementById('primera').value !== 'segunda' && document.getElementById('primera').value !== 'tengo';
   const situacion=document.getElementById('primera').value || 'primera';
   const m2=parseFloat(document.getElementById('m2').value)||55;
   const tasa=parseFloat(document.getElementById('tasa').value)||4.1;
   const plazoIngresado=parseFloat(document.getElementById('plazo').value)||25;
-  const plazo=plazoIngresado;
+  const plazoMaxEdad=edad>0?Math.max(75-edad,5):40;
+  const plazo=edad>0?Math.min(plazoIngresado,plazoMaxEdad):plazoIngresado;
   const piePct=parseFloat(document.getElementById('pie').value)||20;
 
   const sueldoTotal=sueldo+codeudor;
@@ -2436,8 +1691,11 @@ function calcular(){
     avisoAhorro.style.display='none';
   }
 
+  const cuotaSinLimiteEdad=cuotaMensual(credito,tasa,plazoIngresado);
+  renderBloqueEdad(edad,plazoIngresado,plazo,cuota,cuotaSinLimiteEdad,sueldoTotal,precioClp,pieClp,ahorroHoy);
+
   const aniosPieCalc=(pieClp-ahorroHoy>0&&sueldoTotal*0.20>0)?(pieClp-ahorroHoy)/(sueldoTotal*0.20)/12:0;
-  renderFraseImpacto(sueldoTotal,pct,pieClp,aniosPieCalc,precioClp,datos.nombre,plazo);
+  renderFraseImpacto(sueldoTotal,pct,pieClp,aniosPieCalc,precioClp,datos.nombre,edad,plazo);
   renderEscenarios(precioUF,piePct,tasa,plazo,subsAplican,sueldoTotal,ahorroHoy);
   renderSubsidios(subsAplican,precioUF,tasa,plazo,ctx);
   renderArrVsCompra(precioClp,precioUF,piePct,tasa,plazo,cuota);
@@ -2448,6 +1706,39 @@ function calcular(){
     histSubEl.innerHTML='Referencia RM · Depto 55 m² en Santiago · Sueldos en ese período subieron ~40%'+sfx;
   }
   _resultadoCalculado=true;
+}
+
+/* BLOQUE EDAD */
+function renderBloqueEdad(edad,plazoIngresado,plazo,cuota,cuotaSinLimite,sueldoTotal,precioClp,pieClp,ahorroHoy){
+  const bloque=document.getElementById('bloque-edad');
+  if(!bloque) return;
+  if(edad<=0){bloque.style.display='none';return;}
+  bloque.style.display='block';
+  const edadFin=edad+plazo;
+  const aniosPagoFin=new Date().getFullYear()+plazo;
+  const plazoLimitado=plazo<plazoIngresado;
+  const pct=sueldoTotal>0?cuota/sueldoTotal*100:0;
+  document.getElementById('edad-subtitulo').textContent=`Tienes ${edad} años · plazo máximo del banco: ${plazo} años (hasta ~75, varía por banco)`;
+  const colorPct=pct<=30?'verde':pct<=50?'amarillo':'rojo';
+  document.getElementById('edad-metricas').innerHTML=`
+    <div class="edad-metrica"><div class="edad-metrica-label">Terminas de pagar</div><div class="edad-metrica-valor ${edadFin>=65?'rojo':edadFin>=55?'amarillo':'verde'}">${edadFin} años</div><div class="edad-metrica-sub">Año ${aniosPagoFin}</div></div>
+    <div class="edad-metrica"><div class="edad-metrica-label">Plazo disponible</div><div class="edad-metrica-valor ${plazoLimitado?'amarillo':'verde'}">${plazo} años</div><div class="edad-metrica-sub">${plazoLimitado?`Reducido desde ${plazoIngresado}`:'Sin restricción'}</div></div>
+    <div class="edad-metrica"><div class="edad-metrica-label">Cuota mensual</div><div class="edad-metrica-valor ${colorPct}">$${fmt(cuota)}</div><div class="edad-metrica-sub">${pct.toFixed(1)}% de tu sueldo</div></div>`;
+  let txt='';
+  if(plazoLimitado){ const dif=cuota-cuotaSinLimite; txt+=`⚠️ <strong>Tu edad acorta el plazo de ${plazoIngresado} a ${plazo} años.</strong> Tu cuota sube <em>$${fmt(dif)} más</em> que si pudieras pagar en ${plazoIngresado} años. `; }
+  if(edadFin>75){ txt+=`🔴 <strong>El banco no aprobará el plazo de ${plazoIngresado} años</strong> porque tendrías ${edad+plazoIngresado} años al terminar. El plazo real queda en <em>${plazo} años</em>. `; }
+  else if(edadFin>=65){ txt+=`🟡 Terminarías de pagar a los <strong>${edadFin} años</strong>, cerca del retiro. Considera que a esa edad tu ingreso puede bajar. `; }
+  else if(edadFin<=50){ txt+=`✅ Terminarías de pagar a los <strong>${edadFin} años</strong>, con mucho margen financiero por delante. `; }
+  else { txt+=`Terminarías de pagar a los <strong>${edadFin} años</strong>. `; }
+  if(ahorroHoy<pieClp&&sueldoTotal>0){
+    const mesesParaPie=Math.ceil((pieClp-ahorroHoy)/(sueldoTotal*0.20));
+    const edadConPie=edad+mesesParaPie/12;
+    const plazoRestante=75-Math.ceil(edadConPie);
+    if(plazoRestante<15&&plazoRestante>0){ txt+=`📌 Si tardas <em>${Math.ceil(mesesParaPie/12)} años</em> en juntar el pie, tendrías <strong>${plazoRestante} años</strong> para pagar — lo que subiría aún más la cuota.`; }
+    else if(plazoRestante<=0){ txt+=`🔴 <strong>Atención:</strong> al ritmo de ahorro actual juntarías el pie a los <em>${Math.round(edadConPie)} años</em> — ya no calificarías para crédito.`; }
+  }
+  if(!txt) txt=`Con ${edad} años y plazo de ${plazo} años tienes una ventana normal para este crédito.`;
+  document.getElementById('edad-veredicto').innerHTML=txt;
 }
 
 /* ESCENARIOS */
@@ -2787,16 +2078,17 @@ function renderArrVsCompra(precioClp,precioUF,piePct,tasa,plazo,cuota){
 }
 
 /* FRASE IMPACTO */
-function renderFraseImpacto(sueldo,pct,pieClp,aniosPie,precioClp,regionNombre,plazo){
+function renderFraseImpacto(sueldo,pct,pieClp,aniosPie,precioClp,regionNombre,edad,plazo){
   const fraseEl=document.getElementById('frase-impacto');
   const textoEl=document.getElementById('frase-texto');
   if(!sueldo||sueldo<=0){fraseEl.style.display='none';return;}
   fraseEl.style.display='block';
   const sueldoFmt='$'+fmt(sueldo);
+  const edadFin=(edad>0&&plazo>0)?edad+plazo:null;
   let frase='';
-  if(pct<=30){ frase=`Con <em>${sueldoFmt}/mes</em>, el dividendo representa solo el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. Eres de los pocos chilenos con acceso real a vivienda propia en ${regionNombre}.`; }
-  else if(pct<=50){ frase=`Con <em>${sueldoFmt}/mes</em>, destinarías el <strong>${pct.toFixed(1)}% de tu sueldo</strong> al dividendo. Quedarás con poco margen. Y para el pie aún necesitas <strong>${Math.ceil(aniosPie*12)} meses de ahorro disciplinado</strong>.`; }
-  else if(pct<=80){ frase=`Con <em>${sueldoFmt}/mes</em>, el dividendo se llevaría el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. El banco probablemente no lo aprobará. Necesitarías ganar <strong>el doble</strong> para calificar solo, o conseguir un codeudor.`; }
+  if(pct<=30){ frase=`Con <em>${sueldoFmt}/mes</em>, el dividendo representa solo el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. Eres de los pocos chilenos con acceso real a vivienda propia en ${regionNombre}.`; if(edadFin) frase+=` <strong>Terminarías de pagar a los ${edadFin} años.</strong>`; }
+  else if(pct<=50){ frase=`Con <em>${sueldoFmt}/mes</em>, destinarías el <strong>${pct.toFixed(1)}% de tu sueldo</strong> al dividendo. Quedarás con poco margen. Y para el pie aún necesitas <strong>${Math.ceil(aniosPie*12)} meses de ahorro disciplinado</strong>.`; if(edadFin) frase+=` Terminarías de pagar a los <strong>${edadFin} años</strong>.`; }
+  else if(pct<=80){ frase=`Con <em>${sueldoFmt}/mes</em>, el dividendo se llevaría el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. El banco probablemente no lo aprobará. Necesitarías ganar <strong>el doble</strong> para calificar solo, o conseguir un codeudor.`; if(edadFin) frase+=` Y terminarías pagando a los <strong>${edadFin} años</strong>.`; }
   else { frase=`<strong>Esta vivienda no es accesible para tu sueldo actual.</strong> El dividendo sería el <em>${pct.toFixed(1)}% de tus ingresos</em>. No es un problema tuyo: es la realidad de millones de chilenos hoy.`; }
   if(aniosPie>10&&pct>30) frase+=` Juntarías el pie en <em>${Math.ceil(aniosPie)} años</em> ahorrando el 20% de tu sueldo.`;
   textoEl.innerHTML=frase;
@@ -3883,6 +3175,4 @@ function checkSubsidiosRapido(){
   res.innerHTML=html;
   if(cta) cta.style.display='flex';
 }
-</script>
-</body>
-</html>
+</script></body></html>

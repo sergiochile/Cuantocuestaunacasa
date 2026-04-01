@@ -7,5 +7,3 @@ Sitemap: https://cuantocuestaunacasa.cl/sitemap.xml
 # Evitar indexar archivos de configuración
 Disallow: /netlify.toml
 Disallow: /_redirects
-Disallow: /_fix.py
-Disallow: /build.py
