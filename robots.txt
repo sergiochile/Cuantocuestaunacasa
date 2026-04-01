@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://cuantocuestaunacasa.cl/sitemap.xml
+
+# Evitar indexar archivos de configuración
+Disallow: /netlify.toml
+Disallow: /_redirects

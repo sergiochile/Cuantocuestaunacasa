@@ -1,0 +1,248 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "name": "Preguntas frecuentes sobre comprar una casa en Chile",
+  "description": "Respuestas a las preguntas más frecuentes sobre comprar vivienda en Chile: precios, subsidios DS1/DS19, crédito hipotecario, pie, FOGAES, arrendar vs comprar y el proceso completo.",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Puedo comprar una casa con un sueldo de $600.000?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Con $600.000/mes el banco puede prestarte hasta ~$28.000.000 (30% de esfuerzo, 25 años, tasa 4.1%). Eso alcanza para una vivienda de ~$35.000.000. En regiones como Maule, Araucanía o Biobío hay opciones dentro de ese rango. Además, con ese ingreso (15.6 UF/mes) calificas al subsidio DS19, que descuenta hasta 180 UF del precio."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto sueldo necesito para comprar una casa en Santiago?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un departamento de 55 m² en Santiago cuesta ~4.235 UF (~$163.000.000). Para pagarlo con pie 20% y 25 años, necesitas al menos $1.300.000/mes de sueldo. Con codeudor, los sueldos se suman. También puedes usar subsidio DS1 (hasta 78 UF/mes de ingreso) para reducir el precio efectivo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Con qué sueldo mínimo puedo pedir un crédito hipotecario en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No hay un mínimo fijo, pero el banco exige que el dividendo no supere el 25-30% de tu sueldo. Para un crédito de $50.000.000 a 25 años y 4.1%, el dividendo es ~$268.000/mes, así que necesitarías al menos $900.000 de sueldo. Con subsidio DS19 y precio más bajo, puedes entrar con menos."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo comprar una casa siendo arrendatario?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. No necesitas tener vivienda propia ni propiedad previa para calificar a un crédito hipotecario (a menos que sea un subsidio que exija primera vivienda). El banco evalúa tu sueldo, historial crediticio y capacidad de pago, no tu situación habitacional actual."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué pasa si mi sueldo es informal o a honorarios?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Puedes pedir un crédito hipotecario siendo independiente o a honorarios, pero el banco pedirá acreditar ingresos: declaración de renta, cotizaciones previsionales, estados de cuenta o un año de historial. Algunos bancos usan el promedio de los últimos 12-24 meses como ingreso base."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo comprar con un codeudor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Con un codeudor (pareja, familiar), los sueldos se suman para calcular el crédito máximo. Ambos quedan como titulares del crédito y la propiedad. Es la forma más común de acceder a viviendas de mayor valor cuando un solo sueldo no alcanza."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto cuesta un departamento en Santiago en 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En la Región Metropolitana el precio por m² es de ~77 UF para departamentos nuevos (CChC Q3 2025). Un departamento de 55 m² cuesta aproximadamente 4.235 UF (~$163.000.000). Varía mucho según la comuna: Providencia y Las Condes superan los 100 UF/m², mientras que comunas periféricas pueden estar bajo 60 UF/m²."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuál es la región más barata para comprar casa en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Las regiones con precios por m² más bajos son La Araucanía (36 UF/m²), Ñuble (38 UF/m²) y Aysén (35 UF/m²). Un departamento de 55 m² en Araucanía cuesta ~1.980 UF (~$76.000.000). El dividendo sería de ~$400.000/mes con pie 20% y 25 años."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto cuesta una casa usada en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Las viviendas usadas tienen un descuento promedio de 10-20% respecto a las nuevas. En Santiago, una casa usada de 55 m² está en ~62 UF/m² (~$132.000.000). En regiones intermedias, alrededor de 35-45 UF/m². Los subsidios DS19 y DS1 en algunos tramos no aplican a vivienda usada."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto vale el metro cuadrado en Valparaíso?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En la Región de Valparaíso el precio promedio es de 58 UF/m² para departamentos (CChC Q3 2025). Un departamento de 55 m² vale ~3.190 UF (~$122.000.000). El dividendo con pie 20% y 25 años sería de ~$665.000/mes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo funciona el crédito hipotecario en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El banco financia hasta el 80-90% del valor de la propiedad. Tú pones el resto (pie). El crédito se paga en cuotas mensuales fijas (dividendo) durante 15 a 30 años. La tasa promedio en Chile es 4-5% anual en UF. La regla principal es que el dividendo no supere el 25-30% de tu sueldo líquido."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuál es la tasa de interés hipotecaria en Chile en 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En 2026, la tasa promedio para créditos hipotecarios en Chile está entre 3.8% y 5% anual en UF, según el banco y el plazo. La CMF publica las tasas actualizadas mensualmente. Con la Ley 21.748 (subsidio a la tasa), viviendas nuevas hasta 4.000 UF pueden acceder a una rebaja de ~0.6% los primeros años."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto tiempo dura un crédito hipotecario en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El plazo estándar es 20 a 30 años, siendo 25 años el más común. A mayor plazo, menor dividendo mensual, pero pagas más intereses en total. El banco no puede prestar hasta una edad que supere los ~75-80 años del solicitante, por lo que si tienes más de 45-50 años, el plazo disponible se reduce."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué es la regla del 30% en créditos hipotecarios?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Es la regla de esfuerzo financiero. Los bancos en Chile generalmente exigen que el dividendo mensual no supere el 25-30% de tu sueldo líquido total (incluyendo codeudores). Si tu sueldo es $1.000.000, el dividendo máximo aprobable sería ~$300.000/mes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto hay que ahorrar para el pie de una casa en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El pie estándar es el 20% del precio de la propiedad. Para una vivienda de $100.000.000, necesitas $20.000.000. Con FOGAES, el mínimo baja al 10% ($10.000.000). Si calificas al DS19, el bono pie puede cubrir hasta 30 UF (~$1.200.000) adicionales."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué es FOGAES y cómo funciona?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El Fondo de Garantía Especial (FOGAES) es un programa del Estado chileno que garantiza el 10% del precio de la vivienda ante el banco, permitiéndote comprar con solo el 10% de pie en vez del 20% estándar. Aplica a viviendas hasta 4.500 UF, no requiere ser primera vivienda y lo tramita el banco automáticamente."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo comprar una casa sin pie en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Es muy difícil conseguir financiamiento al 100% en Chile. Con FOGAES el mínimo baja al 10%. Con el subsidio DS19 más el Bono Pie DS19, el aporte propio puede ser muy bajo (el Estado cubre gran parte). Fuera de eso, los bancos generalmente no financian más del 90% del valor."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo usar mis ahorros del APV para el pie?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. El Ahorro Previsional Voluntario (APV) puede retirarse anticipadamente para comprar primera vivienda, con ciertas condiciones tributarias. También puedes usar la Cuenta 2 de la AFP. Consulta con tu AFP o asesor financiero las condiciones específicas."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué subsidio habitacional me conviene en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Depende de tu ingreso mensual: hasta 25 UF/mes aplica DS19 (180 UF de subsidio, primera vivienda nueva hasta 950 UF); hasta 37 UF/mes aplica DS1 Tramo 1 (130 UF); hasta 60 UF/mes aplica DS1 Tramo 2 (90 UF); hasta 78 UF/mes aplica DS1 Tramo 3 (60 UF). Para todos: FOGAES (pie 10%) y Ley 21.748 (tasa rebajada en vivienda nueva)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto es el subsidio DS19 en 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El subsidio DS19 en 2026 entrega hasta 180 UF (~$6.900.000) de subsidio directo para comprar vivienda social nueva hasta 950 UF (~$36.500.000). Aplica a familias con ingresos hasta 25 UF/mes y sin vivienda previa. Además existe el Bono Pie DS19 de hasta 30 UF adicionales para cubrir la entrada."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo postulo al subsidio habitacional en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Puedes postular en minvu.gob.cl o en la SEREMI de Vivienda de tu región. Los subsidios DS1 se abren por llamado (revisa el calendario Minvu). Para el DS19, necesitas estar inscrito en el Registro Social de Hogares (RSH) y tener cuenta de ahorro con al menos 10-100 UF según el tramo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué es el subsidio a la tasa Ley 21.748?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La Ley 21.748 subsidia parte de la tasa de interés del crédito hipotecario. Tu tasa baja ~0.6% los primeros años, lo que reduce el dividendo mensual entre $30.000 y $60.000 dependiendo del monto. Aplica a vivienda nueva hasta 4.000 UF. El banco lo aplica directamente, solo menciona que quieres usarlo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Conviene arrendar o comprar en Chile en 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Depende de tu situación. Comprar conviene si el dividendo es similar o menor al arriendo, planeas quedarte 5 o más años, tienes el pie y buscas estabilidad y patrimonio. Arrendar conviene si necesitas flexibilidad, el dividendo supera el 30% de tu sueldo o aún no tienes el pie. En Chile el arriendo sube con la UF; el dividendo es fijo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto se paga de arriendo en Santiago en 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un departamento de 50-60 m² en Santiago se arrienda entre $450.000 y $800.000/mes según la comuna. En comunas centrales (Providencia, Ñuñoa) el arriendo promedio supera $600.000. En comunas periféricas puede bajar a $350.000-$450.000. El arriendo se reajusta con la variación del IPC o la UF."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Es mejor comprar o seguir arrendando si el dividendo sería el doble del arriendo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Si el dividendo duplica el arriendo, en el corto plazo arrendar es más conveniente financieramente. Sin embargo, parte del dividendo queda como patrimonio (amortización del capital). El punto de equilibrio suele ser a los 8-15 años. Calcula con la herramienta de Arrendar vs Comprar de cuantocuestaunacasa.cl para tu caso específico."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuáles son los pasos para comprar una casa en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El proceso tiene 8 pasos: (1) Ahorrar el pie (10-20%), (2) Pre-aprobación bancaria, (3) Buscar la propiedad y firmar promesa de compraventa, (4) Tasación bancaria, (5) Aprobación formal del crédito, (6) Escritura ante notario, (7) Inscripción en el Conservador de Bienes Raíces, (8) Recibir las llaves. El proceso completo toma 2-3 meses."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto cuestan los gastos notariales al comprar una casa en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Los gastos operacionales suman aproximadamente el 1.5-2.5% del valor de la propiedad e incluyen: tasación (~$150.000-$250.000), gastos notariales (~$200.000-$400.000), inscripción CBR (~$100.000-$300.000) y seguros obligatorios (desgravamen e incendio). Para una vivienda de $100.000.000, considera $1.500.000-$2.500.000 adicionales."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto tiempo tarda el proceso de compra de una vivienda en Chile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El proceso completo toma entre 2 y 4 meses: negociación y promesa (1-2 semanas), aprobación del crédito bancario (2-4 semanas), firma de escritura (1-2 semanas), inscripción en el CBR (5-10 días hábiles). Si el banco tiene mucha demanda, puede extenderse hasta 3-4 meses."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué es la promesa de compraventa?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Es un contrato privado o notarial donde el comprador y vendedor se comprometen a realizar la compraventa en una fecha futura. Al firmarlo, se paga una reserva o garantía (1-5% del precio). Si el comprador desiste sin causa, pierde la garantía. Si el vendedor desiste, debe devolver el doble. Es el paso previo a la escritura definitiva."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué es la UF y por qué los precios de las casas se expresan en UF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La Unidad de Fomento (UF) es una unidad de cuenta reajustable según el IPC mensual en Chile. Su valor cambia diariamente. Las propiedades se expresan en UF para mantener el valor real en el tiempo, independiente de la inflación. Puedes consultar el valor actual de la UF en el Banco Central o en mindicador.cl."
+      }
+    }
+  ]
+}
