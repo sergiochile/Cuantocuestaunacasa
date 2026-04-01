@@ -979,17 +979,6 @@
 
       <div class="aviso" id="aviso-ahorro" style="display:none"></div>
 
-      <div id="bloque-edad" style="display:none">
-        <div class="edad-card">
-          <div class="edad-card-header">
-            <span class="edad-icono">🕐</span>
-            <div><div class="edad-titulo">Tu crédito según tu edad</div><div class="edad-sub" id="edad-subtitulo"></div></div>
-          </div>
-          <div class="edad-metricas" id="edad-metricas"></div>
-          <div class="edad-veredicto" id="edad-veredicto"></div>
-        </div>
-      </div>
-
       <div class="frase-impacto" id="frase-impacto" style="display:none">
         <div class="fi-label">Tu situación en perspectiva</div>
         <div class="fi-texto" id="frase-texto"></div>
@@ -2326,14 +2315,12 @@ function calcular(){
   const sueldo=parseCLP('sueldo');
   const ahorroHoy=parseCLP('ahorro');
   const codeudor=parseCLP('codeudor');
-  const edad=0;
   const primera=document.getElementById('primera').value !== 'segunda' && document.getElementById('primera').value !== 'tengo';
   const situacion=document.getElementById('primera').value || 'primera';
   const m2=parseFloat(document.getElementById('m2').value)||55;
   const tasa=parseFloat(document.getElementById('tasa').value)||4.1;
   const plazoIngresado=parseFloat(document.getElementById('plazo').value)||25;
-  const plazoMaxEdad=edad>0?Math.max(75-edad,5):40;
-  const plazo=edad>0?Math.min(plazoIngresado,plazoMaxEdad):plazoIngresado;
+  const plazo=plazoIngresado;
   const piePct=parseFloat(document.getElementById('pie').value)||20;
 
   const sueldoTotal=sueldo+codeudor;
@@ -2449,11 +2436,8 @@ function calcular(){
     avisoAhorro.style.display='none';
   }
 
-  const cuotaSinLimiteEdad=cuotaMensual(credito,tasa,plazoIngresado);
-  renderBloqueEdad(edad,plazoIngresado,plazo,cuota,cuotaSinLimiteEdad,sueldoTotal,precioClp,pieClp,ahorroHoy);
-
   const aniosPieCalc=(pieClp-ahorroHoy>0&&sueldoTotal*0.20>0)?(pieClp-ahorroHoy)/(sueldoTotal*0.20)/12:0;
-  renderFraseImpacto(sueldoTotal,pct,pieClp,aniosPieCalc,precioClp,datos.nombre,edad,plazo);
+  renderFraseImpacto(sueldoTotal,pct,pieClp,aniosPieCalc,precioClp,datos.nombre,plazo);
   renderEscenarios(precioUF,piePct,tasa,plazo,subsAplican,sueldoTotal,ahorroHoy);
   renderSubsidios(subsAplican,precioUF,tasa,plazo,ctx);
   renderArrVsCompra(precioClp,precioUF,piePct,tasa,plazo,cuota);
@@ -2464,39 +2448,6 @@ function calcular(){
     histSubEl.innerHTML='Referencia RM · Depto 55 m² en Santiago · Sueldos en ese período subieron ~40%'+sfx;
   }
   _resultadoCalculado=true;
-}
-
-/* BLOQUE EDAD */
-function renderBloqueEdad(edad,plazoIngresado,plazo,cuota,cuotaSinLimite,sueldoTotal,precioClp,pieClp,ahorroHoy){
-  const bloque=document.getElementById('bloque-edad');
-  if(!bloque) return;
-  if(edad<=0){bloque.style.display='none';return;}
-  bloque.style.display='block';
-  const edadFin=edad+plazo;
-  const aniosPagoFin=new Date().getFullYear()+plazo;
-  const plazoLimitado=plazo<plazoIngresado;
-  const pct=sueldoTotal>0?cuota/sueldoTotal*100:0;
-  document.getElementById('edad-subtitulo').textContent=`Tienes ${edad} años · plazo máximo del banco: ${plazo} años (hasta ~75, varía por banco)`;
-  const colorPct=pct<=30?'verde':pct<=50?'amarillo':'rojo';
-  document.getElementById('edad-metricas').innerHTML=`
-    <div class="edad-metrica"><div class="edad-metrica-label">Terminas de pagar</div><div class="edad-metrica-valor ${edadFin>=65?'rojo':edadFin>=55?'amarillo':'verde'}">${edadFin} años</div><div class="edad-metrica-sub">Año ${aniosPagoFin}</div></div>
-    <div class="edad-metrica"><div class="edad-metrica-label">Plazo disponible</div><div class="edad-metrica-valor ${plazoLimitado?'amarillo':'verde'}">${plazo} años</div><div class="edad-metrica-sub">${plazoLimitado?`Reducido desde ${plazoIngresado}`:'Sin restricción'}</div></div>
-    <div class="edad-metrica"><div class="edad-metrica-label">Cuota mensual</div><div class="edad-metrica-valor ${colorPct}">$${fmt(cuota)}</div><div class="edad-metrica-sub">${pct.toFixed(1)}% de tu sueldo</div></div>`;
-  let txt='';
-  if(plazoLimitado){ const dif=cuota-cuotaSinLimite; txt+=`⚠️ <strong>Tu edad acorta el plazo de ${plazoIngresado} a ${plazo} años.</strong> Tu cuota sube <em>$${fmt(dif)} más</em> que si pudieras pagar en ${plazoIngresado} años. `; }
-  if(edadFin>75){ txt+=`🔴 <strong>El banco no aprobará el plazo de ${plazoIngresado} años</strong> porque tendrías ${edad+plazoIngresado} años al terminar. El plazo real queda en <em>${plazo} años</em>. `; }
-  else if(edadFin>=65){ txt+=`🟡 Terminarías de pagar a los <strong>${edadFin} años</strong>, cerca del retiro. Considera que a esa edad tu ingreso puede bajar. `; }
-  else if(edadFin<=50){ txt+=`✅ Terminarías de pagar a los <strong>${edadFin} años</strong>, con mucho margen financiero por delante. `; }
-  else { txt+=`Terminarías de pagar a los <strong>${edadFin} años</strong>. `; }
-  if(ahorroHoy<pieClp&&sueldoTotal>0){
-    const mesesParaPie=Math.ceil((pieClp-ahorroHoy)/(sueldoTotal*0.20));
-    const edadConPie=edad+mesesParaPie/12;
-    const plazoRestante=75-Math.ceil(edadConPie);
-    if(plazoRestante<15&&plazoRestante>0){ txt+=`📌 Si tardas <em>${Math.ceil(mesesParaPie/12)} años</em> en juntar el pie, tendrías <strong>${plazoRestante} años</strong> para pagar — lo que subiría aún más la cuota.`; }
-    else if(plazoRestante<=0){ txt+=`🔴 <strong>Atención:</strong> al ritmo de ahorro actual juntarías el pie a los <em>${Math.round(edadConPie)} años</em> — ya no calificarías para crédito.`; }
-  }
-  if(!txt) txt=`Con ${edad} años y plazo de ${plazo} años tienes una ventana normal para este crédito.`;
-  document.getElementById('edad-veredicto').innerHTML=txt;
 }
 
 /* ESCENARIOS */
@@ -2836,17 +2787,16 @@ function renderArrVsCompra(precioClp,precioUF,piePct,tasa,plazo,cuota){
 }
 
 /* FRASE IMPACTO */
-function renderFraseImpacto(sueldo,pct,pieClp,aniosPie,precioClp,regionNombre,edad,plazo){
+function renderFraseImpacto(sueldo,pct,pieClp,aniosPie,precioClp,regionNombre,plazo){
   const fraseEl=document.getElementById('frase-impacto');
   const textoEl=document.getElementById('frase-texto');
   if(!sueldo||sueldo<=0){fraseEl.style.display='none';return;}
   fraseEl.style.display='block';
   const sueldoFmt='$'+fmt(sueldo);
-  const edadFin=(edad>0&&plazo>0)?edad+plazo:null;
   let frase='';
-  if(pct<=30){ frase=`Con <em>${sueldoFmt}/mes</em>, el dividendo representa solo el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. Eres de los pocos chilenos con acceso real a vivienda propia en ${regionNombre}.`; if(edadFin) frase+=` <strong>Terminarías de pagar a los ${edadFin} años.</strong>`; }
-  else if(pct<=50){ frase=`Con <em>${sueldoFmt}/mes</em>, destinarías el <strong>${pct.toFixed(1)}% de tu sueldo</strong> al dividendo. Quedarás con poco margen. Y para el pie aún necesitas <strong>${Math.ceil(aniosPie*12)} meses de ahorro disciplinado</strong>.`; if(edadFin) frase+=` Terminarías de pagar a los <strong>${edadFin} años</strong>.`; }
-  else if(pct<=80){ frase=`Con <em>${sueldoFmt}/mes</em>, el dividendo se llevaría el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. El banco probablemente no lo aprobará. Necesitarías ganar <strong>el doble</strong> para calificar solo, o conseguir un codeudor.`; if(edadFin) frase+=` Y terminarías pagando a los <strong>${edadFin} años</strong>.`; }
+  if(pct<=30){ frase=`Con <em>${sueldoFmt}/mes</em>, el dividendo representa solo el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. Eres de los pocos chilenos con acceso real a vivienda propia en ${regionNombre}.`; }
+  else if(pct<=50){ frase=`Con <em>${sueldoFmt}/mes</em>, destinarías el <strong>${pct.toFixed(1)}% de tu sueldo</strong> al dividendo. Quedarás con poco margen. Y para el pie aún necesitas <strong>${Math.ceil(aniosPie*12)} meses de ahorro disciplinado</strong>.`; }
+  else if(pct<=80){ frase=`Con <em>${sueldoFmt}/mes</em>, el dividendo se llevaría el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. El banco probablemente no lo aprobará. Necesitarías ganar <strong>el doble</strong> para calificar solo, o conseguir un codeudor.`; }
   else { frase=`<strong>Esta vivienda no es accesible para tu sueldo actual.</strong> El dividendo sería el <em>${pct.toFixed(1)}% de tus ingresos</em>. No es un problema tuyo: es la realidad de millones de chilenos hoy.`; }
   if(aniosPie>10&&pct>30) frase+=` Juntarías el pie en <em>${Math.ceil(aniosPie)} años</em> ahorrando el 20% de tu sueldo.`;
   textoEl.innerHTML=frase;
