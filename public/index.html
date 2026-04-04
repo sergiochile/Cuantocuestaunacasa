@@ -31,7 +31,9 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <!-- Carga no-bloqueante: usa print→all trick; display=swap ya está en la URL -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap"></noscript>
 
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css">
@@ -125,7 +127,7 @@
 <body>
 
   <!-- NAVEGACIÓN -->
-  <nav>
+  <nav class="site-nav">
     <span class="nav-logo" data-main-action="reload-page" role="button" tabindex="0" aria-label="Recargar calculadora">
       ¿cuánto cuesta una <em>casa</em>?
     </span>

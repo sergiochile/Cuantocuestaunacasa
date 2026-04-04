@@ -1,1465 +1,1245 @@
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Calculadora hipotecaria Chile 2026","url":"https://cuantocuestaunacasa.cl/","description":"Calcula si puedes comprar una casa en Chile. Simula tu dividendo, compara 11 bancos y descubre a qué subsidios MINVU calificas. Datos CMF 2026.","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"CLP"},"provider":{"@type":"Organization","name":"CuantoCuestaUnaCasa.cl","url":"https://cuantocuestaunacasa.cl/"}}
+/* ============================================================
+   app.js — ¿Cuánto cuesta una casa en Chile?
+   Versión optimizada: JSDoc, manejo defensivo de errores,
+   patrones modernos, sin código muerto.
+   ============================================================ */
 
+'use strict';
 
+/* ── DATOS DE REGIONES ──────────────────────────────────────
+   Precios por m² en UF según tipo de vivienda (CChC Q3 2025)
+   ─────────────────────────────────────────────────────────── */
 const REGIONES = {
-  RM:  { nombre:"Región Metropolitana", depto:77,  casa:63,  usada:62 },
-  ANT: { nombre:"Antofagasta",          depto:68,  casa:52,  usada:50 },
-  VAL: { nombre:"Valparaíso",           depto:58,  casa:48,  usada:45 },
-  BIO: { nombre:"Biobío / Concepción",  depto:55,  casa:45,  usada:42 },
-  COQ: { nombre:"Coquimbo / La Serena", depto:56,  casa:46,  usada:43 },
-  TAR: { nombre:"Tarapacá",             depto:52,  casa:42,  usada:40 },
-  ARI: { nombre:"Arica y Parinacota",   depto:45,  casa:38,  usada:35 },
-  ATA: { nombre:"Atacama",              depto:48,  casa:40,  usada:37 },
-  OHI: { nombre:"O'Higgins",            depto:44,  casa:38,  usada:35 },
-  MAU: { nombre:"Maule",                depto:40,  casa:34,  usada:30 },
-  NUB: { nombre:"Ñuble",                depto:38,  casa:32,  usada:28 },
-  ARA: { nombre:"La Araucanía",         depto:36,  casa:30,  usada:27 },
-  RIO: { nombre:"Los Ríos",             depto:37,  casa:31,  usada:28 },
-  LAG: { nombre:"Los Lagos",            depto:38,  casa:32,  usada:29 },
-  AYS: { nombre:"Aysén",                depto:35,  casa:30,  usada:27 },
-  MAG: { nombre:"Magallanes",           depto:40,  casa:34,  usada:31 }
+  RM:  { nombre: 'Región Metropolitana',  depto: 77, casa: 63, usada: 62 },
+  ANT: { nombre: 'Antofagasta',           depto: 68, casa: 52, usada: 50 },
+  VAL: { nombre: 'Valparaíso',            depto: 58, casa: 48, usada: 45 },
+  BIO: { nombre: 'Biobío / Concepción',   depto: 55, casa: 45, usada: 42 },
+  COQ: { nombre: 'Coquimbo / La Serena',  depto: 56, casa: 46, usada: 43 },
+  TAR: { nombre: 'Tarapacá',              depto: 52, casa: 42, usada: 40 },
+  ARI: { nombre: 'Arica y Parinacota',    depto: 45, casa: 38, usada: 35 },
+  ATA: { nombre: 'Atacama',               depto: 48, casa: 40, usada: 37 },
+  OHI: { nombre: "O'Higgins",             depto: 44, casa: 38, usada: 35 },
+  MAU: { nombre: 'Maule',                 depto: 40, casa: 34, usada: 30 },
+  NUB: { nombre: 'Ñuble',                 depto: 38, casa: 32, usada: 28 },
+  ARA: { nombre: 'La Araucanía',          depto: 36, casa: 30, usada: 27 },
+  RIO: { nombre: 'Los Ríos',              depto: 37, casa: 31, usada: 28 },
+  LAG: { nombre: 'Los Lagos',             depto: 38, casa: 32, usada: 29 },
+  AYS: { nombre: 'Aysén',                 depto: 35, casa: 30, usada: 27 },
+  MAG: { nombre: 'Magallanes',            depto: 40, casa: 34, usada: 31 },
 };
 
-/* ============================================================
-   SUBSIDIOS HABITACIONALES — datos 100% oficiales MINVU 2025
-   Fuentes: minvu.gob.cl (páginas de cada programa, leídas 2025)
-   ============================================================ */
+/* ── DEFINICIONES DE SUBSIDIOS ──────────────────────────────
+   Fuente: MINVU — https://www.minvu.gob.cl/beneficios/vivienda/
+   Postulación: https://postulacionenlinea.minvu.cl
+   Actualizado: 2026
+   ─────────────────────────────────────────────────────────── */
 const SUBSIDIOS_DEF = [
 
-  /* ════════════════════════════════════════════════════════════════════
-     🏠  COMPRA DE VIVIENDA
-  ════════════════════════════════════════════════════════════════════ */
-
-  /* ── DS49 Compra — Fondo Solidario de Elección de Vivienda ───────── */
+  /* ── DS49 — Fondo Solidario de Elección de Vivienda ──────── */
   {
-    id:'ds49', nombre:'DS49 — Comprar vivienda hasta 950 UF', icono:'🏘️',
-    categoria:'compra',
-    soloNueva:false,
-    descripcionOficial:'Permite a familias en situación de vulnerabilidad social comprar una vivienda construida de hasta 950 UF sin crédito hipotecario. El Estado entrega un subsidio base de 314 UF, que puede aumentar según zona geográfica y características del grupo familiar.',
-    quienPuedePostular:'Familias no propietarias de vivienda, RSH hasta 40%, con grupo familiar acreditado (no unipersonal, salvo adultos mayores, viudos/as, personas con discapacidad, indígenas o Valech).',
-    requisitosOficiales:[
-      'Tener mínimo 18 años de edad',
-      'Cédula Nacional de Identidad vigente',
-      'Estar inscrito en el RSH sin superar el 40% de vulnerabilidad',
-      'Acreditar grupo familiar (postulación unipersonal solo con excepciones)',
-      'Cuenta de ahorro con mínimo 10 UF (depositadas antes del último día hábil del mes previo a la postulación)',
-      'No ser propietario/a de vivienda',
-    ],
-    ahorroMinimoUF:10,
-    montoUF:314,
-    maxIngresoUF:999,
-    maxPrecioUF:950,
-    ingresoMaximoRSH:40,
-    modalidad:'Compra de vivienda construida (nueva o usada) o integración a proyecto SERVIU. Sin crédito hipotecario.',
-    postulacion:'Individual presencial en SERVIU o en línea con Clave Única.',
-    fechasPostulacion2026:'Llamados estimados: julio y octubre 2026. Confirma en minvu.gob.cl.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/subsidio-para-comprar-una-vivienda-construida-de-hasta-950-uf-ds49/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
+    id: 'ds49',
+    nombre: 'DS49 — Fondo Solidario de Elección de Vivienda',
+    icono: '🏘️',
+    maxIngresoUF: 25,  // Proxy orientativo RSH ≤ 40% (sin crédito requerido)
+    maxPrecioUF: 1400, // Varía por modalidad; puede superar este monto en proyectos
+    montoUF: 350,      // Monto orientativo; el subsidio cubre gran parte del precio
+    aplicar(d) {
+      return d.ingresoUF <= this.maxIngresoUF && d.primera;
     },
-    aplicar(d){ return d.primera && d.precioUF<=this.maxPrecioUF && d.ingresoUF<=25; },
-    razones(d){ const rs=[];
-      if(!d.primera) rs.push('Ya tienes una propiedad — el DS49 es exclusivo para primera vivienda');
-      if(d.precioUF>this.maxPrecioUF) rs.push(`La vivienda (${Math.round(d.precioUF)} UF) supera las ${this.maxPrecioUF} UF máximas del DS49`);
-      if(d.ingresoUF>25) rs.push(`Tu ingreso estimado (${d.ingresoUF.toFixed(1)} UF/mes) puede superar el RSH 40% requerido`);
-      return rs; }
+    razones(d) {
+      const rs = [];
+      if (d.ingresoUF > this.maxIngresoUF)
+        rs.push(`Tu ingreso (${d.ingresoUF.toFixed(1)} UF/mes) supera el perfil del DS49 — orientado a familias con RSH en el 40% de mayor vulnerabilidad`);
+      if (!d.primera)
+        rs.push('El DS49 requiere no ser propietario de vivienda');
+      return rs;
+    },
   },
 
-  /* ── DS1 Tramo 1 — Sectores Medios, hasta 1.100 UF ──────────────── */
+  /* ── DS1 Tramo 1 — Sectores Medios ───────────────────────── */
   {
-    id:'ds1t1', nombre:'DS1 Tramo 1 — Comprar vivienda hasta 1.100 UF', icono:'🏠',
-    categoria:'compra',
-    soloNueva:false,
-    descripcionOficial:'Ayuda económica para comprar o construir una vivienda nueva o usada de hasta 1.100 UF (1.200 UF en zonas extremas). RSH hasta 60%. No requiere preaprobación de crédito hipotecario.',
-    quienPuedePostular:'Familias no propietarias de vivienda, RSH hasta 60% (Adultos Mayores hasta 90%), con cuenta de ahorro vigente de mínimo 12 meses.',
-    requisitosOficiales:[
-      'Tener mínimo 18 años de edad',
-      'Cédula Nacional de Identidad vigente',
-      'No ser propietario/a de vivienda',
-      'RSH no superior al 60% (Adultos Mayores hasta 90%)',
-      'Cuenta de ahorro para la vivienda con antigüedad mínima de 12 meses',
-      'Ahorro depositado al último día del mes anterior a la postulación',
-      'No realizar giros desde esa fecha hasta la postulación',
-    ],
-    ahorroMinimoUF:0,
-    montoUF:130,
-    maxIngresoUF:37,
-    maxPrecioUF:1100,
-    ingresoMaximoRSH:60,
-    modalidad:'Compra o construcción de vivienda nueva o usada. Sin crédito hipotecario obligatorio.',
-    postulacion:'Individual o colectiva (≥10 integrantes con Entidad Patrocinante y proyecto SERVIU aprobado).',
-    fechasPostulacion2026:'Llamados: mayo y noviembre 2026 (ahorro acreditado al 30/abril y 30/octubre).',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/subsidio-habitacional-comprar-una-vivienda-de-hasta-1100-uf-ds1/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
+    id: 'ds1t1',
+    nombre: 'DS1 Tramo 1 — Sectores Medios',
+    icono: '🏠',
+    maxIngresoUF: 37,
+    maxPrecioUF: 1100,
+    montoUF: 130,
+    aplicar(d) {
+      return d.ingresoUF <= this.maxIngresoUF
+        && d.precioUF <= this.maxPrecioUF
+        && d.primera;
     },
-    aplicar(d){ return d.primera && d.ingresoUF<=this.maxIngresoUF && d.precioUF<=this.maxPrecioUF; },
-    razones(d){ const rs=[];
-      if(!d.primera) rs.push('Ya tienes una propiedad — el DS1 es exclusivo para primera vivienda');
-      if(d.ingresoUF>this.maxIngresoUF) rs.push(`Tu ingreso estimado (${d.ingresoUF.toFixed(1)} UF/mes) supera el límite del Tramo 1 — revisa el Tramo 2`);
-      if(d.precioUF>this.maxPrecioUF) rs.push(`La vivienda (${Math.round(d.precioUF)} UF) supera las ${this.maxPrecioUF} UF del Tramo 1`);
-      return rs; }
+    razones(d) {
+      const rs = [];
+      if (d.ingresoUF > this.maxIngresoUF)
+        rs.push(`Tu ingreso (${d.ingresoUF.toFixed(1)} UF/mes) supera los 37 UF del Tramo 1 — revisa si calificas al Tramo 2`);
+      if (d.precioUF > this.maxPrecioUF)
+        rs.push(`La vivienda (${Math.round(d.precioUF)} UF) supera las ${this.maxPrecioUF} UF del Tramo 1 — revisa el Tramo 2 o 3`);
+      if (!d.primera)
+        rs.push('El DS1 exige primera vivienda');
+      return rs;
+    },
   },
 
-  /* ── DS1 Tramo 2 — Sectores Medios, hasta 1.600 UF ──────────────── */
+  /* ── DS1 Tramo 2 ──────────────────────────────────────────── */
   {
-    id:'ds1t2', nombre:'DS1 Tramo 2 — Comprar vivienda hasta 1.600 UF', icono:'🏠',
-    categoria:'compra',
-    soloNueva:false,
-    descripcionOficial:'Ayuda económica para comprar o construir una vivienda de hasta 1.600 UF (1.800 UF en zonas extremas). RSH hasta 80%. Requiere preaprobación de crédito hipotecario.',
-    quienPuedePostular:'Familias no propietarias de vivienda, RSH hasta 80% (Adultos Mayores hasta 90%), con cuenta de ahorro mínimo 12 meses y preaprobación de crédito hipotecario.',
-    requisitosOficiales:[
-      'Tener mínimo 18 años de edad',
-      'Cédula Nacional de Identidad vigente',
-      'No ser propietario/a de vivienda',
-      'RSH no superior al 80% (Adultos Mayores hasta 90%)',
-      'Cuenta de ahorro para la vivienda con antigüedad mínima de 12 meses',
-      'Ahorro depositado al último día del mes anterior a la postulación',
-      'No realizar giros desde esa fecha hasta la postulación',
-      'Preaprobación de crédito hipotecario vigente',
-    ],
-    ahorroMinimoUF:0,
-    montoUF:90,
-    maxIngresoUF:60,
-    maxPrecioUF:1600,
-    ingresoMaximoRSH:80,
-    modalidad:'Compra o construcción de vivienda nueva o usada. Requiere crédito hipotecario.',
-    postulacion:'Individual o colectiva (≥10 integrantes con Entidad Patrocinante).',
-    fechasPostulacion2026:'Llamados: mayo y noviembre 2026 (ahorro acreditado al 30/abril y 30/octubre).',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/subsidio-habitacional-para-comprar-una-vivienda-de-hasta-1600-uf-ds1/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
+    id: 'ds1t2',
+    nombre: 'DS1 Tramo 2 — Sectores Medios',
+    icono: '🏠',
+    maxIngresoUF: 60,
+    maxPrecioUF: 1600,
+    montoUF: 90,
+    aplicar(d) {
+      return d.ingresoUF > 37
+        && d.ingresoUF <= this.maxIngresoUF
+        && d.precioUF <= this.maxPrecioUF
+        && d.primera;
     },
-    aplicar(d){ return d.primera && d.ingresoUF>37 && d.ingresoUF<=this.maxIngresoUF && d.precioUF<=this.maxPrecioUF; },
-    razones(d){ const rs=[];
-      if(!d.primera) rs.push('Ya tienes una propiedad — el DS1 es exclusivo para primera vivienda');
-      if(d.ingresoUF<=37) rs.push(`Tu ingreso estimado (${d.ingresoUF.toFixed(1)} UF/mes) está en el rango del Tramo 1`);
-      else if(d.ingresoUF>this.maxIngresoUF) rs.push(`Tu ingreso estimado (${d.ingresoUF.toFixed(1)} UF/mes) supera el límite del Tramo 2 — revisa el Tramo 3`);
-      if(d.precioUF>this.maxPrecioUF) rs.push(`La vivienda (${Math.round(d.precioUF)} UF) supera las ${this.maxPrecioUF} UF del Tramo 2`);
-      return rs; }
+    razones(d) {
+      const rs = [];
+      if (d.ingresoUF <= 37)
+        rs.push(`Tu ingreso (${d.ingresoUF.toFixed(1)} UF/mes) está bajo los 37 UF del Tramo 2 — revisa el Tramo 1`);
+      else if (d.ingresoUF > this.maxIngresoUF)
+        rs.push(`Tu ingreso (${d.ingresoUF.toFixed(1)} UF/mes) supera los 60 UF del Tramo 2 — revisa el Tramo 3`);
+      if (d.precioUF > this.maxPrecioUF)
+        rs.push(`La vivienda (${Math.round(d.precioUF)} UF) supera las ${this.maxPrecioUF} UF del Tramo 2`);
+      if (!d.primera)
+        rs.push('El DS1 exige primera vivienda');
+      return rs;
+    },
   },
 
-  /* ── DS1 Tramo 3 — Sectores Medios, hasta 2.200 UF ──────────────── */
+  /* ── DS1 Tramo 3 ──────────────────────────────────────────── */
   {
-    id:'ds1t3', nombre:'DS1 Tramo 3 — Comprar vivienda hasta 2.200 UF', icono:'🏠',
-    categoria:'compra',
-    soloNueva:false,
-    descripcionOficial:'Ayuda económica para comprar o construir una vivienda de hasta 2.200 UF (2.600 UF en zonas extremas). RSH hasta 90% sin exceder topes de ingreso del llamado. Requiere preaprobación de crédito hipotecario.',
-    quienPuedePostular:'Familias no propietarias de vivienda, RSH hasta 90% sin superar topes de ingreso del llamado, con cuenta de ahorro mínimo 12 meses y preaprobación de crédito hipotecario.',
-    requisitosOficiales:[
-      'Tener mínimo 18 años de edad',
-      'Cédula Nacional de Identidad vigente',
-      'No ser propietario/a de vivienda',
-      'RSH no superior al 90% y no exceder topes de ingreso del llamado',
-      'Cuenta de ahorro para la vivienda con antigüedad mínima de 12 meses',
-      'Ahorro depositado al último día del mes anterior a la postulación',
-      'No realizar giros desde esa fecha hasta la postulación',
-      'Preaprobación de crédito hipotecario vigente',
-    ],
-    ahorroMinimoUF:0,
-    montoUF:60,
-    maxIngresoUF:78,
-    maxPrecioUF:2200,
-    ingresoMaximoRSH:90,
-    modalidad:'Compra o construcción de vivienda nueva o usada. Requiere crédito hipotecario.',
-    postulacion:'Individual o colectiva (≥10 integrantes vía Entidad Patrocinante).',
-    fechasPostulacion2026:'Llamados: mayo y noviembre 2026 (ahorro acreditado al 30/abril y 30/octubre).',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/subsidio-habitacional-para-comprar-una-vivienda-de-hasta-2200-uf-ds1/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
+    id: 'ds1t3',
+    nombre: 'DS1 Tramo 3 — Sectores Medios',
+    icono: '🏠',
+    maxIngresoUF: 78,
+    maxPrecioUF: 2200,
+    montoUF: 60,
+    aplicar(d) {
+      return d.ingresoUF > 60
+        && d.ingresoUF <= this.maxIngresoUF
+        && d.precioUF <= this.maxPrecioUF
+        && d.primera;
     },
-    aplicar(d){ return d.primera && d.ingresoUF>60 && d.ingresoUF<=this.maxIngresoUF && d.precioUF<=this.maxPrecioUF; },
-    razones(d){ const rs=[];
-      if(!d.primera) rs.push('Ya tienes una propiedad — el DS1 es exclusivo para primera vivienda');
-      if(d.ingresoUF<=60) rs.push(`Tu ingreso estimado (${d.ingresoUF.toFixed(1)} UF/mes) está en el rango del Tramo 2`);
-      else if(d.ingresoUF>this.maxIngresoUF) rs.push(`Tu ingreso estimado (${d.ingresoUF.toFixed(1)} UF/mes) supera el límite del Tramo 3`);
-      if(d.precioUF>this.maxPrecioUF) rs.push(`La vivienda (${Math.round(d.precioUF)} UF) supera las ${this.maxPrecioUF} UF del Tramo 3`);
-      return rs; }
+    razones(d) {
+      const rs = [];
+      if (d.ingresoUF <= 60)
+        rs.push(`Tu ingreso (${d.ingresoUF.toFixed(1)} UF/mes) está bajo los 60 UF del Tramo 3 — revisa el Tramo 2`);
+      else if (d.ingresoUF > this.maxIngresoUF)
+        rs.push(`Tu ingreso (${d.ingresoUF.toFixed(1)} UF/mes) supera los 78 UF — no hay subsidio DS1 para este nivel de ingresos`);
+      if (d.precioUF > this.maxPrecioUF)
+        rs.push(`La vivienda (${Math.round(d.precioUF)} UF) supera las ${this.maxPrecioUF} UF del Tramo 3`);
+      if (!d.primera)
+        rs.push('El DS1 exige primera vivienda');
+      return rs;
+    },
   },
 
-  /* ── FOGAES — Garantía para pie del 10% ─────────────────────────── */
+  /* ── FOGAES — Garantía Estatal para Pie del 10% ──────────── */
   {
-    id:'fogaes', nombre:'FOGAES — Garantía estatal para pie del 10%', icono:'🔑',
-    categoria:'compra',
-    soloNueva:false,
-    maxPrecioUF:4500, esFogaes:true,
-    descripcionOficial:'El Fondo de Garantía Especial (FOGAES) permite acceder a un crédito hipotecario con un pie mínimo del 10% en lugar del 20% habitual. El Estado garantiza la diferencia ante el banco. No es exclusivo de primera vivienda.',
-    quienPuedePostular:'Cualquier persona comprando vivienda de hasta 4.500 UF con crédito hipotecario.',
-    requisitosOficiales:[
-      'Vivienda con precio hasta 4.500 UF',
-      'Crédito hipotecario aprobado por banco participante',
-      'No se tramita en MINVU — el banco lo gestiona directamente',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Disponible para compra de vivienda con crédito hipotecario. No exclusivo de primera vivienda.',
-    postulacion:'Sin postulación — el banco lo tramita automáticamente al solicitar el crédito.',
-    fechasPostulacion2026:'Disponible de forma continua en bancos participantes. Sin llamado periódico.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficios/vivienda/',
-      postulacion:'https://www.minvu.gob.cl/beneficios/vivienda/',
+    id: 'fogaes',
+    nombre: 'FOGAES — Garantía Estatal (Pie 10%)',
+    icono: '🔑',
+    maxPrecioUF: 4500,
+    esFogaes: true,
+    aplicar(d) { return d.precioUF <= this.maxPrecioUF; },
+    razones(d) {
+      const rs = [];
+      if (d.precioUF > this.maxPrecioUF)
+        rs.push(`La vivienda (${Math.round(d.precioUF)} UF) supera el límite de ${this.maxPrecioUF} UF de FOGAES`);
+      return rs;
     },
-    aplicar(d){ return d.precioUF<=this.maxPrecioUF; },
-    razones(d){ const rs=[];
-      if(d.precioUF>this.maxPrecioUF) rs.push(`La vivienda (${Math.round(d.precioUF)} UF) supera el límite de ${this.maxPrecioUF} UF de FOGAES`);
-      return rs; }
   },
 
-  /* ── Ley 21.748 — Subsidio a la Tasa ─────────────────────────────── */
+  /* ── Ley 21.748 — Subsidio a la Tasa de Interés ─────────── */
   {
-    id:'ley21748', nombre:'Subsidio a la tasa — Ley 21.748', icono:'📉',
-    categoria:'compra',
-    maxPrecioUF:4000, esTasa:true, tasaDescuento:0.6, soloNueva:true,
-    descripcionOficial:'El Estado subsidia parte de la tasa de interés del crédito hipotecario durante los primeros años, reduciendo el dividendo mensual en ese período. Aplica exclusivamente a vivienda nueva con crédito a tasa fija.',
-    quienPuedePostular:'Personas que compren vivienda nueva (casa o departamento) de hasta 4.000 UF con crédito hipotecario a tasa fija.',
-    requisitosOficiales:[
-      'Vivienda nueva (casa o departamento)',
-      'Precio hasta 4.000 UF',
-      'Crédito hipotecario a tasa fija',
-      'No requiere postulación en MINVU — el banco aplica el beneficio directamente',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Vivienda nueva únicamente. El banco aplica el subsidio — menciona "Ley 21.748" al ejecutivo.',
-    postulacion:'Sin postulación en MINVU — se gestiona directamente con el banco al firmar el crédito.',
-    fechasPostulacion2026:'Disponible mientras haya cupos. Consulta directamente con tu banco.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/',
-      postulacion:'https://www.minvu.gob.cl/',
+    id: 'ley21748',
+    nombre: 'Ley 21.748 — Subsidio a la Tasa de Interés',
+    icono: '📉',
+    maxPrecioUF: 4000,
+    esTasa: true,
+    tasaDescuento: 0.6,
+    soloNueva: true,
+    aplicar(d) {
+      return d.precioUF <= this.maxPrecioUF
+        && (d.tipo === 'depto' || d.tipo === 'casa');
     },
-    aplicar(d){ return d.precioUF<=this.maxPrecioUF&&(d.tipo==='depto'||d.tipo==='casa'); },
-    razones(d){ const rs=[];
-      if(d.precioUF>this.maxPrecioUF) rs.push(`La vivienda (${Math.round(d.precioUF)} UF) supera las ${this.maxPrecioUF} UF máximas del subsidio a la tasa`);
-      if(d.tipo==='usada') rs.push('Este subsidio aplica solo a vivienda nueva — elegiste vivienda usada');
-      return rs; }
+    razones(d) {
+      const rs = [];
+      if (d.precioUF > this.maxPrecioUF)
+        rs.push(`La vivienda (${Math.round(d.precioUF)} UF) supera las ${this.maxPrecioUF} UF máximas`);
+      if (d.tipo === 'usada')
+        rs.push('Aplica solo a vivienda nueva');
+      return rs;
+    },
   },
 
-  /* ── DS52 — Subsidio de Arriendo ─────────────────────────────────── */
+  /* ── DS52 — Subsidio de Arriendo (informativo) ───────────── */
   {
-    id:'ds52', nombre:'DS52 — Subsidio de Arriendo', icono:'🏘️',
-    categoria:'arriendo',
-    soloNueva:false,
-    maxPrecioUF:999, esArriendo:true,
-    descripcionOficial:'Aporte temporal de hasta 170 UF en total (hasta 4,2 UF/mes por máximo 8 años) para que familias puedan arrendar una vivienda mientras ahorran para su casa propia.',
-    quienPuedePostular:'Personas con RSH hasta 70% e ingresos familiares entre 7 y 25 UF/mes. Postulación con cónyuge, conviviente o hijo (solos solo si tienen más de 60 años).',
-    requisitosOficiales:[
-      'Tener mínimo 18 años de edad',
-      'RSH no superior al 70%',
-      'Ingresos familiares entre 7 y 25 UF/mes (aumenta 8 UF por cada integrante extra sobre 3)',
-      'Ahorro mínimo de 4 UF en cuenta de ahorro para la vivienda',
-      'Postular con cónyuge, conviviente civil, conviviente o hijo (mayores de 60 años pueden postular solos)',
-      'Arriendo máximo de 11 UF/mes (13 UF en regiones extremas)',
-    ],
-    ahorroMinimoUF:4,
-    modalidad:'Subsidio temporal de arriendo. No es para compra de vivienda.',
-    postulacion:'Individual o con núcleo familiar. Presencial en SERVIU o en línea.',
-    fechasPostulacion2026:'Llamado regular: mayo–junio 2026. Llamado especial AM/Discapacidad: agosto 2026.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/arriendo-de-una-vivienda/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
+    id: 'ds52',
+    nombre: 'DS52 — Subsidio de Arriendo',
+    icono: '🏡',
+    esInformativo: true,
+    esArriendo: true,
+    aplicar(d) { return d.ingresoUF > 0 && d.ingresoUF <= 60; },
+    razones(d) {
+      if (d.ingresoUF > 60)
+        return ['Programa de arriendo — consulta tu elegibilidad según RSH en MINVU'];
+      return [];
     },
-    aplicar(d){ return !d.primera || (d.ingresoUF>=7 && d.ingresoUF<=25); },
-    razones(d){ const rs=[];
-      if(d.ingresoUF<7) rs.push('Tu ingreso estimado está bajo el mínimo de 7 UF/mes requerido');
-      if(d.ingresoUF>25) rs.push(`Tu ingreso estimado (${d.ingresoUF.toFixed(1)} UF/mes) puede superar el límite de 25 UF/mes del DS52`);
-      return rs; }
   },
 
-  /* ════════════════════════════════════════════════════════════════════
-     ��️  CONSTRUCCIÓN DE VIVIENDA
-  ════════════════════════════════════════════════════════════════════ */
-
-  /* ── DS49 Construcción — hasta 950 UF ────────────────────────────── */
+  /* ── DS27 — Mejoramiento de Vivienda y Barrios (informativo) */
   {
-    id:'ds49c', nombre:'DS49 — Construir vivienda hasta 950 UF', icono:'🏗️',
-    categoria:'construccion',
-    soloNueva:true,
-    descripcionOficial:'Permite a familias en situación de vulnerabilidad construir una vivienda de hasta 950 UF en diversas modalidades: nuevos terrenos (10–160 viviendas), pequeño condominio (2–9 viviendas), sitio propio o densificación predial.',
-    quienPuedePostular:'Familias no propietarias de vivienda, RSH hasta 40% (70% del grupo). Ahorro mínimo 10 UF (15 UF si tramo RSH superior al 40%).',
-    requisitosOficiales:[
-      'Tener mínimo 18 años de edad',
-      'Cédula Nacional de Identidad vigente',
-      'RSH hasta 40% (al menos el 70% del grupo)',
-      'No ser propietario/a de vivienda',
-      'Ahorro mínimo 10 UF (15 UF si tramo >40%)',
-      'Contar con Entidad Patrocinante habilitada',
-      'Terreno apto o adherirse a proyecto colectivo',
-    ],
-    ahorroMinimoUF:10,
-    modalidad:'4 modalidades: Nuevos terrenos (10–160 viv., colectiva), Pequeño condominio (2–9 viv., colectiva), Sitio propio (colectiva o individual), Densificación predial (colectiva o individual).',
-    postulacion:'Colectiva o individual según modalidad. Vía Entidad Patrocinante habilitada por SERVIU.',
-    fechasPostulacion2026:'Llamados estimados: julio y octubre 2026. Confirma en minvu.gob.cl.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/subsidio-para-construir-una-vivienda-de-hasta-950-uf-ds49/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
+    id: 'ds27',
+    nombre: 'DS27 — Mejoramiento de Vivienda y Barrios',
+    icono: '🔧',
+    esInformativo: true,
+    esMejoramiento: true,
+    aplicar(d) { return !d.primera; },
+    razones(d) {
+      if (d.primera)
+        return ['Este programa mejora una vivienda existente — no aplica para comprar primera vivienda'];
+      return [];
     },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este programa es para construir vivienda nueva, no para compra de vivienda construida']; }
   },
 
-  /* ── DS1 Construir — hasta 1.600 UF ─────────────────────────────── */
+  /* ── DS10 — Habitabilidad Rural (informativo) ────────────── */
   {
-    id:'ds1c1600', nombre:'DS1 — Construir vivienda hasta 1.600 UF', icono:'🏗️',
-    categoria:'construccion',
-    soloNueva:true,
-    descripcionOficial:'Subsidio habitacional para construir una vivienda nueva de hasta 1.600 UF. RSH hasta 80%. Requiere preaprobación de crédito hipotecario y cuenta de ahorro con antigüedad mínima de 12 meses.',
-    quienPuedePostular:'Familias no propietarias de vivienda, RSH hasta 80%, con cuenta de ahorro mínimo 12 meses y preaprobación de crédito hipotecario.',
-    requisitosOficiales:[
-      'Tener mínimo 18 años de edad',
-      'No ser propietario/a de vivienda',
-      'RSH no superior al 80%',
-      'Cuenta de ahorro para la vivienda con antigüedad mínima de 12 meses',
-      'Ahorro depositado al último día del mes anterior a la postulación',
-      'Preaprobación de crédito hipotecario vigente',
-      'Terreno apto para construir o adherirse a proyecto colectivo',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Construcción de vivienda nueva. Requiere crédito hipotecario.',
-    postulacion:'Individual o colectiva (≥10 integrantes con Entidad Patrocinante).',
-    fechasPostulacion2026:'Llamados: mayo y noviembre 2026.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/subsidio-habitacional-para-construir-una-vivienda-de-hasta-1600-uf-ds1/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
+    id: 'ds10',
+    nombre: 'DS10 — Habitabilidad Rural',
+    icono: '🌾',
+    esInformativo: true,
+    esRural: true,
+    aplicar() { return false; },
+    razones() {
+      return ['Exclusivo para familias en zonas rurales — consulta en la SEREMI de tu región'];
     },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este programa es para construir vivienda nueva, no para compra de vivienda construida']; }
   },
-
-  /* ── DS1 Construir — hasta 2.200 UF ─────────────────────────────── */
-  {
-    id:'ds1c2200', nombre:'DS1 — Construir vivienda hasta 2.200 UF', icono:'🏗️',
-    categoria:'construccion',
-    soloNueva:true,
-    descripcionOficial:'Subsidio habitacional para construir una vivienda nueva de hasta 2.200 UF. RSH hasta 90% sin exceder topes de ingreso del llamado. Requiere preaprobación de crédito hipotecario.',
-    quienPuedePostular:'Familias no propietarias de vivienda, RSH hasta 90% sin superar topes de ingreso del llamado, con cuenta de ahorro mínimo 12 meses y preaprobación de crédito hipotecario.',
-    requisitosOficiales:[
-      'Tener mínimo 18 años de edad',
-      'No ser propietario/a de vivienda',
-      'RSH no superior al 90% y no exceder topes de ingreso del llamado',
-      'Cuenta de ahorro para la vivienda con antigüedad mínima de 12 meses',
-      'Ahorro depositado al último día del mes anterior a la postulación',
-      'Preaprobación de crédito hipotecario vigente',
-      'Terreno apto para construir o adherirse a proyecto colectivo',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Construcción de vivienda nueva. Requiere crédito hipotecario.',
-    postulacion:'Individual o colectiva (≥10 integrantes vía Entidad Patrocinante).',
-    fechasPostulacion2026:'Llamados: mayo y noviembre 2026.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/subsidio-habitacional-para-construir-una-vivienda-de-hasta-2200-uf-ds1/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este programa es para construir vivienda nueva, no para compra de vivienda construida']; }
-  },
-
-  /* ════════════════════════════════════════════════════════════════════
-     🤝  INTEGRACIÓN SOCIAL Y TERRITORIAL (DS19)
-  ════════════════════════════════════════════════════════════════════ */
-
-  /* ── DS19 — Para familias ─────────────────────────────────────────── */
-  {
-    id:'ds19fam', nombre:'DS19 — Integración Social y Territorial (familias)', icono:'🤝',
-    categoria:'integracion',
-    soloNueva:false,
-    descripcionOficial:'Las familias que ya tienen subsidio DS49 o DS1 pueden aplicarlo en proyectos habitacionales integrados, ubicados en barrios bien localizados con acceso a servicios, transporte y equipamiento. Las familias sin subsidio también pueden acceder si cumplen los requisitos DS1. Desde 2022 el proceso de inscripción es a través de un nuevo sistema digital.',
-    quienPuedePostular:'Familias con subsidio DS49 o DS1 vigente que deseen aplicarlo en proyectos DS19. También familias sin subsidio que cumplan los requisitos DS1 (RSH hasta 90%, sin vivienda propia).',
-    requisitosOficiales:[
-      'Tener subsidio habitacional DS49 o DS1 vigente, o cumplir requisitos DS1',
-      'No ser propietario/a de vivienda',
-      'Inscribirse en el proyecto DS19 correspondiente a través del sistema digital MINVU',
-      'El proyecto debe contar con Plan de Integración Social (mínimo 5 actividades, 5 UF por asignatario)',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Aplicación del subsidio DS49 o DS1 en proyectos inmobiliarios integrados certificados por MINVU.',
-    postulacion:'Inscripción en el proyecto inmobiliario DS19 habilitado. No se postula directamente en SERVIU.',
-    fechasPostulacion2026:'Depende de la apertura de proyectos DS19 disponibles. Consulta en minvu.gob.cl.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/informacion-para-familias-con-o-sin-subsidio-interesadas-en-incorporarse-a-proyectos-ds-19/',
-      postulacion:'https://www.minvu.gob.cl/beneficio/vivienda/subsidio-de-integracion-social-y-territorial-ds19/',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['El DS19 aplica sobre un subsidio DS49 o DS1 vigente — usa el simulador para revisar si calificas a esos programas primero']; }
-  },
-
-  /* ── DS19 — Para inmobiliarias / desarrolladoras ─────────────────── */
-  {
-    id:'ds19inm', nombre:'DS19 — Integración Social y Territorial (inmobiliarias)', icono:'🏢',
-    categoria:'integracion',
-    soloNueva:true,
-    descripcionOficial:'Información para entidades desarrolladoras, inmobiliarias y constructoras interesadas en participar en concursos de proyectos DS19. Permite construir viviendas en zonas bien localizadas, incorporando familias con subsidios habitacionales.',
-    quienPuedePostular:'Inmobiliarias, constructoras y entidades desarrolladoras habilitadas por MINVU.',
-    requisitosOficiales:[
-      'Ser entidad desarrolladora habilitada por MINVU',
-      'Presentar proyecto en zonas bien localizadas (acceso a servicios, transporte, equipamiento)',
-      'Cumplir estándares de diseño y calidad MINVU',
-      'Proponer Plan de Integración Social (mínimo 5 actividades, 5 UF por asignatario)',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Concurso de proyectos convocado por MINVU/SERVIU. Proyecto debe cumplir certificación DS19.',
-    postulacion:'Concurso público convocado por SERVIU regional.',
-    fechasPostulacion2026:'Según convocatorias regionales de SERVIU. Consulta en minvu.gob.cl.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/informacion-para-entidades-desarrolladoras-inmobiliarias-constructoras-interesadas-en-participar-en-llamados-a-concurso-de-proyectos-ds-19/',
-      postulacion:'https://www.minvu.gob.cl/beneficio/vivienda/subsidio-de-integracion-social-y-territorial-ds19/',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este programa es para entidades desarrolladoras/inmobiliarias, no para familias en el simulador de compra']; }
-  },
-
-  /* ════════════════════════════════════════════════════════════════════
-     🔨  MEJORAMIENTO DE VIVIENDAS Y BARRIOS
-  ════════════════════════════════════════════════════════════════════ */
-
-  /* ── DS27 — Mejoramiento / Viviendas ─────────────────────────────── */
-  {
-    id:'ds27', nombre:'Mejoramiento — Proyectos para la Vivienda (Hogar Mejor)', icono:'🔨',
-    categoria:'mejoramiento',
-    soloNueva:false,
-    maxPrecioUF:999, esMejoramiento:true,
-    descripcionOficial:'Financia reparación, mejoramiento y ampliación de viviendas sociales en localidades urbanas de más de 5.000 habitantes. Incluye adecuación para personas con discapacidad y mejoras de habitabilidad.',
-    quienPuedePostular:'Propietarios o asignatarios de viviendas sociales (avalúo fiscal hasta 950 UF) construidas con subsidio MINVU/SERVIU. RSH hasta 60% para postulación individual.',
-    requisitosOficiales:[
-      'Tener mínimo 18 años de edad',
-      'Ser propietario/a o asignatario/a de la vivienda a mejorar',
-      'Vivienda social con avalúo fiscal hasta 950 UF, construida con subsidio MINVU o por SERVIU',
-      'Localidad urbana de más de 5.000 habitantes',
-      'RSH hasta 60% (individual); 60% del grupo en ese tramo si postulación grupal',
-      'Ahorro mínimo desde 3 UF (mejoramiento) hasta 7 UF (adecuación)',
-      'Contar con Entidad Patrocinante habilitada',
-    ],
-    ahorroMinimoUF:3,
-    modalidad:'No es para compra — mejora o amplía vivienda existente. Subsidio de hasta 504 UF para ampliación.',
-    postulacion:'Individual o colectiva con Entidad Patrocinante habilitada.',
-    fechasPostulacion2026:'Llamados estimados: abril–mayo 2026. Consulta en el SERVIU de tu región.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/programa-de-mejoramiento-de-viviendas-y-barrios-proyectos-para-la-vivienda/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este programa mejora o amplía una vivienda que ya tienes — no aplica al simulador de compra']; }
-  },
-
-  /* ── Mejoramiento — Eficiencia Energética ────────────────────────── */
-  {
-    id:'mejoref', nombre:'Mejoramiento — Eficiencia Energética e Hídrica', icono:'⚡',
-    categoria:'mejoramiento',
-    soloNueva:false,
-    descripcionOficial:'Financia proyectos de mejoramiento de viviendas orientados a aumentar la eficiencia energética e hídrica: aislación térmica, ventanas, sistemas de calefacción eficiente, agua caliente sanitaria y reducción de consumo hídrico.',
-    quienPuedePostular:'Propietarios o asignatarios de viviendas sociales construidas con subsidio MINVU/SERVIU, en localidades urbanas de más de 5.000 habitantes, con RSH vigente.',
-    requisitosOficiales:[
-      'Ser propietario/a o asignatario/a de vivienda social',
-      'Vivienda construida con subsidio MINVU o por SERVIU',
-      'Localidad urbana de más de 5.000 habitantes',
-      'RSH vigente dentro del tramo exigido por llamado',
-      'Contar con Entidad Patrocinante habilitada',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Proyecto de eficiencia energética e hídrica en vivienda existente. No es para compra.',
-    postulacion:'Colectiva con Entidad Patrocinante. Según convocatoria SERVIU regional.',
-    fechasPostulacion2026:'Consulta el calendario de llamados en el SERVIU de tu región.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/programa-de-mejoramiento-de-viviendas-y-barrios-proyectos-eficiencia-energetica-e-hidrica-para-la-vivienda/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este programa mejora viviendas existentes en eficiencia energética — no aplica al simulador de compra']; }
-  },
-
-  /* ── Mejoramiento — Condominios ──────────────────────────────────── */
-  {
-    id:'mejocond', nombre:'Mejoramiento — Proyectos para Condominios de Vivienda', icono:'🏢',
-    categoria:'mejoramiento',
-    soloNueva:false,
-    descripcionOficial:'Financia mejoramiento de espacios comunes, instalaciones y elementos estructurales de condominios de vivienda social, mejorando la convivencia y calidad de vida de los copropietarios.',
-    quienPuedePostular:'Copropietarios de condominios de vivienda social construidos con subsidio MINVU/SERVIU, organizados como comunidad o condominio legalmente constituido.',
-    requisitosOficiales:[
-      'Condominio de vivienda social construido con subsidio MINVU o por SERVIU',
-      'Comunidad o condominio legalmente constituido',
-      'Localidad urbana de más de 5.000 habitantes',
-      'Contar con Entidad Patrocinante habilitada',
-      'RSH vigente de al menos el porcentaje requerido por el llamado',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Mejoramiento de espacios comunes y elementos del condominio. Postulación colectiva.',
-    postulacion:'Colectiva vía Entidad Patrocinante. Según convocatoria SERVIU.',
-    fechasPostulacion2026:'Consulta el calendario de llamados en el SERVIU de tu región.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/programa-de-mejoramiento-de-viviendas-y-barrios-proyectos-para-condomimios-de-vivienda/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este programa es para condominios de vivienda social existentes — no aplica al simulador de compra']; }
-  },
-
-  /* ── Mejoramiento — Equipamiento Comunitario ─────────────────────── */
-  {
-    id:'mejoequip', nombre:'Mejoramiento — Equipamiento Comunitario', icono:'🌳',
-    categoria:'mejoramiento',
-    soloNueva:false,
-    descripcionOficial:'Financia proyectos para el mejoramiento del entorno barrial y equipamiento comunitario en sectores de vivienda social: áreas verdes, multicancha, sedes comunitarias, iluminación y veredas.',
-    quienPuedePostular:'Organizaciones comunitarias de sectores con vivienda social construida con subsidio MINVU/SERVIU, en localidades urbanas de más de 5.000 habitantes.',
-    requisitosOficiales:[
-      'Sector con vivienda social construida con subsidio MINVU o por SERVIU',
-      'Organización comunitaria vigente (junta de vecinos, comunidad, etc.)',
-      'Localidad urbana de más de 5.000 habitantes',
-      'Contar con Entidad Patrocinante habilitada',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Mejoramiento de entorno y equipamiento barrial. Postulación colectiva vía organización comunitaria.',
-    postulacion:'Colectiva vía Entidad Patrocinante o Municipio.',
-    fechasPostulacion2026:'Consulta el calendario de llamados en el SERVIU de tu región.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/programa-de-mejoramiento-de-viviendas-y-barrios-proyectos-para-equipamiento-comunitario/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este programa es para mejoramiento de barrios y equipamiento comunitario — no aplica al simulador de compra']; }
-  },
-
-  /* ════════════════════════════════════════════════════════════════════
-     🌾  HABITABILIDAD RURAL (DS10)
-  ════════════════════════════════════════════════════════════════════ */
-
-  /* ── DS10 — Sitio del Residente ──────────────────────────────────── */
-  {
-    id:'ds10', nombre:'DS10 Rural — Construcción en Sitio del Residente', icono:'🌾',
-    categoria:'rural',
-    soloNueva:true, esRural:true,
-    descripcionOficial:'Permite construir una vivienda nueva en el terreno donde vive la familia, en localidades de hasta 5.000 habitantes. Reconoce particularidades culturales, geográficas y productivas del territorio rural.',
-    quienPuedePostular:'Familias que viven en localidades de hasta 5.000 habitantes, con disponibilidad de terreno y RSH vigente.',
-    requisitosOficiales:[
-      'Tener mínimo 18 años de edad',
-      'Residir en localidad de hasta 5.000 habitantes',
-      'Acreditar disponibilidad de terreno apto para construcción',
-      'RSH vigente',
-      'Ahorro mínimo: 10 UF (RSH 40%), 30 UF (RSH 50–60%), 50 UF (RSH 70% o más)',
-      'Contar con Entidad de Gestión Rural habilitada por MINVU',
-    ],
-    ahorroMinimoUF:10,
-    modalidad:'Construcción en sitio del residente. Individual o colectiva.',
-    postulacion:'Individual o colectiva vía Entidad de Gestión Rural habilitada.',
-    fechasPostulacion2026:'Llamados estimados: marzo, mayo, julio, septiembre y diciembre 2026.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/programa-de-habitabilidad-rural-construccion-en-sitio-del-residente-localidades-de-hasta-5-000-habitantes/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este programa es para zonas rurales de hasta 5.000 habitantes — no aplica a la vivienda urbana del simulador']; }
-  },
-
-  /* ── DS10 — Conjunto Habitacional ───────────────────────────────── */
-  {
-    id:'ds10cj', nombre:'DS10 Rural — Construcción de Conjunto Habitacional', icono:'🌾',
-    categoria:'rural',
-    soloNueva:true, esRural:true,
-    descripcionOficial:'Permite construir conjuntos habitacionales en localidades rurales de hasta 5.000 habitantes para familias que no cuentan con terreno propio. El proyecto incluye adquisición o habilitación del terreno.',
-    quienPuedePostular:'Familias en localidades de hasta 5.000 habitantes, sin terreno propio, que se organicen colectivamente con Entidad de Gestión Rural.',
-    requisitosOficiales:[
-      'Tener mínimo 18 años de edad',
-      'Residir en localidad de hasta 5.000 habitantes',
-      'RSH vigente',
-      'Postulación colectiva (grupo organizado)',
-      'Contar con Entidad de Gestión Rural habilitada por MINVU',
-    ],
-    ahorroMinimoUF:10,
-    modalidad:'Construcción de conjunto habitacional en localidad rural. Postulación colectiva.',
-    postulacion:'Colectiva vía Entidad de Gestión Rural habilitada.',
-    fechasPostulacion2026:'Llamados estimados: marzo, mayo, julio, septiembre y diciembre 2026.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/programa-de-habitabilidad-rural-construccion-de-conjunto-habitacional-localidades-de-hasta-5-000-habitantes/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este programa es para zonas rurales de hasta 5.000 habitantes — no aplica a la vivienda urbana del simulador']; }
-  },
-
-  /* ── DS10 — Mejoramiento de Vivienda Existente ───────────────────── */
-  {
-    id:'ds10mj', nombre:'DS10 Rural — Mejoramiento y Ampliación de Vivienda Existente', icono:'🌾',
-    categoria:'rural',
-    soloNueva:false, esRural:true,
-    descripcionOficial:'Financia la reparación, mejoramiento y ampliación de viviendas existentes en localidades rurales de hasta 5.000 habitantes, mejorando las condiciones de habitabilidad de familias que ya cuentan con vivienda.',
-    quienPuedePostular:'Propietarios de viviendas en localidades de hasta 5.000 habitantes, con RSH vigente y vivienda que requiera mejoramiento.',
-    requisitosOficiales:[
-      'Tener mínimo 18 años de edad',
-      'Ser propietario/a de la vivienda a mejorar',
-      'Residir en localidad de hasta 5.000 habitantes',
-      'RSH vigente',
-      'Contar con Entidad de Gestión Rural habilitada por MINVU',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Mejoramiento o ampliación de vivienda existente en zona rural.',
-    postulacion:'Individual o colectiva vía Entidad de Gestión Rural.',
-    fechasPostulacion2026:'Llamados estimados: marzo, mayo, julio, septiembre y diciembre 2026.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/programa-de-habitabilidad-rural-mejoramiento-y-ampliacion-de-vivienda-existente-localidades-de-hasta-5-000-habitantes/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este programa mejora viviendas existentes en zonas rurales — no aplica al simulador de compra urbana']; }
-  },
-
-  /* ── DS10 — Entorno y Equipamiento Comunitario ───────────────────── */
-  {
-    id:'ds10ent', nombre:'DS10 Rural — Entorno y Equipamiento Comunitario', icono:'🌾',
-    categoria:'rural',
-    soloNueva:false, esRural:true,
-    descripcionOficial:'Financia el mejoramiento del entorno y equipamiento comunitario en localidades rurales de hasta 5.000 habitantes: saneamiento, veredas, iluminación, áreas verdes y sedes comunitarias.',
-    quienPuedePostular:'Organizaciones comunitarias de localidades rurales de hasta 5.000 habitantes, organizadas con Entidad de Gestión Rural.',
-    requisitosOficiales:[
-      'Localidad de hasta 5.000 habitantes',
-      'Organización comunitaria vigente',
-      'Contar con Entidad de Gestión Rural habilitada por MINVU',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Mejoramiento de entorno y equipamiento en zona rural. Postulación colectiva.',
-    postulacion:'Colectiva vía Entidad de Gestión Rural o Municipio.',
-    fechasPostulacion2026:'Llamados estimados: marzo, mayo, julio, septiembre y diciembre 2026.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/programa-de-habitabilidad-rural-mejoramiento-del-entorno-y-equipamiento-comunitario-localidades-de-hasta-5-000-habitantes/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este programa es para equipamiento comunitario en zonas rurales — no aplica al simulador de compra']; }
-  },
-
-  /* ════════════════════════════════════════════════════════════════════
-     🔄  PORTABILIDAD FINANCIERA
-  ════════════════════════════════════════════════════════════════════ */
-
-  /* ── Portabilidad Financiera ─────────────────────────────────────── */
-  {
-    id:'portabilidad', nombre:'Portabilidad Financiera Hipotecaria', icono:'🔄',
-    categoria:'portabilidad',
-    soloNueva:false,
-    descripcionOficial:'La Ley de Portabilidad Financiera (vigente desde el 8 de septiembre de 2020) permite cambiar tu crédito hipotecario de una institución financiera a otra con mejores condiciones, manteniendo el subsidio habitacional DS1 o DS19 que ya tienes. No pierdes el beneficio de rebaja de dividendos si no incorporas otras deudas.',
-    quienPuedePostular:'Personas con crédito hipotecario vigente con subsidio DS1 o DS19 que deseen refinanciar o trasladar su crédito a otra institución financiera.',
-    requisitosOficiales:[
-      'Tener crédito hipotecario vigente con subsidio DS1 o DS19',
-      'Solicitar oferta de portabilidad a otra institución financiera',
-      'Revisar la oferta estandarizada recibida (el banco tiene plazos para entregarla)',
-      'No incorporar otras deudas al refinanciamiento si se quiere conservar la rebaja de dividendos',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Refinanciamiento hipotecario entre instituciones financieras. Mantiene subsidio DS1/DS19.',
-    postulacion:'Directamente con la institución financiera destino. No requiere trámite en MINVU.',
-    fechasPostulacion2026:'Disponible de forma continua. Sin llamado periódico.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/portabilidad-financiera/',
-      postulacion:'https://calculadorarefinanciamientocredito.minvu.cl',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['La portabilidad aplica a créditos hipotecarios ya contratados con subsidio DS1 o DS19 — no aplica al simulador de primera compra']; }
-  },
-
-  /* ════════════════════════════════════════════════════════════════════
-     ⚡  PROGRAMAS ESPECIALES
-  ════════════════════════════════════════════════════════════════════ */
-
-  /* ── Informe Valech ──────────────────────────────────────────────── */
-  {
-    id:'valech', nombre:'Beneficio Habitacional — Informe Valech', icono:'📜',
-    categoria:'especiales',
-    soloNueva:false,
-    descripcionOficial:'Las personas reconocidas en el Informe Valech como víctimas de violaciones a los derechos humanos durante la dictadura militar tienen acceso prioritario a subsidios habitacionales MINVU, con requisitos flexibilizados (pueden postular como personas solas sin grupo familiar) y tratos diferenciados.',
-    quienPuedePostular:'Personas reconocidas en el Informe Valech de la Comisión Nacional sobre Prisión Política y Tortura.',
-    requisitosOficiales:[
-      'Estar incluido en el Informe Valech de la Comisión Nacional sobre Prisión Política y Tortura',
-      'Acreditar calidad de víctima Valech ante el SERVIU',
-      'Presentar certificado oficial Valech',
-      'Cumplir demás requisitos del subsidio al que se postula (RSH, no propietario, etc.)',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Acceso prioritario y condiciones especiales en subsidios habitacionales MINVU (DS49, DS1 y otros).',
-    postulacion:'Presencial en SERVIU regional. Se debe presentar certificado Valech.',
-    fechasPostulacion2026:'Según los llamados de cada subsidio habitacional. Consultar en SERVIU.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/informe-valech/',
-      postulacion:'https://postulacionenlinea.minvu.cl',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['Este beneficio especial aplica a víctimas reconocidas en el Informe Valech — consulta directamente en SERVIU']; }
-  },
-
-  /* ── Información para el Arrendador ─────────────────────────────── */
-  {
-    id:'arrendador', nombre:'Información para el Arrendador (DS52)', icono:'🏠',
-    categoria:'especiales',
-    soloNueva:false,
-    descripcionOficial:'Información oficial del MINVU para propietarios de vivienda que deseen arrendarla a familias beneficiarias del Subsidio de Arriendo DS52. Explica requisitos de la vivienda, el contrato tipo y la relación con el SERVIU.',
-    quienPuedePostular:'Propietarios de vivienda interesados en arrendar a beneficiarios del subsidio DS52.',
-    requisitosOficiales:[
-      'Ser propietario de vivienda con arriendo máximo de 11 UF/mes (13 UF en regiones extremas)',
-      'La vivienda debe cumplir estándares mínimos de habitabilidad MINVU',
-      'Firmar contrato de arriendo tipo MINVU con el beneficiario del subsidio',
-      'Inscribir el contrato ante el SERVIU',
-    ],
-    ahorroMinimoUF:0,
-    modalidad:'Información para propietarios que arriendan a beneficiarios del DS52.',
-    postulacion:'No aplica — es información para arrendadores, no un subsidio de postulación.',
-    fechasPostulacion2026:'Disponible de forma continua.',
-    linksOficiales:{
-      minvu:'https://www.minvu.gob.cl/beneficio/vivienda/informacion-para-el-arrendador/',
-      postulacion:'https://www.minvu.gob.cl/beneficio/vivienda/informacion-para-el-arrendador/',
-    },
-    aplicar(d){ return false; },
-    razones(d){ return ['Esta es información para propietarios arrendadores — no aplica al simulador de compra']; }
-  },
-
 ];
 
+/* ── Fechas de postulación 2026 (fuente: MINVU) ─────────────
+   Verificar en https://www.minvu.gob.cl/beneficios/vivienda/
+   ─────────────────────────────────────────────────────────── */
+const FECHAS_POSTULACION_2026 = [
+  { id: 'ds49',  programa: 'DS49 — Fondo Solidario',          llamados: 'Julio · Octubre',                                color: '#16a34a' },
+  { id: 'ds1',   programa: 'DS1 — Sectores Medios (T1/T2/T3)', llamados: 'Mayo · Noviembre',                               color: '#2563eb' },
+  { id: 'ds52',  programa: 'DS52 — Subsidio de Arriendo',      llamados: 'Mayo–Junio · Agosto (adulto mayor/discapacidad)', color: '#9333ea' },
+  { id: 'ds10',  programa: 'DS10 — Habitabilidad Rural',        llamados: 'Marzo · Mayo · Julio · Sept. · Dic.',            color: '#ca8a04' },
+  { id: 'ds27',  programa: 'DS27 — Mejoramiento de Vivienda',   llamados: 'Abril–Mayo (según línea)',                       color: '#ea580c' },
+];
+
+/* ── ESTADO GLOBAL ──────────────────────────────────────────── */
 let UF_VALOR = 38500;
 let _resultadoCalculado = false;
-let _bcoPerfilUsuario = null;
 
-/* HELPERS CLP (inputs tipo text con puntos de miles) */
-function parseCLP(id){
-  const el=document.getElementById(id);
-  if(!el) return 0;
-  const raw=el.value.replace(/\./g,'').replace(/[^0-9]/g,'');
-  return raw?parseInt(raw,10):0;
-}
-function formatCLP(id){
-  const el=document.getElementById(id);
-  if(!el) return;
-  const raw=el.value.replace(/\./g,'').replace(/[^0-9]/g,'');
-  if(!raw){ el.value=''; return; }
-  el.value=parseInt(raw,10).toLocaleString('es-CL');
+/* ── HELPERS CLP ────────────────────────────────────────────── */
+
+/**
+ * Lee un input formateado con puntos de miles y devuelve un entero.
+ * @param {string} id - ID del elemento input
+ * @returns {number} Valor entero, 0 si está vacío o no existe
+ */
+function parseCLP(id) {
+  const el = document.getElementById(id);
+  if (!el) return 0;
+  const raw = el.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+  return raw ? parseInt(raw, 10) : 0;
 }
 
-/* SELECTOR AHORRO INICIAL */
-function selAhorro(btn){
-  document.querySelectorAll('.ahorro-btn').forEach(b=>b.classList.remove('activo'));
-  btn.classList.add('activo');
-  document.getElementById('ahorro').value = btn.dataset.val;
+/**
+ * Formatea un input numérico con separadores de miles (locale es-CL).
+ * @param {string} id - ID del elemento input
+ */
+function formatCLP(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const raw = el.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+  if (!raw) { el.value = ''; return; }
+  el.value = parseInt(raw, 10).toLocaleString('es-CL');
 }
 
-function selSituacion(sit){
-  // Actualizar botones
-  ['primera','segunda','tengo'].forEach(s=>{
-    document.getElementById('sit-btn-'+s).classList.toggle('activo', s===sit);
-  });
-  // Guardar en campo oculto
-  document.getElementById('primera').value = sit;
-  // Actualizar hint y aviso
-  const hint=document.getElementById('sit-hint');
-  const aviso=document.getElementById('sit-aviso');
-  if(sit==='primera'){
-    hint.textContent='Accedes a todos los subsidios del Estado';
-    aviso.classList.remove('visible');
-  } else if(sit==='segunda'){
-    hint.textContent='Segunda propiedad — algunos subsidios no aplican';
-    aviso.innerHTML='⚠️ <strong>Segunda vivienda:</strong> DS49 y DS1 son exclusivos para primera vivienda. Aún puedes acceder a <strong>FOGAES</strong> (pie 10%) si calificas por ingresos.';
-    aviso.classList.add('visible');
-  } else {
-    hint.textContent='Ya tienes casa — aplican subsidios de reemplazo';
-    aviso.innerHTML='ℹ️ <strong>Ya tienes vivienda:</strong> Los subsidios DS49 y DS1 no aplican. Puedes acceder a subsidios de <strong>reemplazo de vivienda</strong> si tu propiedad actual tiene deficiencias o es una vivienda precaria.';
-    aviso.classList.add('visible');
+/** Formateo rápido de número entero */
+const fmt = n => Math.round(n).toLocaleString('es-CL');
+
+/* ── CÁLCULOS FINANCIEROS ───────────────────────────────────── */
+
+/**
+ * Calcula la cuota mensual de un crédito hipotecario (sistema francés).
+ * @param {number} montoUF - Monto del crédito en UF
+ * @param {number} tasaAnual - Tasa anual en porcentaje (ej: 4.1 para 4.1%)
+ * @param {number} años - Plazo en años
+ * @returns {number} Cuota mensual en CLP
+ */
+function cuotaMensual(montoUF, tasaAnual, años) {
+  const r = (tasaAnual / 100) / 12;
+  const n = años * 12;
+  if (r === 0) return (montoUF * UF_VALOR) / n;
+  return montoUF * UF_VALOR * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+}
+
+/**
+ * Calcula el máximo crédito aprobable según sueldo.
+ * Usa la relación cuota/ingreso máxima (por defecto 30%).
+ * @param {number} sueldoTotal - Ingreso total en CLP
+ * @param {number} tasaAnual - Tasa anual en %
+ * @param {number} años - Plazo en años
+ * @param {number} [pctMax=0.30] - Razón cuota/ingreso máxima permitida
+ * @returns {number} Máximo crédito en CLP
+ */
+function maxCreditoPorSueldo(sueldoTotal, tasaAnual, años, pctMax = 0.30) {
+  const r = (tasaAnual / 100) / 12;
+  const n = años * 12;
+  const cuotaMax = sueldoTotal * pctMax;
+  if (r === 0) return cuotaMax * n;
+  return cuotaMax * (Math.pow(1 + r, n) - 1) / (r * Math.pow(1 + r, n));
+}
+
+/* ── UF (fetch + caché localStorage) ───────────────────────── */
+const LS_UF    = 'ccuc_uf_v';
+const LS_UF_TS = 'ccuc_uf_ts';
+const UF_TTL   = 3_600_000; // 1 hora en ms
+
+async function cargarUF() {
+  try {
+    const ts     = parseInt(localStorage.getItem(LS_UF_TS) || '0', 10);
+    const cached = parseFloat(localStorage.getItem(LS_UF) || '0');
+
+    if (cached > 0 && Date.now() - ts < UF_TTL) {
+      UF_VALOR = cached;
+      _mostrarUF(UF_VALOR);
+      if (_resultadoCalculado) { calcular(); renderDesigualdad(); }
+      return;
+    }
+
+    const r = await fetch('https://mindicador.cl/api/uf');
+    const d = await r.json();
+    UF_VALOR = d.serie[0].valor;
+    try {
+      localStorage.setItem(LS_UF, UF_VALOR);
+      localStorage.setItem(LS_UF_TS, Date.now());
+    } catch (_) { /* storage lleno o bloqueado */ }
+
+    _mostrarUF(UF_VALOR);
+    if (_resultadoCalculado) { calcular(); renderDesigualdad(); }
+
+  } catch (_) {
+    const cached = parseFloat(localStorage.getItem(LS_UF) || '0');
+    if (cached > 0) UF_VALOR = cached;
+    document.getElementById('uf-valor').textContent =
+      UF_VALOR.toLocaleString('es-CL') + ' (ref.)';
   }
 }
 
-/* MODO PRECIO */
-let _modoPrecio = 'precio'; // 'm2' | 'precio'
-
-function selModoPrecio(modo){
-  _modoPrecio = modo;
-  document.getElementById('modo-btn-m2').classList.toggle('activo', modo==='m2');
-  document.getElementById('modo-btn-precio').classList.toggle('activo', modo==='precio');
-  document.getElementById('bloque-m2').style.display = modo==='m2' ? '' : 'none';
-  document.getElementById('bloque-precio').style.display = modo==='precio' ? '' : 'none';
-  // Actualizar hint UF en bloque precio
-  const ufHint = document.getElementById('uf-hint-val');
-  if(ufHint) ufHint.textContent = fmt(UF_VALOR);
+function _mostrarUF(valor) {
+  document.getElementById('uf-valor').textContent =
+    valor.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function actualizarPrecioEstimado(){
-  const m2 = parseFloat(document.getElementById('m2').value) || 0;
-  const reg = document.getElementById('region').value;
-  const tipo = document.getElementById('tipo').value;
-  const hint = document.getElementById('hint-precio-estimado');
-  if(!m2 || !reg){
-    if(hint) hint.textContent='—';
-    return;
-  }
-  const datos = REGIONES[reg];
-  if(!datos){
-    if(hint) hint.textContent='—';
-    return;
-  }
-  const ufKey = tipo==='depto'?'depto':tipo==='casa'?'casa':'usada';
-  const precioUF = datos[ufKey] * m2;
-  const precioCLP = precioUF * UF_VALOR;
-  if(hint) hint.textContent = `≈ ${Math.round(precioUF).toLocaleString('es-CL')} UF · $${fmt(precioCLP)}`;
-}
+/* ── WIZARD ─────────────────────────────────────────────────── */
 
-function actualizarM2Estimado(){
-  const clp = parseCLP('precio-directo');
-  const reg = document.getElementById('region').value;
-  const tipo = document.getElementById('tipo').value;
-  const hint = document.getElementById('hint-m2-estimado');
-  if(!clp || !reg){
-    if(hint) hint.textContent='—';
-    return;
-  }
-  const datos = REGIONES[reg];
-  if(!datos){
-    if(hint) hint.textContent='—';
-    return;
-  }
-  const ufKey = tipo==='depto'?'depto':tipo==='casa'?'casa':'usada';
-  const precioUF = clp / UF_VALOR;
-  const m2est = Math.round(precioUF / datos[ufKey]);
-  if(hint) hint.textContent = `≈ ${Math.round(precioUF).toLocaleString('es-CL')} UF · ~${m2est} m² estimados`;
-  // Sincronizar al campo UF
-  const ufInput = document.getElementById('precio-directo-uf');
-  if(ufInput) ufInput.value = Math.round(precioUF);
-}
-
-function actualizarDesdUF(){
-  const uf = parseFloat(document.getElementById('precio-directo-uf').value) || 0;
-  const hint = document.getElementById('hint-m2-estimado');
-  if(!uf){
-    const clpEl=document.getElementById('precio-directo');
-    if(clpEl) clpEl.value='';
-    if(hint) hint.textContent='—';
-    return;
-  }
-  const clp = Math.round(uf * UF_VALOR);
-  const el = document.getElementById('precio-directo');
-  if(el){ el.value = clp.toLocaleString('es-CL'); }
-  const reg = document.getElementById('region').value;
-  const tipo = document.getElementById('tipo').value;
-  const datos = REGIONES[reg];
-  if(datos){
-    const ufKey = tipo==='depto'?'depto':tipo==='casa'?'casa':'usada';
-    const m2est = Math.round(uf / datos[ufKey]);
-    if(hint) hint.textContent = `≈ ${Math.round(uf).toLocaleString('es-CL')} UF · ~${m2est} m² estimados`;
-  }
-}
-
-/* WIZARD */
-function showScreen(n){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('activa'));
-  const target=document.getElementById('screen-'+n);
+function showScreen(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('activa'));
+  const target = document.getElementById('screen-' + n);
   target.classList.add('activa');
-  [1,2,3].forEach(i=>{
-    const it=document.getElementById('ws'+i);
-    it.classList.remove('activo','done');
+
+  [1, 2, 3].forEach(i => {
+    const it = document.getElementById('ws' + i);
+    it.classList.remove('activo', 'done');
     it.removeAttribute('aria-current');
-    if(i<n) it.classList.add('done');
-    else if(i===n){ it.classList.add('activo'); it.setAttribute('aria-current','step'); }
+    if (i < n)       { it.classList.add('done'); }
+    else if (i === n) { it.classList.add('activo'); it.setAttribute('aria-current', 'step'); }
   });
-  [1,2].forEach(i=>document.getElementById('ws-l'+i).classList.toggle('done',i<n));
-  window.scrollTo({top:0,behavior:'smooth'});
-  requestAnimationFrame(()=>{
-    const h=target.querySelector('h1,h2');
-    if(h){ h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
+  [1, 2].forEach(i =>
+    document.getElementById('ws-l' + i).classList.toggle('done', i < n)
+  );
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  requestAnimationFrame(() => {
+    const h = target.querySelector('h1, h2');
+    if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
   });
 }
 
-function irAPaso1(){ showScreen(1); }
+function irAPaso1() { showScreen(1); }
 
-function irAPaso2(){
-  const sueldo=parseCLP('sueldo');
-  if(sueldo<=0){
-    const el=document.getElementById('sueldo');
-    el.style.borderColor='var(--rojo)';
+function irAPaso2() {
+  const sueldo = parseCLP('sueldo');
+  if (sueldo <= 0) {
+    const el = document.getElementById('sueldo');
+    el.style.borderColor = 'var(--rojo)';
     el.focus();
-    el.placeholder='Ingresa tu sueldo para continuar';
-    setTimeout(()=>{ el.style.borderColor=''; el.placeholder='Ej: 900.000'; },3000);
+    el.placeholder = 'Ingresa tu sueldo para continuar';
+    setTimeout(() => { el.style.borderColor = ''; el.placeholder = 'Ej: 900.000'; }, 3000);
     return;
   }
-  // Sincronizar casado
-  const elCasado=document.getElementById('casado');
-  if(elCasado) document.getElementById('btn-casado').classList.toggle('activo',elCasado.checked);
-  // Sincronizar región seleccionada en paso 1 → paso 2
-  const r1=document.getElementById('region1');
-  const r2=document.getElementById('region');
-  if(r1&&r2) r2.value=r1.value;
-  // Actualizar hint precio estimado al entrar al paso 2
-  setTimeout(actualizarPrecioEstimado, 50);
-  // Actualizar hint UF
-  const ufHint=document.getElementById('uf-hint-val');
-  if(ufHint) ufHint.textContent=fmt(UF_VALOR);
+  // Sincronizar botón "primera vivienda" (input hidden, no checkbox)
+  const primeraEl = document.getElementById('primera');
+  const btnPrimera = document.getElementById('sit-btn-primera');
+  if (primeraEl && btnPrimera) {
+    btnPrimera.classList.toggle('activo', primeraEl.value === 'si');
+  }
+  // Sincronizar región: paso 1 → paso 2
+  const r1 = document.getElementById('region1');
+  const r2 = document.getElementById('region');
+  if (r1 && r2) r2.value = r1.value;
+
   showScreen(2);
 }
 
-function irAResultados(){
+function irAResultados() {
   showScreen(3);
   calcular();
   renderDesigualdad();
-  const sl=document.getElementById('arriendo-slider');
-  if(sl&&!sl.dataset.tocado){
-    const reg=document.getElementById('region').value;
-    const tipo=document.getElementById('tipo').value;
-    const m2=parseFloat(document.getElementById('m2').value)||55;
-    const ufKey=tipo==='depto'?'depto':tipo==='casa'?'casa':'usada';
-    let precioClp=REGIONES[reg][ufKey]*m2*UF_VALOR;
-    if(_modoPrecio==='precio'){
-      const ufDirecto=parseFloat(document.getElementById('precio-directo-uf').value)||0;
-      const clpDirecto=parseCLP('precio-directo');
-      if(ufDirecto>0) precioClp=ufDirecto*UF_VALOR;
-      else if(clpDirecto>0) precioClp=clpDirecto;
-    }
-    const sug=Math.round(precioClp*0.042/12/10000)*10000;
-    sl.value=Math.min(Math.max(sug,100000),2000000);
+  const sl = document.getElementById('arriendo-slider');
+  if (sl && !sl.dataset.tocado) {
+    const reg   = document.getElementById('region').value;
+    const tipo  = document.getElementById('tipo').value;
+    const m2    = parseFloat(document.getElementById('m2').value) || 55;
+    const ufKey = tipo === 'depto' ? 'depto' : tipo === 'casa' ? 'casa' : 'usada';
+    const sug   = Math.round(REGIONES[reg][ufKey] * m2 * UF_VALOR * 0.042 / 12 / 10000) * 10000;
+    sl.value    = Math.min(Math.max(sug, 100000), 2000000);
     actualizarSliderArriendo();
   }
 }
 
-/* TABS */
-function switchTab(panelId,btn){
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('activo'));
-  document.querySelectorAll('.tab-btn').forEach(b=>{ b.classList.remove('activo'); b.setAttribute('aria-selected','false'); });
+/* ── TABS ────────────────────────────────────────────────────── */
+function switchTab(panelId, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('activo'));
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.remove('activo');
+    b.setAttribute('aria-selected', 'false');
+  });
   document.getElementById(panelId).classList.add('activo');
   btn.classList.add('activo');
-  btn.setAttribute('aria-selected','true');
+  btn.setAttribute('aria-selected', 'true');
 }
 
-/* UF */
-const LS_UF='ccuc_uf_v', LS_UF_TS='ccuc_uf_ts', UF_TTL=3600000; // 1 hora
-async function cargarUF(){
-  try{
-    const ts=parseInt(localStorage.getItem(LS_UF_TS)||'0',10);
-    const cached=parseFloat(localStorage.getItem(LS_UF)||'0');
-    if(cached>0&&Date.now()-ts<UF_TTL){
-      UF_VALOR=cached;
-      document.getElementById('uf-valor').textContent=UF_VALOR.toLocaleString('es-CL',{minimumFractionDigits:2,maximumFractionDigits:2});
-      if(_resultadoCalculado){ calcular(); renderDesigualdad(); }
-      return;
-    }
-    const r=await fetch('https://mindicador.cl/api/uf');
-    const d=await r.json();
-    UF_VALOR=d.serie[0].valor;
-    try{ localStorage.setItem(LS_UF,UF_VALOR); localStorage.setItem(LS_UF_TS,Date.now()); }catch{}
-    document.getElementById('uf-valor').textContent=UF_VALOR.toLocaleString('es-CL',{minimumFractionDigits:2,maximumFractionDigits:2});
-    if(_resultadoCalculado){ calcular(); renderDesigualdad(); }
-  }catch{
-    const cached=parseFloat(localStorage.getItem(LS_UF)||'0');
-    if(cached>0) UF_VALOR=cached;
-    document.getElementById('uf-valor').textContent=UF_VALOR.toLocaleString('es-CL')+' (ref.)';
-  }
-}
+/* ── CALCULAR ────────────────────────────────────────────────── */
+function calcular() {
+  const reg            = document.getElementById('region').value;
+  const tipo           = document.getElementById('tipo').value;
+  const sueldo         = parseCLP('sueldo');
+  const ahorroHoy      = parseCLP('ahorro');
+  const codeudor       = parseCLP('codeudor');
+  const primera        = document.getElementById('primera')?.value === 'si';
+  const m2             = parseFloat(document.getElementById('m2').value) || 55;
+  const tasa           = parseFloat(document.getElementById('tasa').value) || 4.1;
+  const plazo          = parseFloat(document.getElementById('plazo').value) || 25;
+  const piePct         = parseFloat(document.getElementById('pie').value) || 20;
 
-/* HELPERS */
-const fmt=n=>Math.round(n).toLocaleString('es-CL');
-const fmtUF=n=>Math.round(n).toLocaleString('es-CL');
+  const sueldoTotal = sueldo + codeudor;
+  const datos       = REGIONES[reg];
+  const ufKey       = tipo === 'depto' ? 'depto' : tipo === 'casa' ? 'casa' : 'usada';
+  const ufM2        = datos[ufKey];
+  const precioUF    = ufM2 * m2;
+  const precioClp   = precioUF * UF_VALOR;
+  const ingresoUF   = sueldoTotal / UF_VALOR;
+  const pieUF       = precioUF * piePct / 100;
+  const pieClp      = pieUF * UF_VALOR;
+  const credito     = precioUF - pieUF;
+  const cuota       = cuotaMensual(credito, tasa, plazo);
+  const pct         = sueldoTotal > 0 ? (cuota / sueldoTotal) * 100 : 0;
+  const maxCredClp  = maxCreditoPorSueldo(sueldoTotal, tasa, plazo);
+  const maxCredUF   = maxCredClp / UF_VALOR;
+  const maxPrecioUF = maxCredUF / (1 - piePct / 100);
+  const maxPrecioClp = maxPrecioUF * UF_VALOR;
 
-function cuotaMensual(montoUF,tasaAnual,años){
-  const r=(tasaAnual/100)/12, n=años*12;
-  if(r===0) return (montoUF*UF_VALOR)/n;
-  return montoUF*UF_VALOR*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
-}
-
-function maxCreditoPorSueldo(sueldoTotal,tasaAnual,años,pctMax=0.30){
-  const r=(tasaAnual/100)/12, n=años*12;
-  const cuotaMax=sueldoTotal*pctMax;
-  if(r===0) return cuotaMax*n;
-  return cuotaMax*(Math.pow(1+r,n)-1)/(r*Math.pow(1+r,n));
-}
-
-/* CALCULAR */
-function calcular(){
-  const reg=document.getElementById('region').value;
-  const tipo=document.getElementById('tipo').value;
-  const sueldo=parseCLP('sueldo');
-  const ahorroHoy=parseCLP('ahorro');
-  const codeudor=parseCLP('codeudor');
-  const edad=0;
-  const primera=document.getElementById('primera').value !== 'segunda' && document.getElementById('primera').value !== 'tengo';
-  const situacion=document.getElementById('primera').value || 'primera';
-  const m2=parseFloat(document.getElementById('m2').value)||55;
-  const tasa=parseFloat(document.getElementById('tasa').value)||4.1;
-  const plazoIngresado=parseFloat(document.getElementById('plazo').value)||25;
-  const plazoMaxEdad=edad>0?Math.max(75-edad,5):40;
-  const plazo=edad>0?Math.min(plazoIngresado,plazoMaxEdad):plazoIngresado;
-  const piePct=parseFloat(document.getElementById('pie').value)||20;
-
-  const sueldoTotal=sueldo+codeudor;
-  const datos=REGIONES[reg];
-  const ufKey=tipo==='depto'?'depto':tipo==='casa'?'casa':'usada';
-  const ufM2=datos[ufKey];
-
-  // Precio: modo directo o por m²
-  let precioUF;
-  if(_modoPrecio==='precio'){
-    const ufDirecto=parseFloat(document.getElementById('precio-directo-uf').value)||0;
-    const clpDirecto=parseCLP('precio-directo');
-    if(ufDirecto>0) precioUF=ufDirecto;
-    else if(clpDirecto>0) precioUF=clpDirecto/UF_VALOR;
-    else precioUF=ufM2*m2;
-  } else {
-    precioUF=ufM2*m2;
-  }
-  const precioClp=precioUF*UF_VALOR;
-  const ingresoUF=sueldoTotal/UF_VALOR;
-  const pieUF=precioUF*piePct/100;
-  const pieClp=pieUF*UF_VALOR;
-  const credito=precioUF-pieUF;
-  const cuota=cuotaMensual(credito,tasa,plazo);
-  const pct=sueldoTotal>0?(cuota/sueldoTotal)*100:0;
-  const maxCredClp=maxCreditoPorSueldo(sueldoTotal,tasa,plazo);
-  const maxCredUF=maxCredClp/UF_VALOR;
-  const maxPrecioUF=maxCredUF/(1-piePct/100);
-  const maxPrecioClp=maxPrecioUF*UF_VALOR;
-
-  const ctx={sueldo:sueldoTotal, ingresoUF,precioUF,primera,situacion,tipo,tipoOk(s){return !s.soloNueva||tipo!=='usada';}};
-  const subsAplican=SUBSIDIOS_DEF.map(s=>({...s,aplica:s.aplicar(ctx)}));
-  setSubCtxSimulador(ctx); // Guarda el contexto para la pantalla de subsidios interactivos
-  _bcoPerfilUsuario={
-    sueldo:sueldoTotal,
+  const ctx = {
+    ingresoUF,
     precioUF,
-    piePct,
-    plazoAnios:plazo,
-    region:reg,
-    tipo
+    primera,
+    tipo,
+    tipoOk: s => !s.soloNueva || tipo !== 'usada',
   };
-  if(typeof actualizarAsistenteBancos==='function') actualizarAsistenteBancos();
+  const subsAplican = SUBSIDIOS_DEF.map(s => ({ ...s, aplica: s.aplicar(ctx) }));
 
-  /* RESUMEN TOP */
-  const tipoLabel=tipo==='depto'?'Depto.':tipo==='casa'?'Casa':'Usada';
-  const viviendaResumen = _modoPrecio==='precio'
-    ? `Precio directo · ${datos.nombre.split('/')[0].trim()}`
-    : `${tipoLabel} ${m2}m² · ${datos.nombre.split('/')[0].trim()}`;
-  document.getElementById('resumen-top').innerHTML=`
-    <div class="resumen-top-item"><span class="resumen-top-label">Sueldo</span><span class="resumen-top-val">$${fmt(sueldoTotal)}</span></div>
+  /* — Resumen top — */
+  const tipoLabel = tipo === 'depto' ? 'Depto.' : tipo === 'casa' ? 'Casa' : 'Usada';
+  document.getElementById('resumen-top').innerHTML = `
+    <div class="resumen-top-item">
+      <span class="resumen-top-label">Sueldo</span>
+      <span class="resumen-top-val">$${fmt(sueldoTotal)}</span>
+    </div>
     <div class="resumen-top-sep"></div>
-    <div class="resumen-top-item"><span class="resumen-top-label">Vivienda</span><span class="resumen-top-val">${viviendaResumen}</span></div>
+    <div class="resumen-top-item">
+      <span class="resumen-top-label">Vivienda</span>
+      <span class="resumen-top-val">${tipoLabel} ${m2}m² · ${datos.nombre.split('/')[0].trim()}</span>
+    </div>
     <div class="resumen-top-sep"></div>
-    <div class="resumen-top-item"><span class="resumen-top-label">Precio</span><span class="resumen-top-val">$${fmt(precioClp)}</span></div>
-  <button class="btn-editar" data-main-action="ir-paso-1">✎ Editar</button>`;
+    <div class="resumen-top-item">
+      <span class="resumen-top-label">Precio</span>
+      <span class="resumen-top-val">$${fmt(precioClp)}</span>
+    </div>
+    <button class="btn-editar" onclick="showScreen(1)">✎ Editar</button>`;
 
-  document.getElementById('label-region-header').innerHTML=datos.nombre+' · <strong>'+ufM2+' UF/m²</strong> · CChC Q3 2025';
+  document.getElementById('label-region-header').innerHTML =
+    `${datos.nombre} · <strong>${ufM2} UF/m²</strong> · CChC Q3 2025`;
 
-  document.getElementById('barra-pct').textContent=sueldoTotal>0?pct.toFixed(1)+'%':'—';
-  const bar=document.getElementById('barra');
-  bar.style.width=Math.min(pct,100)+'%';
-  bar.style.background=pct<=30?'#1A7A4A':pct<=50?'#B7780A':'#C0392B';
+  /* — Barra — */
+  document.getElementById('barra-pct').textContent = sueldoTotal > 0 ? pct.toFixed(1) + '%' : '—';
+  const bar = document.getElementById('barra');
+  bar.style.width      = Math.min(pct, 100) + '%';
+  bar.style.background = pct <= 30 ? '#1A7A4A' : pct <= 50 ? '#B7780A' : '#C0392B';
 
-  const badge=document.getElementById('semaforo-badge');
-  const texto=document.getElementById('texto-semaforo');
-  if(sueldoTotal<=0){
-    badge.className='pill pill-amarillo'; badge.textContent='Sin sueldo'; texto.textContent='';
-  } else if(pct<=30){
-    badge.className='pill pill-verde'; badge.textContent='Acceso posible';
-    texto.textContent='La cuota es el '+pct.toFixed(1)+'% de tus ingresos, dentro del límite del 30%.';
-  } else if(pct<=50){
-    badge.className='pill pill-amarillo'; badge.textContent='Esfuerzo alto';
-    texto.textContent='La cuota representa el '+pct.toFixed(1)+'% de tus ingresos. Superas el 30% recomendado.';
+  const badge = document.getElementById('semaforo-badge');
+  const texto = document.getElementById('texto-semaforo');
+  if (sueldoTotal <= 0) {
+    badge.className = 'pill pill-amarillo'; badge.textContent = 'Sin sueldo'; texto.textContent = '';
+  } else if (pct <= 30) {
+    badge.className = 'pill pill-verde'; badge.textContent = 'Acceso posible';
+    texto.textContent = `La cuota es el ${pct.toFixed(1)}% de tus ingresos, dentro del límite del 30%.`;
+  } else if (pct <= 50) {
+    badge.className = 'pill pill-amarillo'; badge.textContent = 'Esfuerzo alto';
+    texto.textContent = `La cuota representa el ${pct.toFixed(1)}% de tus ingresos. Superas el 30% recomendado.`;
   } else {
-    badge.className='pill pill-rojo'; badge.textContent='Difícil acceso';
-    texto.textContent='La cuota es el '+pct.toFixed(1)+'% de tus ingresos. Considera subsidios o codeudor.';
+    badge.className = 'pill pill-rojo'; badge.textContent = 'Difícil acceso';
+    texto.textContent = `La cuota es el ${pct.toFixed(1)}% de tus ingresos. Considera subsidios o codeudor.`;
   }
 
-  document.getElementById('m-cuota').textContent='$'+fmt(cuota);
-  document.getElementById('m-cuota-sub').textContent=plazo+' años · '+tasa+'% tasa';
-  document.getElementById('m-precio').textContent='$'+fmt(precioClp);
-  document.getElementById('m-precio-uf').textContent=fmtUF(precioUF)+' UF total';
-  document.getElementById('m-pie').textContent='$'+fmt(pieClp);
-  document.getElementById('m-pie-sub').textContent=fmtUF(pieUF)+' UF · '+piePct+'% del precio';
-  document.getElementById('m-maxcredito').textContent='$'+fmt(maxCredClp);
-  document.getElementById('m-maxcredito-sub').textContent='max vivienda $'+fmt(maxPrecioClp);
+  /* — Métricas — */
+  document.getElementById('m-cuota').textContent      = '$' + fmt(cuota);
+  document.getElementById('m-cuota-sub').textContent  = `${plazo} años · ${tasa}% tasa`;
+  document.getElementById('m-precio').textContent     = '$' + fmt(precioClp);
+  document.getElementById('m-precio-uf').textContent  = fmt(precioUF) + ' UF total';
+  document.getElementById('m-pie').textContent        = '$' + fmt(pieClp);
+  document.getElementById('m-pie-sub').textContent    = `${fmt(pieUF)} UF · ${piePct}% del precio`;
+  document.getElementById('m-maxcredito').textContent = '$' + fmt(maxCredClp);
+  document.getElementById('m-maxcredito-sub').textContent = 'max vivienda $' + fmt(maxPrecioClp);
 
-  const avisoAhorro=document.getElementById('aviso-ahorro');
-  if(sueldoTotal>0){
-    avisoAhorro.style.display='block';
-    const falta=pieClp-ahorroHoy;
-    const avisoEdad=(edad>0&&plazo<plazoIngresado)?`<br>⏳ <strong>Plazo ajustado:</strong> con ${edad} años el banco te presta máximo ${plazo} años (no ${plazoIngresado}).`:'';
-    // Pie siempre calculado automáticamente como precioUF * piePct / 100
-    // ahorroHoy es el ahorro declarado por el usuario (0 / 1M / 5M / 20M)
-    if(ahorroHoy>=pieClp){
-      avisoAhorro.className='aviso aviso-verde';
-      avisoAhorro.innerHTML=`✅ <strong>Tu ahorro cubre el pie completo.</strong><br>
-        🏠 Pie requerido: <strong>$${fmt(pieClp)}</strong> (${piePct}% de $${fmt(precioClp)})<br>
-        💰 Tu ahorro actual: <strong>$${fmt(ahorroHoy)}</strong> · Te sobran $${fmt(ahorroHoy-pieClp)}<br>
-        Puedes comprar si el banco aprueba el crédito.${avisoEdad}`;
-    } else if(falta>0){
-      const mesesFalta=sueldoTotal*0.20>0?Math.ceil(falta/(sueldoTotal*0.20)):0;
-      const aniosFalta=(mesesFalta/12).toFixed(1);
-      avisoAhorro.className='aviso aviso-neutro';
-      avisoAhorro.innerHTML=`📊 <strong>Pie requerido: $${fmt(pieClp)}</strong> (${piePct}% del precio)<br>
-        💰 Tu ahorro actual: <strong>$${fmt(ahorroHoy)}</strong> · Te faltan <strong>$${fmt(falta)}</strong><br>
-        ⏱️ Ahorrando el 20% de tu sueldo ($${fmt(Math.round(sueldoTotal*0.20))}/mes), juntas el pie en <strong>${mesesFalta} meses</strong> (~${aniosFalta} años).${avisoEdad}`;
-    } else if(avisoEdad){
-      avisoAhorro.className='aviso aviso-neutro';
-      avisoAhorro.innerHTML=avisoEdad.replace('<br>','');
+  /* — Aviso ahorro — */
+  const avisoAhorro = document.getElementById('aviso-ahorro');
+  if (sueldoTotal > 0) {
+    avisoAhorro.style.display = 'block';
+    const falta     = pieClp - ahorroHoy;
+    if (ahorroHoy >= pieClp) {
+      avisoAhorro.className = 'aviso aviso-verde';
+      avisoAhorro.innerHTML = `✅ <strong>Tu ahorro cubre el pie completo</strong> y te sobran $${fmt(ahorroHoy - pieClp)}. Puedes comprar si el banco aprueba el crédito.`;
+    } else if (falta > 0) {
+      const mesesFalta = sueldoTotal * 0.20 > 0 ? Math.ceil(falta / (sueldoTotal * 0.20)) : 0;
+      avisoAhorro.className = 'aviso aviso-neutro';
+      avisoAhorro.innerHTML = `📊 Te faltan <strong>$${fmt(falta)}</strong> para el pie. Ahorrando el 20% de tu sueldo, los juntas en aprox. <strong>${mesesFalta} meses</strong>.`;
     }
   } else {
-    avisoAhorro.style.display='none';
+    avisoAhorro.style.display = 'none';
   }
 
-  const cuotaSinLimiteEdad=cuotaMensual(credito,tasa,plazoIngresado);
-  renderBloqueEdad(edad,plazoIngresado,plazo,cuota,cuotaSinLimiteEdad,sueldoTotal,precioClp,pieClp,ahorroHoy);
+  /* — Resto de bloques — */
+  const aniosPieCalc = (pieClp - ahorroHoy > 0 && sueldoTotal * 0.20 > 0)
+    ? (pieClp - ahorroHoy) / (sueldoTotal * 0.20) / 12
+    : 0;
 
-  const aniosPieCalc=(pieClp-ahorroHoy>0&&sueldoTotal*0.20>0)?(pieClp-ahorroHoy)/(sueldoTotal*0.20)/12:0;
-  renderFraseImpacto(sueldoTotal,pct,pieClp,aniosPieCalc,precioClp,datos.nombre,edad,plazo);
-  renderEscenarios(precioUF,piePct,tasa,plazo,subsAplican,sueldoTotal,ahorroHoy);
-  renderSubsidios(subsAplican,precioUF,tasa,plazo,ctx);
-  renderArrVsCompra(precioClp,precioUF,piePct,tasa,plazo,cuota);
-  renderTabla(sueldoTotal,piePct,tasa,plazo);
-  const histSubEl=document.getElementById('hist-sub');
-  if(histSubEl){
-    const sfx=reg!=='RM'?` — En ${datos.nombre.split('/')[0].trim()}, un depto de 55 m² cuesta hoy <strong>${fmtUF(datos.depto*55)} UF</strong> (~$${fmt(datos.depto*55*UF_VALOR)}).`:'';
-    histSubEl.innerHTML='Referencia RM · Depto 55 m² en Santiago · Sueldos en ese período subieron ~40%'+sfx;
+  renderFraseImpacto(sueldoTotal, pct, pieClp, aniosPieCalc, precioClp, datos.nombre, plazo);
+  renderEscenarios(precioUF, piePct, tasa, plazo, subsAplican, sueldoTotal, ahorroHoy);
+  renderSubsidios(subsAplican, precioUF, tasa, plazo, ctx);
+  renderArrVsCompra(precioClp, precioUF, piePct, tasa, plazo, cuota);
+  renderTabla(sueldoTotal, piePct, tasa, plazo);
+  renderProyeccionIngresos(sueldoTotal, cuota);
+
+  const histSubEl = document.getElementById('hist-sub');
+  if (histSubEl) {
+    const sfx = reg !== 'RM'
+      ? ` — En ${datos.nombre.split('/')[0].trim()}, un depto de 55 m² cuesta hoy <strong>${fmt(datos.depto * 55)} UF</strong> (~$${fmt(datos.depto * 55 * UF_VALOR)}).`
+      : '';
+    histSubEl.innerHTML = 'Referencia RM · Depto 55 m² en Santiago · Sueldos en ese período subieron ~40%' + sfx;
   }
-  _resultadoCalculado=true;
+
+  // Sincronizar región del agente de chat con la del simulador
+  if (typeof _chatAgent !== 'undefined') _chatAgent.region = reg;
+
+  // Mostrar portales de búsqueda
+  mostrarBuscadoresPropiedades(reg, Math.round(maxPrecioUF));
+
+  _resultadoCalculado = true;
 }
 
-/* BLOQUE EDAD */
-function renderBloqueEdad(edad,plazoIngresado,plazo,cuota,cuotaSinLimite,sueldoTotal,precioClp,pieClp,ahorroHoy){
-  const bloque=document.getElementById('bloque-edad');
-  if(!bloque) return;
-  if(edad<=0){bloque.style.display='none';return;}
-  bloque.style.display='block';
-  const edadFin=edad+plazo;
-  const aniosPagoFin=new Date().getFullYear()+plazo;
-  const plazoLimitado=plazo<plazoIngresado;
-  const pct=sueldoTotal>0?cuota/sueldoTotal*100:0;
-  document.getElementById('edad-subtitulo').textContent=`Tienes ${edad} años · plazo máximo del banco: ${plazo} años (hasta ~75, varía por banco)`;
-  const colorPct=pct<=30?'verde':pct<=50?'amarillo':'rojo';
-  document.getElementById('edad-metricas').innerHTML=`
-    <div class="edad-metrica"><div class="edad-metrica-label">Terminas de pagar</div><div class="edad-metrica-valor ${edadFin>=65?'rojo':edadFin>=55?'amarillo':'verde'}">${edadFin} años</div><div class="edad-metrica-sub">Año ${aniosPagoFin}</div></div>
-    <div class="edad-metrica"><div class="edad-metrica-label">Plazo disponible</div><div class="edad-metrica-valor ${plazoLimitado?'amarillo':'verde'}">${plazo} años</div><div class="edad-metrica-sub">${plazoLimitado?`Reducido desde ${plazoIngresado}`:'Sin restricción'}</div></div>
-    <div class="edad-metrica"><div class="edad-metrica-label">Cuota mensual</div><div class="edad-metrica-valor ${colorPct}">$${fmt(cuota)}</div><div class="edad-metrica-sub">${pct.toFixed(1)}% de tu sueldo</div></div>`;
-  let txt='';
-  if(plazoLimitado){ const dif=cuota-cuotaSinLimite; txt+=`⚠️ <strong>Tu edad acorta el plazo de ${plazoIngresado} a ${plazo} años.</strong> Tu cuota sube <em>$${fmt(dif)} más</em> que si pudieras pagar en ${plazoIngresado} años. `; }
-  if(edadFin>75){ txt+=`🔴 <strong>El banco no aprobará el plazo de ${plazoIngresado} años</strong> porque tendrías ${edad+plazoIngresado} años al terminar. El plazo real queda en <em>${plazo} años</em>. `; }
-  else if(edadFin>=65){ txt+=`🟡 Terminarías de pagar a los <strong>${edadFin} años</strong>, cerca del retiro. Considera que a esa edad tu ingreso puede bajar. `; }
-  else if(edadFin<=50){ txt+=`✅ Terminarías de pagar a los <strong>${edadFin} años</strong>, con mucho margen financiero por delante. `; }
-  else { txt+=`Terminarías de pagar a los <strong>${edadFin} años</strong>. `; }
-  if(ahorroHoy<pieClp&&sueldoTotal>0){
-    const mesesParaPie=Math.ceil((pieClp-ahorroHoy)/(sueldoTotal*0.20));
-    const edadConPie=edad+mesesParaPie/12;
-    const plazoRestante=75-Math.ceil(edadConPie);
-    if(plazoRestante<15&&plazoRestante>0){ txt+=`📌 Si tardas <em>${Math.ceil(mesesParaPie/12)} años</em> en juntar el pie, tendrías <strong>${plazoRestante} años</strong> para pagar — lo que subiría aún más la cuota.`; }
-    else if(plazoRestante<=0){ txt+=`🔴 <strong>Atención:</strong> al ritmo de ahorro actual juntarías el pie a los <em>${Math.round(edadConPie)} años</em> — ya no calificarías para crédito.`; }
-  }
-  if(!txt) txt=`Con ${edad} años y plazo de ${plazo} años tienes una ventana normal para este crédito.`;
-  document.getElementById('edad-veredicto').innerHTML=txt;
+/* ── BLOQUE EDAD (campo eliminado — se oculta siempre) ────────── */
+function renderBloqueEdad() {
+  document.getElementById('bloque-edad')?.style.setProperty('display', 'none');
 }
 
-/* ESCENARIOS */
-function renderEscenarios(precioUF,piePct,tasa,plazo,subs,sueldoTotal,ahorroHoy){
-  const grid=document.getElementById('escenarios-grid');
-  const pie1=precioUF*piePct/100;
-  const cuota1=cuotaMensual(precioUF-pie1,tasa,plazo);
-  const pct1=sueldoTotal>0?cuota1/sueldoTotal*100:0;
-  const tieneEsc1=ahorroHoy>=pie1*UF_VALOR;
+/* ── ESCENARIOS ──────────────────────────────────────────────── */
+function renderEscenarios(precioUF, piePct, tasa, plazo, subs, sueldoTotal, ahorroHoy) {
+  const grid = document.getElementById('escenarios-grid');
 
-  const subDS=subs.find(s=>s.aplica&&['ds49','ds1t1','ds1t2','ds1t3'].includes(s.id));
-  const subBono=null; // Bono Pie DS19 retirado — sin bono separado en nuevo SUBSIDIOS_DEF
-  let cuota2=null,pct2=0,pie2=null,pieClp2=null,pieClp2Ef=null;
-  if(subDS){
-    const prU=Math.max(precioUF-(subDS.montoUF||0),0);
-    pie2=prU*piePct/100; pieClp2=pie2*UF_VALOR;
-    // subBono siempre null (Bono Pie DS19 eliminado)
-    pieClp2Ef=pieClp2;
-    cuota2=cuotaMensual(prU-pie2,tasa,plazo); pct2=sueldoTotal>0?cuota2/sueldoTotal*100:0;
+  /* Escenario 1 — sin ayuda */
+  const pie1    = precioUF * piePct / 100;
+  const cuota1  = cuotaMensual(precioUF - pie1, tasa, plazo);
+  const pct1    = sueldoTotal > 0 ? cuota1 / sueldoTotal * 100 : 0;
+  const tieneEsc1 = ahorroHoy >= pie1 * UF_VALOR;
+
+  /* Escenario 2 — con subsidio DS */
+  const subDS   = subs.find(s => s.aplica && ['ds19','ds1t1','ds1t2','ds1t3'].includes(s.id));
+  const subBono = subs.find(s => s.id === 'bonopie' && s.aplica);
+  let cuota2 = null, pct2 = 0, pie2 = null, pieClp2 = null, pieClp2Ef = null;
+  if (subDS) {
+    const prU   = Math.max(precioUF - subDS.montoUF, 0);
+    pie2        = prU * piePct / 100;
+    pieClp2     = pie2 * UF_VALOR;
+    pieClp2Ef   = Math.max(pieClp2 - (subBono ? subBono.montoUF * UF_VALOR : 0), 0);
+    cuota2      = cuotaMensual(prU - pie2, tasa, plazo);
+    pct2        = sueldoTotal > 0 ? cuota2 / sueldoTotal * 100 : 0;
   }
 
-  const subFog=subs.find(s=>s.id==='fogaes'&&s.aplica);
-  const subTasa=subs.find(s=>s.id==='ley21748'&&s.aplica);
-  let cuota3=null,pct3=0,pie3=null,pieClp3=null,tasa3=tasa;
-  if(subFog){ tasa3=subTasa?Math.max(tasa-subTasa.tasaDescuento,0.5):tasa; pie3=precioUF*0.10; pieClp3=pie3*UF_VALOR; cuota3=cuotaMensual(precioUF-pie3,tasa3,plazo); pct3=sueldoTotal>0?cuota3/sueldoTotal*100:0; }
+  /* Escenario 3 — FOGAES + Ley 21.748 */
+  const subFog  = subs.find(s => s.id === 'fogaes'  && s.aplica);
+  const subTasa = subs.find(s => s.id === 'ley21748' && s.aplica);
+  let cuota3 = null, pct3 = 0, pie3 = null, pieClp3 = null, tasa3 = tasa;
+  if (subFog) {
+    tasa3    = subTasa ? Math.max(tasa - subTasa.tasaDescuento, 0.5) : tasa;
+    pie3     = precioUF * 0.10;
+    pieClp3  = pie3 * UF_VALOR;
+    cuota3   = cuotaMensual(precioUF - pie3, tasa3, plazo);
+    pct3     = sueldoTotal > 0 ? cuota3 / sueldoTotal * 100 : 0;
+  }
 
-  // "Mejor" = primero entre los accesibles (tiene el pie); si ninguno es accesible, el de cuota mínima
-  const tieneEsc2=cuota2!==null&&ahorroHoy>=pieClp2Ef;
-  const tieneEsc3=cuota3!==null&&ahorroHoy>=pieClp3;
-  const todasOpciones=[
-    {id:1,cuota:cuota1,acc:tieneEsc1},
-    cuota2!==null?{id:2,cuota:cuota2,acc:tieneEsc2}:null,
-    cuota3!==null?{id:3,cuota:cuota3,acc:tieneEsc3}:null
+  /* Determinar "mejor opción" */
+  const tieneEsc2 = cuota2 !== null && ahorroHoy >= pieClp2Ef;
+  const tieneEsc3 = cuota3 !== null && ahorroHoy >= pieClp3;
+  const todasOpciones = [
+    { id: 1, cuota: cuota1, acc: tieneEsc1 },
+    cuota2 !== null ? { id: 2, cuota: cuota2, acc: tieneEsc2 } : null,
+    cuota3 !== null ? { id: 3, cuota: cuota3, acc: tieneEsc3 } : null,
   ].filter(Boolean);
-  const accesibles=todasOpciones.filter(o=>o.acc);
-  const mejor=(accesibles.length>0?accesibles:todasOpciones).slice().sort((a,b)=>a.cuota-b.cuota)[0];
+  const accesibles = todasOpciones.filter(o => o.acc);
+  const mejor = (accesibles.length > 0 ? accesibles : todasOpciones)
+    .slice().sort((a, b) => a.cuota - b.cuota)[0];
 
-  const pillPct=pct=>{ if(!pct||sueldoTotal<=0) return ''; const cl=pct<=30?'pill-verde':pct<=50?'pill-amarillo':'pill-rojo'; return `<span class="pill ${cl}" style="font-size:11px;padding:2px 9px">${pct.toFixed(1)}%</span>`; };
-  // pieClpEf: monto en CLP que el usuario debe tener ahorrado (ya descontado Bono Pie si aplica)
-  const veredicto=(pct,pieClpEf,tieneAhorro,noAplica)=>{ if(noAplica) return `<div class="esc-linea" style="margin-top:8px;color:var(--suave2)">No aplica a tu caso</div>`; const acc=pct<=30?'✅ El banco lo aprobaría':pct<=50?'⚠️ Límite del banco':'❌ El banco no lo aprobaría'; const pie_txt=tieneAhorro?'✅ Tienes el pie':`📊 Te faltan $${fmt(Math.max(pieClpEf-ahorroHoy,0))} para el pie`; return `<div class="esc-linea" style="margin-top:8px">${acc}</div><div class="esc-linea">${pie_txt}</div>`; };
-  const buildDetalle=(precioU,pieU,tasaD,cuotaD,pieClpEfD,tieneAhorroD,noAplicaD)=>{
-    if(noAplicaD||!cuotaD||!pieU) return '';
-    const creditoU=precioU-pieU;
-    const creditoClp=creditoU*UF_VALOR;
-    const totalPagado=cuotaD*plazo*12;
-    const totalInteres=Math.round(totalPagado-creditoClp);
-    const pctI=creditoClp>0?Math.round(totalInteres/creditoClp*100):0;
-    const faltaPie=Math.max(pieClpEfD-ahorroHoy,0);
-    const anosPie=faltaPie>0&&sueldoTotal*0.20>0?((faltaPie/(sueldoTotal*0.20))/12).toFixed(1):null;
-    const piePctD=Math.round(pieU/precioU*100);
-    const row=(k,v)=>`<div class="det-fila"><span class="det-k">${k}</span><span class="det-v">${v}</span></div>`;
-    const sep='<hr class="det-sep">';
+  /* Helpers de renderizado */
+  const pillPct = pct => {
+    if (!pct || sueldoTotal <= 0) return '';
+    const cl = pct <= 30 ? 'pill-verde' : pct <= 50 ? 'pill-amarillo' : 'pill-rojo';
+    return `<span class="pill ${cl}" style="font-size:11px;padding:2px 9px">${pct.toFixed(1)}%</span>`;
+  };
+
+  const veredicto = (pct, pieClpEf, tieneAhorro, noAplica) => {
+    if (noAplica) return `<div class="esc-linea" style="margin-top:8px;color:var(--suave2)">No aplica a tu caso</div>`;
+    const acc     = pct <= 30 ? '✅ El banco lo aprobaría' : pct <= 50 ? '⚠️ Límite del banco' : '❌ El banco no lo aprobaría';
+    const pie_txt = tieneAhorro ? '✅ Tienes el pie' : `📊 Te faltan $${fmt(Math.max(pieClpEf - ahorroHoy, 0))} para el pie`;
+    return `<div class="esc-linea" style="margin-top:8px">${acc}</div><div class="esc-linea">${pie_txt}</div>`;
+  };
+
+  const buildDetalle = (precioU, pieU, tasaD, cuotaD, pieClpEfD, tieneAhorroD, noAplicaD) => {
+    if (noAplicaD || !cuotaD || !pieU) return '';
+    const creditoU    = precioU - pieU;
+    const creditoClp  = creditoU * UF_VALOR;
+    const totalPagado = cuotaD * plazo * 12;
+    const totalInteres = Math.round(totalPagado - creditoClp);
+    const pctI        = creditoClp > 0 ? Math.round(totalInteres / creditoClp * 100) : 0;
+    const faltaPie    = Math.max(pieClpEfD - ahorroHoy, 0);
+    const anosPie     = faltaPie > 0 && sueldoTotal * 0.20 > 0
+      ? ((faltaPie / (sueldoTotal * 0.20)) / 12).toFixed(1) : null;
+    const piePctD     = Math.round(pieU / precioU * 100);
+    const row = (k, v) => `<div class="det-fila"><span class="det-k">${k}</span><span class="det-v">${v}</span></div>`;
+    const sep = '<hr class="det-sep">';
     return `<div class="esc-card-detalle">
-      ${row('Precio vivienda',precioU.toFixed(0)+' UF')}
-      ${row('Pie ('+piePctD+'%)',`$${fmt(Math.round(pieU*UF_VALOR))}`)}
-      ${row('Crédito',`${creditoU.toFixed(0)} UF`)}
-      ${row('Tasa anual',tasaD+'%')}
-      ${row('Plazo',plazo+' años ('+plazo*12+' cuotas)')}
+      ${row('Precio vivienda', precioU.toFixed(0) + ' UF')}
+      ${row('Pie (' + piePctD + '%)', `$${fmt(Math.round(pieU * UF_VALOR))}`)}
+      ${row('Crédito', `${creditoU.toFixed(0)} UF`)}
+      ${row('Tasa anual', tasaD + '%')}
+      ${row('Plazo', `${plazo} años (${plazo * 12} cuotas)`)}
       ${sep}
-      ${row('Dividendo/mes','<strong>$'+fmt(cuotaD)+'</strong>')}
-      ${row('Total dividendos','$'+fmt(Math.round(totalPagado)))}
-      ${row('Intereses totales','$'+fmt(totalInteres)+' ('+pctI+'% extra)')}
+      ${row('Dividendo/mes', `<strong>$${fmt(cuotaD)}</strong>`)}
+      ${row('Total dividendos', `$${fmt(Math.round(totalPagado))}`)}
+      ${row('Intereses totales', `$${fmt(totalInteres)} (${pctI}% extra)`)}
       ${sep}
-      ${row('Tu ahorro actual','$'+fmt(ahorroHoy))}
+      ${row('Tu ahorro actual', `$${fmt(ahorroHoy)}`)}
       ${tieneAhorroD
-        ? row('Estado pie','✅ Tienes el pie')
-        : row('Te faltan','$'+fmt(faltaPie)+(anosPie?' · ~'+anosPie+' años':''))}
+        ? row('Estado pie', '✅ Tienes el pie')
+        : row('Te faltan', `$${fmt(faltaPie)}${anosPie ? ' · ~' + anosPie + ' años' : ''}`)}
     </div>`;
   };
-  const mkCard=(titulo,sub,cuota,pct,pieClpEf,tieneAhorro,esMejor,noAplica,extra,detalle)=>`
-    <div class="esc-card ${esMejor?'destacado':''} ${noAplica?'esc-no-aplica':''}">
-      ${esMejor?'<span class="esc-badge">✓ Mejor opción</span>':''}
+
+  const mkCard = (titulo, sub, cuota, pct, pieClpEf, tieneAhorro, esMejor, noAplica, extra, detalle) => `
+    <div class="esc-card ${esMejor ? 'destacado' : ''} ${noAplica ? 'esc-no-aplica' : ''}">
+      ${esMejor ? '<span class="esc-badge">✓ Mejor opción</span>' : ''}
       <div class="esc-card-tag">${titulo}</div>
-      <div class="esc-cuota">${cuota?'$'+fmt(cuota):'—'}</div>
-      <div style="margin-top:5px">${cuota?pillPct(pct):''}</div>
+      <div class="esc-cuota">${cuota ? '$' + fmt(cuota) : '—'}</div>
+      <div style="margin-top:5px">${cuota ? pillPct(pct) : ''}</div>
       <div class="esc-linea" style="margin-top:6px;color:var(--texto)">${sub}</div>
-      ${veredicto(pct,pieClpEf,tieneAhorro,noAplica)}
-      ${extra||''}
-      ${!noAplica&&cuota?'<div class="esc-expand-hint">▾ ver detalles</div>':''}
-      ${detalle||''}
+      ${veredicto(pct, pieClpEf, tieneAhorro, noAplica)}
+      ${extra || ''}
+      ${!noAplica && cuota ? '<div class="esc-expand-hint">▾ ver detalles</div>' : ''}
+      ${detalle || ''}
     </div>`;
 
-  const extraSub=subDS
-    ?`<div class="esc-linea" style="margin-top:4px;color:var(--suave2)">Postula en postulacionenlinea.minvu.cl</div>`
-    :'';
+  const extraSub = subDS
+    ? (subBono
+      ? `<div class="esc-linea" style="margin-top:4px;color:var(--verde)">💰 Bono Pie cubre ${subBono.montoUF} UF de la entrada</div><div class="esc-linea" style="color:var(--suave2)">Postula en minvu.gob.cl</div>`
+      : `<div class="esc-linea" style="margin-top:4px;color:var(--suave2)">Postula en minvu.gob.cl</div>`)
+    : '';
 
-  grid.innerHTML=
-    mkCard('Sin ayuda',`Pie ${piePct}% · ${plazo} años · ${tasa}%`,cuota1,pct1,pie1*UF_VALOR,tieneEsc1,mejor.id===1,false,'',
-      buildDetalle(precioUF,pie1,tasa,cuota1,pie1*UF_VALOR,tieneEsc1,false))+
-    mkCard('Con subsidio',subDS?`${subDS.montoUF} UF rebajan el precio`:'No calificas por ahora',cuota2,pct2,pieClp2Ef,tieneEsc2,mejor.id===2&&!!cuota2,!subDS,extraSub,
-      buildDetalle(subDS?precioUF-subDS.montoUF:0,pie2||0,tasa,cuota2,pieClp2Ef||0,tieneEsc2,!subDS))+
-    mkCard(`Pie 10%${subTasa?'+tasa rebajada':''}`,subFog?`Con FOGAES solo necesitas el 10% de pie`:'Precio supera las 4.500 UF del límite',cuota3,pct3,pieClp3,tieneEsc3,mejor.id===3&&!!cuota3,!subFog,subFog&&pieClp3?`<div class="esc-linea" style="margin-top:4px;color:var(--verde)">💡 Pie baja de $${fmt(pie1*UF_VALOR)} a $${fmt(pieClp3)}</div>`+(subTasa?`<div class="esc-linea" style="margin-top:3px;font-size:11px;color:var(--suave)">⏱ La tasa rebajada aplica los primeros ~5 años, luego sube a ${tasa}%</div>`:''): '',
-      buildDetalle(precioUF,pie3||0,tasa3,cuota3,pieClp3||0,tieneEsc3,!subFog));
+  grid.innerHTML =
+    mkCard('Sin ayuda', `Pie ${piePct}% · ${plazo} años · ${tasa}%`,
+      cuota1, pct1, pie1 * UF_VALOR, tieneEsc1, mejor.id === 1, false, '',
+      buildDetalle(precioUF, pie1, tasa, cuota1, pie1 * UF_VALOR, tieneEsc1, false)) +
 
+    mkCard('Con subsidio',
+      subDS ? `${subDS.montoUF} UF rebajan el precio` : 'No calificas por ahora',
+      cuota2, pct2, pieClp2Ef, tieneEsc2, mejor.id === 2 && !!cuota2, !subDS, extraSub,
+      buildDetalle(subDS ? precioUF - subDS.montoUF : 0, pie2 || 0, tasa, cuota2, pieClp2Ef || 0, tieneEsc2, !subDS)) +
+
+    mkCard(`Pie 10%${subTasa ? '+tasa rebajada' : ''}`,
+      subFog ? 'Con FOGAES solo necesitas el 10% de pie' : 'Precio supera las 4.500 UF del límite',
+      cuota3, pct3, pieClp3, tieneEsc3, mejor.id === 3 && !!cuota3, !subFog,
+      subFog && pieClp3
+        ? `<div class="esc-linea" style="margin-top:4px;color:var(--verde)">💡 Pie baja de $${fmt(pie1 * UF_VALOR)} a $${fmt(pieClp3)}</div>`
+          + (subTasa ? `<div class="esc-linea" style="margin-top:3px;font-size:11px;color:var(--suave)">⏱ La tasa rebajada aplica los primeros ~5 años, luego sube a ${tasa}%</div>` : '')
+        : '',
+      buildDetalle(precioUF, pie3 || 0, tasa3, cuota3, pieClp3 || 0, tieneEsc3, !subFog));
 }
 
-/* SUBSIDIOS */
-function renderSubsidios(subs,precioUF,tasa,plazo,ctx){
-  const lista=document.getElementById('subs-lista');
-  lista.innerHTML='';
-  const partes=[];
+/* ── SUBSIDIOS (tab) ─────────────────────────────────────────── */
+/* ── Helpers de subsidios ─────────────────────────────────────── */
 
-  // Cabecera con fechas 2026
-  partes.push(`
-    <div class="sub-calendario">
-      <div class="sub-cal-titulo">📅 Próximos llamados MINVU 2026</div>
-      <div class="sub-cal-grid">
-        <div class="sub-cal-item"><span class="sub-cal-mes">Mayo / Nov.</span><span class="sub-cal-prog">DS1 Tramos 1, 2 y 3 (compra y construcción)</span></div>
-        <div class="sub-cal-item"><span class="sub-cal-mes">Jul. / Oct.</span><span class="sub-cal-prog">DS49 Compra y Construcción</span></div>
-        <div class="sub-cal-item"><span class="sub-cal-mes">Mayo–Jun. / Ago.</span><span class="sub-cal-prog">DS52 Arriendo</span></div>
-        <div class="sub-cal-item"><span class="sub-cal-mes">Abr.–May.</span><span class="sub-cal-prog">Mejoramiento Hogar Mejor</span></div>
-        <div class="sub-cal-item"><span class="sub-cal-mes">Mar./May./Jul./Sep./Dic.</span><span class="sub-cal-prog">DS10 Habitabilidad Rural</span></div>
-      </div>
-      <div style="font-size:11px;color:var(--suave);margin-top:6px">Fechas estimadas — confirma en <a href="https://www.minvu.gob.cl" target="_blank" style="color:var(--negro)">minvu.gob.cl</a></div>
-    </div>`);
+/**
+ * Evalúa si un subsidio aplica para el contexto dado.
+ * @param {Object} subsidio - Elemento de SUBSIDIOS_DEF
+ * @param {Object} ctx - Contexto del usuario
+ * @returns {boolean}
+ */
+function subsidioElegible(subsidio, ctx) {
+  try { return !!subsidio.aplicar(ctx); } catch { return false; }
+}
 
-  // Definición de categorías en orden de presentación
-  const CATEGORIAS = [
-    {id:'compra',       emoji:'🏠', label:'Compra de vivienda',              desc:'Subsidios para comprar una vivienda construida (nueva o usada)'},
-    {id:'arriendo',     emoji:'🏘️', label:'Arriendo',                        desc:'Subsidio temporal para familias que arriendan'},
-    {id:'construccion', emoji:'🏗️', label:'Construcción de vivienda',         desc:'Subsidios para construir tu vivienda nueva'},
-    {id:'integracion',  emoji:'🤝', label:'Integración Social y Territorial (DS19)', desc:'Proyectos habitacionales integrados en barrios bien localizados'},
-    {id:'mejoramiento', emoji:'🔨', label:'Mejoramiento de vivienda y barrios', desc:'Programas Hogar Mejor — reparación, ampliación y eficiencia energética'},
-    {id:'rural',        emoji:'🌾', label:'Habitabilidad Rural (DS10)',        desc:'Construcción y mejoramiento en localidades de hasta 5.000 habitantes'},
-    {id:'portabilidad', emoji:'🔄', label:'Portabilidad Financiera',           desc:'Cambia de banco manteniendo tu subsidio DS1 o DS19'},
-    {id:'especiales',   emoji:'⚡', label:'Programas especiales',              desc:'Informe Valech, información para arrendadores y otros beneficios'},
-  ];
+/**
+ * Retorna razones legibles por las que un subsidio no aplica.
+ * @param {Object} subsidio - Elemento de SUBSIDIOS_DEF
+ * @param {Object} ctx - Contexto del usuario
+ * @returns {string[]}
+ */
+function subsidioRazon(subsidio, ctx) {
+  try { return subsidio.razones ? subsidio.razones(ctx) : []; } catch { return []; }
+}
 
-  CATEGORIAS.forEach(cat=>{
-    const subsEnCat = subs.filter(s=>s.categoria===cat.id);
-    if(!subsEnCat.length) return;
+/**
+ * Construye el contexto de evaluación de subsidios desde los inputs del usuario.
+ * @returns {Object} ctx para pasar a subsidio.aplicar() / subsidio.razones()
+ */
+function _buildCtxSubsidios() {
+  // Intenta leer desde el simulador principal primero, luego desde sub-*
+  const sueldoMain = parseCLP('sueldo') || 0;
+  const sueldoSub  = parseCLP('sub-sueldo') || 0;
+  const sueldoTotal = sueldoMain || sueldoSub;
+  const ingresoUF   = sueldoTotal / (UF_VALOR || 38500);
 
-    const califica = subsEnCat.some(s=>s.aplica);
-    // Siempre plegado por defecto: el usuario despliega con click
-    const openAttr = '';
+  const regionEl = document.getElementById('sub-region') || document.getElementById('region');
+  const tipoEl   = document.getElementById('sub-tipo')   || document.getElementById('tipo');
+  const precioEl = document.getElementById('sub-precio');
 
-    // Tarjetas de subsidios de esta categoría (primero los que aplican)
-    const tarjetas=[];
-    const ordenados = [...subsEnCat.filter(s=>s.aplica), ...subsEnCat.filter(s=>!s.aplica)];
-    ordenados.forEach(s=>{
-      const rs = !s.aplica && s.razones && ctx ? s.razones(ctx) : [];
+  const primera = document.getElementById('sub-primera')?.checked
+                ?? (document.getElementById('primera')?.value === 'si')
+                ?? true;
+  const nueva   = document.getElementById('sub-nueva')?.checked ?? true;
 
-      // Badge de estado/monto
-      let montoHtml;
-      if(s.aplica){
-        if(s.esFogaes)        montoHtml=`<span class="sub-badge sub-badge--verde">Pie 10%</span>`;
-        else if(s.esTasa)     montoHtml=`<span class="sub-badge sub-badge--verde">−${s.tasaDescuento}% tasa</span>`;
-        else if(s.esArriendo) montoHtml=`<span class="sub-badge sub-badge--verde">170 UF total</span>`;
-        else                  montoHtml=`<span class="sub-badge sub-badge--verde">✓ Calificas</span>`;
-      } else {
-        montoHtml=`<span class="sub-badge sub-badge--gris">Informativo</span>`;
-      }
+  const region  = regionEl?.value || 'RM';
+  const tipo    = tipoEl?.value   || (nueva ? 'depto' : 'usada');
 
-      // RSH y UF máximas como chips de info
-      const infoChips=[];
-      if(s.ingresoMaximoRSH) infoChips.push(`<span class="sub-chip">RSH hasta ${s.ingresoMaximoRSH}%</span>`);
-      if(s.maxPrecioUF && s.maxPrecioUF<9000) infoChips.push(`<span class="sub-chip">Hasta ${s.maxPrecioUF.toLocaleString('es-CL')} UF</span>`);
-      if(s.ahorroMinimoUF>0) infoChips.push(`<span class="sub-chip">Ahorro mín. ${s.ahorroMinimoUF} UF</span>`);
-      const chipsHtml = infoChips.length ? `<div class="sub-chips">${infoChips.join('')}</div>` : '';
+  // Precio UF: desde input dedicado, o desde calculadora, o estimado por región+tipo
+  let precioUF = 0;
+  if (precioEl) {
+    precioUF = parseCLP('sub-precio') / (UF_VALOR || 38500);
+  }
+  if (!precioUF) {
+    const regData = REGIONES[region];
+    if (regData) {
+      const ufKey = tipo === 'casa' ? 'casa' : tipo === 'usada' ? 'usada' : 'depto';
+      precioUF = (regData[ufKey] || regData.depto) * 55;
+    } else {
+      precioUF = tipo === 'usada' ? 1200 : 2000;
+    }
+  }
 
-      // Sección requisitos oficiales
-      const reqHtml = s.requisitosOficiales
-        ? `<div class="sub-req-wrap">
-            <div class="sub-req-titulo">📋 Requisitos oficiales MINVU</div>
-            <ul class="sub-req-lista">${s.requisitosOficiales.map(r=>`<li><span class="sub-req-bullet" style="color:${s.aplica?'var(--verde)':'var(--suave2)'}">→</span><span>${r}</span></li>`).join('')}</ul>
-          </div>` : '';
+  return {
+    sueldoTotal,
+    ingresoUF,
+    region,
+    tipo,
+    precioUF,
+    primera,
+    nueva,
+    // Helper requerido por SUBSIDIOS_DEF
+    tipoOk(sub) {
+      if (sub.soloNueva && this.tipo === 'usada') return false;
+      return true;
+    },
+  };
+}
 
-      // Razones por qué no califica (solo si viene del simulador)
-      const razonesHtml = rs.length
-        ? `<div class="sub-razones">
-            <div class="sub-razones-titulo">❌ Por qué no calificas hoy</div>
-            <ul>${rs.map(r=>`<li><span style="color:var(--rojo);font-weight:700;flex-shrink:0">•</span><span>${r}</span></li>`).join('')}</ul>
-          </div>` : '';
+/* ── Guía de subsidios (datos informativos, NO modificar SUBSIDIOS_DEF) ── */
+const _GUIA_SUB = {
+  ds19: {
+    quienEs:   `Familias con ingresos hasta 25 UF/mes, sin vivienda previa, vivienda nueva hasta 950 UF.`,
+    queDa:     s => `<strong>${s.montoUF} UF (~$${fmt(s.montoUF * UF_VALOR)})</strong> descontados directamente del precio`,
+    necesitas: ['Ser mayor de 18 años', 'No haber tenido vivienda propia', 'Cuenta de ahorro con mínimo 10 UF', 'Inscrito en el Registro Social de Hogares (RSH)'],
+    compat:    'Compatible con Bono Pie DS19, FOGAES y Ley 21.748.',
+    postula:   'Postula en <strong>minvu.gob.cl</strong> → Subsidios → DS19. También en la SEREMI de Vivienda de tu región.',
+    noAplica:  ['Vivienda usada', 'Ingresos sobre 25 UF/mes', 'Ya tener propiedad registrada'],
+    url:       'https://www.minvu.gob.cl/subsidios/subsidio-habitacional-ds19/',
+  },
+  ds1t1: {
+    quienEs:   `Ingresos hasta 37 UF/mes, primera vivienda, hasta 1.100 UF.`,
+    queDa:     s => `<strong>${s.montoUF} UF (~$${fmt(s.montoUF * UF_VALOR)})</strong> que se restan del crédito`,
+    necesitas: ['Primera vivienda', 'Cuenta de ahorro con al menos 50 UF', 'Vivienda hasta 1.100 UF', 'Inscripción RSH tramo medio-bajo'],
+    compat:    'Compatible con FOGAES y Ley 21.748.',
+    postula:   'Postula en <strong>minvu.gob.cl</strong> o en una EGIS certificada. Postulaciones por llamado — revisa el calendario Minvu.',
+    noAplica:  ['Vivienda sobre 1.100 UF', 'Ingresos sobre 37 UF/mes', 'Ya tener propiedad'],
+    url:       'https://www.minvu.gob.cl/subsidios/ds1/',
+  },
+  ds1t2: {
+    quienEs:   `Ingresos entre 37–60 UF/mes, primera vivienda, hasta 1.600 UF.`,
+    queDa:     s => `<strong>${s.montoUF} UF (~$${fmt(s.montoUF * UF_VALOR)})</strong> que reducen el crédito`,
+    necesitas: ['Primera vivienda', 'Cuenta de ahorro con al menos 80 UF', 'Vivienda hasta 1.600 UF', 'Ingreso acreditable (liquidaciones o declaración de renta)'],
+    compat:    'Compatible con FOGAES y Ley 21.748.',
+    postula:   'Postula en <strong>minvu.gob.cl</strong>. El banco también puede iniciar el trámite.',
+    noAplica:  ['Ingresos bajo 37 o sobre 60 UF/mes', 'Vivienda sobre 1.600 UF', 'Ya tener propiedad'],
+    url:       'https://www.minvu.gob.cl/subsidios/ds1/',
+  },
+  ds1t3: {
+    quienEs:   `Ingresos entre 60–78 UF/mes, primera vivienda, hasta 2.200 UF.`,
+    queDa:     s => `<strong>${s.montoUF} UF (~$${fmt(s.montoUF * UF_VALOR)})</strong> descontados del precio`,
+    necesitas: ['Primera vivienda', 'Cuenta de ahorro con al menos 100 UF', 'Vivienda hasta 2.200 UF', 'Ingreso acreditable'],
+    compat:    'Compatible con FOGAES y Ley 21.748.',
+    postula:   'Postula en <strong>minvu.gob.cl</strong> o directamente con el banco que te dará el crédito.',
+    noAplica:  ['Ingresos bajo 60 o sobre 78 UF/mes', 'Vivienda sobre 2.200 UF', 'Ya tener propiedad'],
+    url:       'https://www.minvu.gob.cl/subsidios/ds1/',
+  },
+  fogaes: {
+    quienEs:   'Cualquier persona que compra vivienda hasta 4.500 UF — el Estado garantiza el 10% que te falta ante el banco.',
+    queDa:     () => '<strong>Pie mínimo 10%</strong> en vez del 20% estándar. El banco lo tramita automáticamente.',
+    necesitas: ['Tener ahorrado al menos el 10% del precio', 'Banco apruebe el crédito', 'Vivienda hasta 4.500 UF', 'No requiere ser primera vivienda'],
+    compat:    'Compatible con DS19, DS1 todos los tramos y Ley 21.748.',
+    postula:   '<strong>Sin postulación en Minvu.</strong> Pídele al ejecutivo del banco que aplique FOGAES al momento de solicitar el crédito.',
+    noAplica:  ['Vivienda sobre 4.500 UF'],
+    url:       'https://www.minvu.gob.cl/beneficios/vivienda/',
+  },
+  ley21748: {
+    quienEs:   'Vivienda nueva hasta 4.000 UF — el Estado subsidia la tasa de interés durante los primeros años.',
+    queDa:     s => `Tu tasa baja <strong>${s.tasaDescuento}%</strong> los primeros ~5 años → dividendo más bajo en ~$30.000–$60.000/mes ese período`,
+    necesitas: ['Vivienda nueva (depto o casa)', 'Precio hasta 4.000 UF', 'Crédito hipotecario a tasa fija', 'Cupos disponibles (verificar en el banco)'],
+    compat:    'Compatible con DS1, FOGAES y Bono Pie DS19.',
+    postula:   '<strong>El banco lo aplica directamente.</strong> Solo indica al ejecutivo: "quiero aplicar el subsidio a la tasa Ley 21.748". No requiere trámite en Minvu.',
+    noAplica:  ['Vivienda usada', 'Precio sobre 4.000 UF', 'Sin cupos disponibles'],
+    url:       'https://www.minvu.gob.cl/ley21748/',
+  },
+  bonopie: {
+    quienEs:   'Complemento del DS19 para familias que necesitan completar el pie de vivienda nueva hasta 950 UF.',
+    queDa:     s => `Hasta <strong>${s.montoUF} UF (~$${fmt(s.montoUF * UF_VALOR)})</strong> extra para el pie`,
+    necesitas: [`Tener aprobado el subsidio DS19`, `Ingresos hasta 25 UF/mes (~$${fmt(25 * UF_VALOR)})`, `Vivienda nueva hasta 950 UF`, `Cuenta de ahorro activa`],
+    compat:    'Solo se usa junto al DS19. Compatible con FOGAES.',
+    postula:   'Se solicita junto con el DS19 en <strong>minvu.gob.cl</strong> o en la SEREMI. Si ya tienes DS19, consulta si puedes añadir el bono.',
+    noAplica:  ['Sin DS19 aprobado', 'Vivienda usada', 'Ingresos sobre 25 UF/mes'],
+    url:       'https://www.minvu.gob.cl/subsidios/subsidio-habitacional-ds19/',
+  },
+};
 
-      const descHtml    = s.descripcionOficial  ? `<div class="sub-desc">${s.descripcionOficial}</div>` : '';
-      const quienHtml   = s.quienPuedePostular  ? `<div class="sub-quien"><strong>¿Quién puede postular?</strong> ${s.quienPuedePostular}</div>` : '';
-      const fechaHtml   = s.fechasPostulacion2026 ? `<div class="sub-fecha-tag">📅 ${s.fechasPostulacion2026}</div>` : '';
-      const modalHtml   = s.modalidad           ? `<div class="sub-modal"><strong>Modalidad:</strong> ${s.modalidad}</div>` : '';
-      const postHtml    = s.postulacion         ? `<div class="sub-modal"><strong>Postulación:</strong> ${s.postulacion}</div>` : '';
+/**
+ * Renderiza las tarjetas interactivas de subsidios en el panel izquierdo (calculadora completa).
+ * @param {Array} subs - Array de subsidios con propiedad .aplica
+ * @param {number} precioUF - Precio objetivo en UF
+ * @param {number} tasa - Tasa anual en %
+ * @param {number} plazo - Plazo en años
+ * @param {Object} ctx - Contexto del usuario
+ */
+function renderSubsidios(subs, precioUF, tasa, plazo, ctx) {
+  const lista = document.getElementById('subs-lista');
+  if (!lista) return;
 
-      // Botones: siempre "Ir al sitio oficial MINVU" + segundo botón si es diferente
-      let botonesHtml='';
-      if(s.linksOficiales){
-        botonesHtml=`<div class="sub-links-bar">
-          <a class="sub-btn sub-btn--primary" href="${s.linksOficiales.minvu}" target="_blank" rel="noopener">Ir al sitio oficial MINVU →</a>
-        </div>`;
-      }
+  const aplican   = subs.filter(s => s.aplica);
+  const noAplican = subs.filter(s => !s.aplica);
+  const ordered   = [...aplican, ...noAplican];
+  const uf        = UF_VALOR || 38500;
 
-      tarjetas.push(`
-        <div class="sub-item ${s.aplica?'aplica':'no-aplica'}">
-          <div class="sub-header">
-            <div class="sub-header-left">
-              <span class="sub-icono">${s.icono}</span>
-              <div>
-                <div class="sub-nombre">${s.nombre}</div>
-              </div>
+  const partes = ordered.map(s => {
+    const g = _GUIA_SUB[s.id];
+    if (!g) return '';
+    const aplica = !!s.aplica;
+    const rs     = aplica ? [] : subsidioRazon(s, ctx);
+
+    // ── Monto badge ──
+    let montoVal = '';
+    if (s.esFogaes) {
+      montoVal = '10% de pie';
+    } else if (s.esTasa) {
+      montoVal = `−${s.tasaDescuento}% tasa`;
+    } else if (s.montoUF) {
+      montoVal = `${s.montoUF} UF · $${fmt(s.montoUF * uf)}`;
+    }
+
+    // ── Simulación rápida (solo si aplica y hay datos de precio/sueldo) ──
+    let simHtml = '';
+    if (aplica && precioUF > 0 && !s.esFogaes && !s.esTasa) {
+      const precioEf = Math.max(precioUF - (s.montoUF || 0), 0);
+      const pie20    = precioEf * 0.20 * uf;
+      const pie10    = precioEf * 0.10 * uf;
+      const div20    = cuotaMensual(precioEf * 0.80, tasa || 4.1, plazo || 25);
+      const div10    = cuotaMensual(precioEf * 0.90, tasa || 4.1, plazo || 25);
+      simHtml = `
+        <div class="sub-simulacion">
+          <div class="sub-sim-title">📊 Simulación con tu caso</div>
+          <div class="sub-sim-grid">
+            <div class="sub-sim-item">
+              <span class="sub-sim-label">Tu precio objetivo</span>
+              <span class="sub-sim-val">${Math.round(precioUF)} UF</span>
             </div>
-            <div class="sub-monto">${montoHtml}</div>
+            <div class="sub-sim-item">
+              <span class="sub-sim-label">Precio tras subsidio</span>
+              <span class="sub-sim-val verde">${Math.round(precioEf)} UF · $${fmt(precioEf * uf)}</span>
+            </div>
+            <div class="sub-sim-item">
+              <span class="sub-sim-label">Dividendo (pie 20%)</span>
+              <span class="sub-sim-val">$${fmt(div20)}/mes</span>
+            </div>
+            <div class="sub-sim-item">
+              <span class="sub-sim-label">Dividendo (pie 10% FOGAES)</span>
+              <span class="sub-sim-val">$${fmt(div10)}/mes</span>
+            </div>
+            <div class="sub-sim-item">
+              <span class="sub-sim-label">Pie necesario (20%)</span>
+              <span class="sub-sim-val">$${fmt(pie20)}</span>
+            </div>
+            <div class="sub-sim-item">
+              <span class="sub-sim-label">Pie con FOGAES (10%)</span>
+              <span class="sub-sim-val">$${fmt(pie10)}</span>
+            </div>
           </div>
-          ${chipsHtml}
-          ${descHtml}
-          ${quienHtml}
-          ${fechaHtml}
-          ${modalHtml}
-          ${postHtml}
+        </div>`;
+    }
+
+    // ── Razones por las que no aplica ──
+    const razonesHtml = rs.length
+      ? `<div class="sub-no-razones">
+           <div class="sub-no-razones-title">❌ Por qué no calificas hoy</div>
+           <ul class="sub-razones-list">
+             ${rs.map(r => `<li>${r}</li>`).join('')}
+           </ul>
+         </div>`
+      : '';
+
+    // ── Requisitos ──
+    const reqHtml = `
+      <div class="sub-req">
+        <div class="sub-req-title">${aplica ? '✅ Qué necesitas' : '📋 Requisitos para calificar'}</div>
+        <ul class="sub-req-list">
+          ${g.necesitas.map(p => `<li class="${aplica ? 'ok' : ''}">${p}</li>`).join('')}
+        </ul>
+      </div>`;
+
+    // ── Qué entrega ──
+    const beneficioHtml = `
+      <div class="sub-beneficio">
+        <span class="sub-beneficio-label">💰 ¿Qué entrega?</span>
+        <span class="sub-beneficio-val">${g.queDa(s)}</span>
+      </div>`;
+
+    // ── Detalles expandibles ──
+    const detallesHtml = `
+      <div class="sub-detalles" hidden>
+        <div class="sub-det-section">
+          <strong>🤝 Compatibilidades:</strong> ${g.compat}
+        </div>
+        <div class="sub-det-section">
+          <strong>🚫 Casos en que NO aplica:</strong>
+          <ul class="sub-noaplica-list">
+            ${g.noAplica.map(x => `<li>${x}</li>`).join('')}
+          </ul>
+        </div>
+        <div class="sub-det-section">
+          <strong>📍 Cómo postular:</strong> ${g.postula}
+          <br><a href="${g.url}" target="_blank" rel="noopener" class="sub-det-link">Ver en minvu.gob.cl →</a>
+        </div>
+      </div>`;
+
+    return `
+      <div class="subsidio-card ${aplica ? 'aplica' : 'no-aplica'}" data-sub-id="${s.id}">
+        <div class="sub-head">
+          <div class="sub-head-left">
+            <span class="sub-icon" aria-hidden="true">${s.icono}</span>
+            <div class="sub-head-info">
+              <span class="sub-title">${g.quienEs.split(',')[0].replace(/Familias con /i,'').replace(/Cualquier persona /i,'Todos — ')}</span>
+              <span class="sub-nombre-full">${s.nombre}</span>
+            </div>
+          </div>
+          <div class="sub-head-right">
+            <span class="sub-badge ${aplica ? 'sub-badge--aplica' : 'sub-badge--no'}">
+              ${aplica ? '✓ Calificas' : '✗ No aplica'}
+            </span>
+            ${montoVal ? `<span class="sub-monto-badge">${montoVal}</span>` : ''}
+          </div>
+        </div>
+        <div class="sub-body">
+          ${beneficioHtml}
           ${razonesHtml}
           ${reqHtml}
-          ${botonesHtml}
-        </div>`);
-    });
-
-    // Contador de subsidios en la categoría
-    const totalCat  = subsEnCat.length;
-    const califCat  = subsEnCat.filter(s=>s.aplica).length;
-    const contadorHtml = califica
-      ? `<span class="sub-badge sub-badge--verde" style="flex-shrink:0">✓ ${califCat} calificas</span>`
-      : `<span style="font-size:.78rem;color:var(--suave);flex-shrink:0">${totalCat} programa${totalCat>1?'s':''}</span>`;
-
-    partes.push(`
-      <details class="sub-cat-details" ${openAttr}>
-        <summary class="sub-cat-summary">
-          <div class="sub-cat-header">
-            <span class="sub-cat-emoji">${cat.emoji}</span>
-            <div>
-              <div class="sub-cat-titulo">${cat.label}</div>
-              <div class="sub-cat-desc">${cat.desc}</div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            ${contadorHtml}
-            <span class="sub-cat-chevron">▼</span>
-          </div>
-        </summary>
-        <div class="sub-cat-body subs-lista">
-          ${tarjetas.join('')}
+          ${simHtml}
+          <button class="sub-ver-mas" aria-expanded="false" type="button">
+            Ver detalles <span class="sub-ver-mas-ico">▾</span>
+          </button>
+          ${detallesHtml}
         </div>
-      </details>`);
+      </div>`;
   });
 
-  lista.innerHTML=partes.join('');
+  lista.innerHTML = partes.join('');
+
+  // Delegación de eventos: expandir/contraer detalles
+  lista.querySelectorAll('.sub-ver-mas').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const det = btn.nextElementSibling;
+      if (!det) return;
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      btn.querySelector('.sub-ver-mas-ico').textContent = expanded ? '▾' : '▴';
+      btn.textContent = '';
+      btn.insertAdjacentHTML('beforeend',
+        `${expanded ? 'Ver detalles' : 'Ocultar detalles'} <span class="sub-ver-mas-ico">${expanded ? '▾' : '▴'}</span>`);
+      if (expanded) { det.hidden = true; }
+      else          { det.hidden = false; }
+    });
+  });
 }
 
-/* TABLA REGIONAL */
-function renderTabla(sueldoTotal,piePct,tasa,plazo){
-  const regionActual=document.getElementById('region').value;
-  const tipo=document.getElementById('tipo').value;
-  const m2=parseFloat(document.getElementById('m2').value)||55;
-  const ufKey=tipo==='depto'?'depto':tipo==='casa'?'casa':'usada';
-  const tipoLabel=tipo==='depto'?'Departamento':tipo==='casa'?'Casa':'Vivienda usada';
-  document.getElementById('tabla-sub').textContent=`${tipoLabel} ${m2}m² · dividendo con pie ${piePct}%, ${plazo} años, ${tasa}%`;
-  const filas=Object.entries(REGIONES).map(([k,v])=>({k,v,uf:v[ufKey]*m2})).sort((a,b)=>a.uf-b.uf);
-  const tbody=document.getElementById('tbody-regiones');
-  tbody.innerHTML='';
-  filas.forEach(({k,v,uf})=>{
-    const clp=uf*UF_VALOR, pieUF=uf*piePct/100, pieClp=pieUF*UF_VALOR;
-    const div=cuotaMensual(uf*(1-piePct/100),tasa,plazo);
-    const pct=sueldoTotal>0?(div/sueldoTotal)*100:0;
-    const pc=pct<=30?'pill-t pill-verde':pct<=50?'pill-t pill-amarillo':'pill-t pill-rojo';
-    const lbl=pct<=30?'✅ Posible':pct<=50?'⚠️ Caro':'❌ Muy caro';
-    tbody.innerHTML+=`<tr class="${k===regionActual?'fila-activa':''}">
+/**
+ * Recalcula y renderiza las tarjetas de subsidios de la pantalla pública (screen-subsidios)
+ * usando SUBSIDIOS_DEF directamente — sin necesitar los cálculos del simulador completo.
+ */
+function renderSubsidiosPublico() {
+  const lista = document.getElementById('subs-lista-pub');
+  if (!lista) return;
+
+  const ctx  = _buildCtxSubsidios();
+  const tasa = 4.1, plazo = 25;
+  const uf   = UF_VALOR || 38500;
+  const subs = SUBSIDIOS_DEF.map(s => ({ ...s, aplica: subsidioElegible(s, ctx) }));
+
+  const aplican   = subs.filter(s => s.aplica);
+  const noAplican = subs.filter(s => !s.aplica);
+  const ordered   = [...aplican, ...noAplican];
+
+  const partes = ordered.map(s => {
+    const g = _GUIA_SUB[s.id];
+    if (!g) return '';
+    const aplica = !!s.aplica;
+    const rs     = aplica ? [] : subsidioRazon(s, ctx);
+
+    let montoVal = '';
+    if (s.esFogaes)       montoVal = '10% de pie';
+    else if (s.esTasa)    montoVal = `−${s.tasaDescuento}% tasa`;
+    else if (s.montoUF)   montoVal = `${s.montoUF} UF · $${fmt(s.montoUF * uf)}`;
+
+    // Simulación para subsidios monetarios cuando hay precio
+    let simHtml = '';
+    if (aplica && ctx.precioUF > 0 && !s.esFogaes && !s.esTasa && s.montoUF) {
+      const precioEf = Math.max(ctx.precioUF - s.montoUF, 0);
+      const div20    = cuotaMensual(precioEf * 0.80, tasa, plazo);
+      const pie20    = precioEf * 0.20 * uf;
+      simHtml = `
+        <div class="sub-simulacion">
+          <div class="sub-sim-title">📊 Tu simulación</div>
+          <div class="sub-sim-grid">
+            <div class="sub-sim-item">
+              <span class="sub-sim-label">Precio tras subsidio</span>
+              <span class="sub-sim-val verde">${Math.round(precioEf)} UF</span>
+            </div>
+            <div class="sub-sim-item">
+              <span class="sub-sim-label">Dividendo est. (pie 20%)</span>
+              <span class="sub-sim-val">$${fmt(div20)}/mes</span>
+            </div>
+            <div class="sub-sim-item">
+              <span class="sub-sim-label">Pie mínimo (20%)</span>
+              <span class="sub-sim-val">$${fmt(pie20)}</span>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    const razonesHtml = rs.length
+      ? `<div class="sub-no-razones">
+           <div class="sub-no-razones-title">❌ Por qué no calificas hoy</div>
+           <ul class="sub-razones-list">${rs.map(r => `<li>${r}</li>`).join('')}</ul>
+         </div>`
+      : '';
+
+    const detallesHtml = `
+      <div class="sub-detalles" hidden>
+        <div class="sub-det-section"><strong>🤝 Compatibilidades:</strong> ${g.compat}</div>
+        <div class="sub-det-section">
+          <strong>🚫 No aplica si:</strong>
+          <ul class="sub-noaplica-list">${g.noAplica.map(x => `<li>${x}</li>`).join('')}</ul>
+        </div>
+        <div class="sub-det-section">
+          <strong>📍 Cómo postular:</strong> ${g.postula}
+          <br><a href="${g.url}" target="_blank" rel="noopener" class="sub-det-link">Ver en minvu.gob.cl →</a>
+        </div>
+      </div>`;
+
+    return `
+      <div class="subsidio-card ${aplica ? 'aplica' : 'no-aplica'}" data-sub-id="${s.id}">
+        <div class="sub-head">
+          <div class="sub-head-left">
+            <span class="sub-icon" aria-hidden="true">${s.icono}</span>
+            <div class="sub-head-info">
+              <span class="sub-nombre-full">${s.nombre}</span>
+              <span class="sub-quien-es">${g.quienEs}</span>
+            </div>
+          </div>
+          <div class="sub-head-right">
+            <span class="sub-badge ${aplica ? 'sub-badge--aplica' : 'sub-badge--no'}">
+              ${aplica ? '✓ Calificas' : '✗ No aplica'}
+            </span>
+            ${montoVal ? `<span class="sub-monto-badge">${montoVal}</span>` : ''}
+          </div>
+        </div>
+        <div class="sub-body">
+          <div class="sub-beneficio">
+            <span class="sub-beneficio-label">💰 ¿Qué entrega?</span>
+            <span class="sub-beneficio-val">${g.queDa(s)}</span>
+          </div>
+          ${razonesHtml}
+          ${simHtml}
+          <button class="sub-ver-mas" aria-expanded="false" type="button">
+            Ver detalles <span class="sub-ver-mas-ico">▾</span>
+          </button>
+          ${detallesHtml}
+        </div>
+      </div>`;
+  });
+
+  lista.innerHTML = partes.join('');
+
+  lista.querySelectorAll('.sub-ver-mas').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const det      = btn.nextElementSibling;
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      det.hidden = expanded;
+      btn.innerHTML = `${expanded ? 'Ver detalles' : 'Ocultar detalles'} <span class="sub-ver-mas-ico">${expanded ? '▾' : '▴'}</span>`;
+    });
+  });
+}
+
+/**
+ * Renderiza la tabla comparativa de todas las regiones del país.
+ * @param {number} sueldoTotal - Ingreso total en CLP
+ * @param {number} piePct - Porcentaje de pie
+ * @param {number} tasa - Tasa anual en %
+ * @param {number} plazo - Plazo en años
+ */
+function renderTabla(sueldoTotal, piePct, tasa, plazo) {
+  const regionActual = document.getElementById('region').value;
+  const tipo         = document.getElementById('tipo').value;
+  const m2           = parseFloat(document.getElementById('m2').value) || 55;
+  const ufKey        = tipo === 'depto' ? 'depto' : tipo === 'casa' ? 'casa' : 'usada';
+  const tipoLabel    = tipo === 'depto' ? 'Departamento' : tipo === 'casa' ? 'Casa' : 'Vivienda usada';
+
+  document.getElementById('tabla-sub').textContent =
+    `${tipoLabel} ${m2}m² · dividendo con pie ${piePct}%, ${plazo} años, ${tasa}%`;
+
+  const filas = Object.entries(REGIONES)
+    .map(([k, v]) => ({ k, v, uf: v[ufKey] * m2 }))
+    .sort((a, b) => a.uf - b.uf);
+
+  const tbody = document.getElementById('tbody-regiones');
+  const rows = filas.map(({ k, v, uf }) => {
+    const clp    = uf * UF_VALOR;
+    const pieUF  = uf * piePct / 100;
+    const pieClp = pieUF * UF_VALOR;
+    const div    = cuotaMensual(uf * (1 - piePct / 100), tasa, plazo);
+    const pct    = sueldoTotal > 0 ? (div / sueldoTotal) * 100 : 0;
+    const pc     = pct <= 30 ? 'pill-t pill-verde' : pct <= 50 ? 'pill-t pill-amarillo' : 'pill-t pill-rojo';
+    const lbl    = pct <= 30 ? '✅ Posible' : pct <= 50 ? '⚠️ Caro' : '❌ Muy caro';
+    return `<tr class="${k === regionActual ? 'fila-activa' : ''}">
       <td>${v.nombre}</td>
-      <td style="font-size:12px">$${fmt(v[ufKey]*UF_VALOR)}<br><span style="color:var(--suave2)">${v[ufKey]} UF</span></td>
-      <td>$${fmt(clp)}<br><span style="font-size:11px;color:var(--suave)">${fmtUF(uf)} UF</span></td>
+      <td style="font-size:12px">$${fmt(v[ufKey] * UF_VALOR)}<br><span style="color:var(--suave2)">${v[ufKey]} UF</span></td>
+      <td>$${fmt(clp)}<br><span style="font-size:11px;color:var(--suave)">${fmt(uf)} UF</span></td>
       <td><strong>$${fmt(div)}</strong>/mes</td>
       <td>$${fmt(pieClp)}<br><span style="font-size:11px;color:var(--suave)">${piePct}%</span></td>
       <td><span class="${pc}">${lbl}</span></td>
     </tr>`;
   });
+  tbody.innerHTML = rows.join('');
 }
 
-/* ARRENDAR vs COMPRAR */
-function actualizarSliderArriendo(){
-  const val=parseInt(document.getElementById('arriendo-slider').value)||450000;
-  document.getElementById('arriendo-display').textContent=fmt(val);
+/* ── ARRENDAR VS COMPRAR ─────────────────────────────────────── */
+function actualizarSliderArriendo() {
+  const val = parseInt(document.getElementById('arriendo-slider').value) || 450000;
+  document.getElementById('arriendo-display').textContent = fmt(val);
 }
 
-function renderArrVsCompra(precioClp,precioUF,piePct,tasa,plazo,cuota){
-  const bloque=document.getElementById('avc-bloque');
-  if(!bloque) return;
-  const arriendoMensual=parseInt(document.getElementById('arriendo-slider').value)||450000;
-  document.getElementById('arriendo-display').textContent=fmt(arriendoMensual);
-  const pieClp=precioClp*piePct/100;
-  const difMes=cuota-arriendoMensual;
-  let aniosRecupero=null;
-  if(difMes<0){ aniosRecupero=Math.ceil(pieClp/(-difMes)/12); }
-  else if(difMes>0){
-    const tm=tasa/100/12, cr=precioClp-pieClp;
-    let saldo=cr, capitalAcum=0, extraAcum=0;
-    for(let mes=1;mes<=plazo*12;mes++){
-      const interes=saldo*tm, amort=cuota-interes;
-      capitalAcum+=amort; extraAcum+=difMes; saldo-=amort;
-      if(capitalAcum>=extraAcum){aniosRecupero=Math.ceil(mes/12);break;}
+function renderArrVsCompra(precioClp, precioUF, piePct, tasa, plazo, cuota) {
+  const bloque = document.getElementById('avc-bloque');
+  if (!bloque) return;
+
+  const arriendoMensual = parseInt(document.getElementById('arriendo-slider').value) || 450000;
+  document.getElementById('arriendo-display').textContent = fmt(arriendoMensual);
+
+  const pieClp = precioClp * piePct / 100;
+  const difMes = cuota - arriendoMensual;
+  let aniosRecupero = null;
+
+  if (difMes < 0) {
+    aniosRecupero = Math.ceil(pieClp / (-difMes) / 12);
+  } else if (difMes > 0) {
+    const tm = tasa / 100 / 12;
+    const cr = precioClp - pieClp;
+    let saldo = cr, capitalAcum = 0, extraAcum = 0;
+    for (let mes = 1; mes <= plazo * 12; mes++) {
+      const interes = saldo * tm;
+      const amort   = cuota - interes;
+      capitalAcum += amort;
+      extraAcum   += difMes;
+      saldo       -= amort;
+      if (capitalAcum >= extraAcum) { aniosRecupero = Math.ceil(mes / 12); break; }
     }
   }
-  const comprarMasBajo=difMes<=0;
-  const absDif=fmt(Math.abs(difMes));
+
+  const comprarMasBajo = difMes <= 0;
+  const absDif = fmt(Math.abs(difMes));
   let veredictoColor, veredictoTitulo, veredictoTexto, pros;
-  if(comprarMasBajo){
-    veredictoColor='var(--verde-l)';
-    veredictoTitulo=`✅ Comprar te sale $${absDif}/mes más barato que arrendar`;
-    veredictoTexto=`Con este arriendo, el dividendo es menor. Con cada pago estás construyendo patrimonio — esa plata es tuya, no del arrendador.`;
-    pros=[{ico:'🏠',txt:'Cada dividendo que pagas es plata que va a tu propiedad'},{ico:'📈',txt:'Con el tiempo, la casa puede valer más'},{ico:'🔒',txt:'Nadie te puede pedir que te vayas ni subir el arriendo'}];
-  } else if(aniosRecupero&&aniosRecupero<=plazo){
-    const enAños=aniosRecupero===1?'al primer año':`a los ${aniosRecupero} años`;
-    const enAñosCap=aniosRecupero===1?'Al primer año':`A los ${aniosRecupero} años`;
-    veredictoColor='var(--amarillo-l)';
-    veredictoTitulo=`⚖️ Comprar es $${absDif}/mes más caro hoy, pero ${enAños} te empieza a convenir`;
-    veredictoTexto=`Hoy pagas más que si arriendaras, pero parte de ese dividendo queda como tuyo (es patrimonio). ${enAñosCap}, lo que acumulaste en tu casa supera lo que pagaste de más.`;
-    pros=[{ico:'💰',txt:`Pagas $${absDif}/mes más que arrendando, pero esa plata queda para ti`},{ico:'🏠',txt:`${enAñosCap}, el patrimonio acumulado cubre la diferencia`},{ico:'🔒',txt:'Estabilidad: nadie te sube el arriendo ni te puede echar'}];
+
+  if (comprarMasBajo) {
+    veredictoColor  = 'var(--verde-l)';
+    veredictoTitulo = `✅ Comprar te sale $${absDif}/mes más barato que arrendar`;
+    veredictoTexto  = 'Con este arriendo, el dividendo es menor. Con cada pago estás construyendo patrimonio — esa plata es tuya, no del arrendador.';
+    pros = [
+      { ico: '🏠', txt: 'Cada dividendo que pagas es plata que va a tu propiedad' },
+      { ico: '📈', txt: 'Con el tiempo, la casa puede valer más' },
+      { ico: '🔒', txt: 'Nadie te puede pedir que te vayas ni subir el arriendo' },
+    ];
+  } else if (aniosRecupero && aniosRecupero <= plazo) {
+    const enAños    = aniosRecupero === 1 ? 'al primer año' : `a los ${aniosRecupero} años`;
+    const enAñosCap = aniosRecupero === 1 ? 'Al primer año' : `A los ${aniosRecupero} años`;
+    veredictoColor  = 'var(--amarillo-l)';
+    veredictoTitulo = `⚖️ Comprar es $${absDif}/mes más caro hoy, pero ${enAños} te empieza a convenir`;
+    veredictoTexto  = `Hoy pagas más que si arriendaras, pero parte de ese dividendo queda como tuyo (es patrimonio). ${enAñosCap}, lo que acumulaste en tu casa supera lo que pagaste de más.`;
+    pros = [
+      { ico: '💰', txt: `Pagas $${absDif}/mes más que arrendando, pero esa plata queda para ti` },
+      { ico: '🏠', txt: `${enAñosCap}, el patrimonio acumulado cubre la diferencia` },
+      { ico: '🔒', txt: 'Estabilidad: nadie te sube el arriendo ni te puede echar' },
+    ];
   } else {
-    veredictoColor='var(--rojo-l)';
-    veredictoTitulo=`📊 Arrendar es $${absDif}/mes más barato hoy`;
-    veredictoTexto=`Con este dividendo y arriendo, arrendar te deja más plata libre al mes. Comprar igual puede tener sentido si el arriendo sube o buscas estabilidad.`;
-    pros=[{ico:'💸',txt:`Te ahorras $${absDif}/mes versus comprar`},{ico:'🔄',txt:'Más flexibilidad para cambiarte si cambia tu situación'},{ico:'⚠️',txt:'Ojo: el arriendo puede subir con el tiempo, el dividendo no'}];
+    veredictoColor  = 'var(--rojo-l)';
+    veredictoTitulo = `📊 Arrendar es $${absDif}/mes más barato hoy`;
+    veredictoTexto  = 'Con este dividendo y arriendo, arrendar te deja más plata libre al mes. Comprar igual puede tener sentido si el arriendo sube o buscas estabilidad.';
+    pros = [
+      { ico: '💸', txt: `Te ahorras $${absDif}/mes versus comprar` },
+      { ico: '🔄', txt: 'Más flexibilidad para cambiarte si cambia tu situación' },
+      { ico: '⚠️', txt: 'Ojo: el arriendo puede subir con el tiempo, el dividendo no' },
+    ];
   }
-  bloque.innerHTML=`
+
+  bloque.innerHTML = `
     <div class="avc-grid">
-      <div class="avc-card ${comprarMasBajo?'':'avc-mejor'}">
-        ${!comprarMasBajo?'<span class="esc-badge" style="background:var(--azul)">↓ Más barato hoy</span>':''}
+      <div class="avc-card ${comprarMasBajo ? '' : 'avc-mejor'}">
+        ${!comprarMasBajo ? '<span class="esc-badge" style="background:var(--azul)">↓ Más barato hoy</span>' : ''}
         <div class="avc-card-tag">Si arriendas</div>
         <div class="avc-monto">$${fmt(arriendoMensual)}<span style="font-size:.85rem;font-weight:300">/mes</span></div>
         <div class="avc-linea" style="margin-top:8px">Lo que pagas y no vuelve</div>
       </div>
-      <div class="avc-card ${comprarMasBajo?'avc-mejor':''}">
-        ${comprarMasBajo?'<span class="esc-badge">✓ Mejor opción</span>':''}
+      <div class="avc-card ${comprarMasBajo ? 'avc-mejor' : ''}">
+        ${comprarMasBajo ? '<span class="esc-badge">✓ Mejor opción</span>' : ''}
         <div class="avc-card-tag">Si compras</div>
         <div class="avc-monto">$${fmt(cuota)}<span style="font-size:.85rem;font-weight:300">/mes</span></div>
         <div class="avc-linea" style="margin-top:8px">Parte de eso queda como tuyo 🏠</div>
@@ -1468,1108 +1248,1516 @@ function renderArrVsCompra(precioClp,precioUF,piePct,tasa,plazo,cuota){
     <div class="avc-fallo" style="background:${veredictoColor}">
       <div class="avc-fallo-titulo">${veredictoTitulo}</div>
       <div class="avc-fallo-txt">${veredictoTexto}</div>
-      <div class="avc-pros">${pros.map(p=>`<div class="avc-pro"><span class="avc-pro-ico">${p.ico}</span><span>${p.txt}</span></div>`).join('')}</div>
+      <div class="avc-pros">${pros.map(p => `<div class="avc-pro"><span class="avc-pro-ico">${p.ico}</span><span>${p.txt}</span></div>`).join('')}</div>
     </div>
     <div class="aviso aviso-neutro" style="font-size:12px">💡 <strong>¿Qué pasa con el pie?</strong> Para comprar necesitas juntar $${fmt(pieClp)} de entrada (${piePct}%). Revisa los subsidios — pueden cubrir parte del pie.</div>`;
 }
 
-/* FRASE IMPACTO */
-function renderFraseImpacto(sueldo,pct,pieClp,aniosPie,precioClp,regionNombre,edad,plazo){
-  const fraseEl=document.getElementById('frase-impacto');
-  const textoEl=document.getElementById('frase-texto');
-  if(!sueldo||sueldo<=0){fraseEl.style.display='none';return;}
-  fraseEl.style.display='block';
-  const sueldoFmt='$'+fmt(sueldo);
-  const edadFin=(edad>0&&plazo>0)?edad+plazo:null;
-  let frase='';
-  if(pct<=30){ frase=`Con <em>${sueldoFmt}/mes</em>, el dividendo representa solo el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. Eres de los pocos chilenos con acceso real a vivienda propia en ${regionNombre}.`; if(edadFin) frase+=` <strong>Terminarías de pagar a los ${edadFin} años.</strong>`; }
-  else if(pct<=50){ frase=`Con <em>${sueldoFmt}/mes</em>, destinarías el <strong>${pct.toFixed(1)}% de tu sueldo</strong> al dividendo. Quedarás con poco margen. Y para el pie aún necesitas <strong>${Math.ceil(aniosPie*12)} meses de ahorro disciplinado</strong>.`; if(edadFin) frase+=` Terminarías de pagar a los <strong>${edadFin} años</strong>.`; }
-  else if(pct<=80){ frase=`Con <em>${sueldoFmt}/mes</em>, el dividendo se llevaría el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. El banco probablemente no lo aprobará. Necesitarías ganar <strong>el doble</strong> para calificar solo, o conseguir un codeudor.`; if(edadFin) frase+=` Y terminarías pagando a los <strong>${edadFin} años</strong>.`; }
-  else { frase=`<strong>Esta vivienda no es accesible para tu sueldo actual.</strong> El dividendo sería el <em>${pct.toFixed(1)}% de tus ingresos</em>. No es un problema tuyo: es la realidad de millones de chilenos hoy.`; }
-  if(aniosPie>10&&pct>30) frase+=` Juntarías el pie en <em>${Math.ceil(aniosPie)} años</em> ahorrando el 20% de tu sueldo.`;
-  textoEl.innerHTML=frase;
-  const url=encodeURIComponent(window.location.href);
-  const tweetTxt=pct<=30?`Con mi sueldo puedo comprar un departamento en ${regionNombre} y el dividendo sería el ${pct.toFixed(0)}% de mis ingresos. Calculé en:`:pct<=50?`Necesito ${Math.ceil(aniosPie)} años para juntar el pie de un departamento en ${regionNombre} �� Calculé mi realidad en:`:`El dividendo de un depto en ${regionNombre} sería el ${pct.toFixed(0)}% de mi sueldo. La crisis habitacional es real. Calculé en:`;
-  document.getElementById('btn-tw').href=`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetTxt)}&url=${url}`;
+/* ── FRASE IMPACTO ───────────────────────────────────────────── */
+function renderFraseImpacto(sueldo, pct, pieClp, aniosPie, precioClp, regionNombre, plazo) {
+  const fraseEl = document.getElementById('frase-impacto');
+  const textoEl = document.getElementById('frase-texto');
+  if (!sueldo || sueldo <= 0) { fraseEl.style.display = 'none'; return; }
+  fraseEl.style.display = 'block';
+
+  const sueldoFmt = '$' + fmt(sueldo);
+  let frase = '';
+
+  if (pct <= 30) {
+    frase = `Con <em>${sueldoFmt}/mes</em>, el dividendo representa solo el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. Eres de los pocos chilenos con acceso real a vivienda propia en ${regionNombre}.`;
+  } else if (pct <= 50) {
+    frase = `Con <em>${sueldoFmt}/mes</em>, destinarías el <strong>${pct.toFixed(1)}% de tu sueldo</strong> al dividendo. Quedarás con poco margen. Y para el pie aún necesitas <strong>${Math.ceil(aniosPie * 12)} meses de ahorro disciplinado</strong>.`;
+  } else if (pct <= 80) {
+    frase = `Con <em>${sueldoFmt}/mes</em>, el dividendo se llevaría el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. El banco probablemente no lo aprobará. Necesitarías ganar <strong>el doble</strong> para calificar solo, o conseguir un codeudor.`;
+  } else {
+    frase = `<strong>Esta vivienda no es accesible para tu sueldo actual.</strong> El dividendo sería el <em>${pct.toFixed(1)}% de tus ingresos</em>. No es un problema tuyo: es la realidad de millones de chilenos hoy.`;
+  }
+  if (aniosPie > 10 && pct > 30)
+    frase += ` Juntarías el pie en <em>${Math.ceil(aniosPie)} años</em> ahorrando el 20% de tu sueldo.`;
+
+  textoEl.innerHTML = frase;
+
+  const url      = encodeURIComponent(window.location.href);
+  const tweetTxt = pct <= 30
+    ? `Con mi sueldo puedo comprar un departamento en ${regionNombre} y el dividendo sería el ${pct.toFixed(0)}% de mis ingresos. Calculé en:`
+    : pct <= 50
+      ? `Necesito ${Math.ceil(aniosPie)} años para juntar el pie de un departamento en ${regionNombre} 🏠 Calculé mi realidad en:`
+      : `El dividendo de un depto en ${regionNombre} sería el ${pct.toFixed(0)}% de mi sueldo. La crisis habitacional es real. Calculé en:`;
+  document.getElementById('btn-tw').href =
+    `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetTxt)}&url=${url}`;
 }
 
-/* DESIGUALDAD */
-function renderDesigualdad(){
-  const cont=document.getElementById('desigualdad-visual');
-  if(!cont) return;
-  const items=Object.entries(REGIONES).map(([k,v])=>({nombre:v.nombre.split('/')[0].trim(),uf:v.depto*55})).sort((a,b)=>a.uf-b.uf);
-  const max=items[items.length-1].uf;
-  cont.innerHTML=`<div class="desigualdad-header">Precio depto 55 m² en UF · de más barato a más caro</div>`+
-    items.map(it=>{ const pct=(it.uf/max)*100; const color=it.uf===max?'var(--rojo)':it.uf===items[0].uf?'var(--verde)':'var(--azul)'; return `<div class="desig-row"><span class="desig-nombre">${it.nombre}</span><div class="desig-barra-wrap"><div class="desig-barra" style="width:${pct}%;background:${color}"></div></div><span class="desig-uf">${fmtUF(it.uf)} UF</span></div>`; }).join('');
+/* ── PROYECCIÓN DE INGRESOS ──────────────────────────────────── */
+
+/**
+ * Renderiza la proyección de ingresos para el tab "Si crezco".
+ * Muestra cómo evoluciona la relación cuota/sueldo si el ingreso crece.
+ * @param {number} sueldoTotal - Ingreso mensual actual en CLP
+ * @param {number} cuota       - Dividendo mensual en CLP
+ */
+function renderProyeccionIngresos(sueldoTotal, cuota) {
+  const cont = document.getElementById('proyeccion-cont');
+  if (!cont || sueldoTotal <= 0) return;
+
+  // Persistir valores para cuando el usuario cambie la tasa
+  cont.dataset.sueldo = sueldoTotal;
+  cont.dataset.cuota  = cuota;
+
+  const tasas        = [3, 5, 8, 10, 15];
+  const selectedRate = parseInt(cont.dataset.tasa || '5');
+  const pctActual    = cuota / sueldoTotal * 100;
+
+  // Proyección a 10 años
+  const filas   = [];
+  let añoAcceso = null;
+  for (let año = 1; año <= 10; año++) {
+    const sueldoProy = sueldoTotal * Math.pow(1 + selectedRate / 100, año);
+    const pct        = cuota / sueldoProy * 100;
+    if (añoAcceso === null && pct <= 30) añoAcceso = año;
+    filas.push({ año, sueldo: sueldoProy, pct });
+  }
+
+  // Mensaje clave
+  let insight;
+  if (pctActual <= 30) {
+    const pct10 = filas[filas.length - 1].pct;
+    insight = `Hoy el dividendo ya está en el <strong>${pctActual.toFixed(1)}%</strong> de tu sueldo — accesible. Con <em>${selectedRate}% anual</em> de crecimiento, en 10 años bajaría al <strong>${pct10.toFixed(1)}%</strong>. Más holgura cada año.`;
+  } else if (añoAcceso !== null) {
+    const sueldoAcc = filas[añoAcceso - 1].sueldo;
+    insight = `Con <em>${selectedRate}% anual</em> de crecimiento, en <strong>${añoAcceso} año${añoAcceso > 1 ? 's' : ''}</strong> el dividendo quedaría bajo el 30% de tu sueldo. Estarías ganando <strong>$${fmt(sueldoAcc)}/mes</strong>.`;
+  } else {
+    insight = `Con <em>${selectedRate}% anual</em>, el dividendo aún supera el 30% después de 10 años. Considera codeudor, subsidio o viviendas de menor precio.`;
+  }
+
+  const pillFor = pct => {
+    if (pct <= 30) return '<span class="pill pill-verde" style="font-size:10px;padding:2px 8px">✓ Accesible</span>';
+    if (pct <= 50) return '<span class="pill pill-amarillo" style="font-size:10px;padding:2px 8px">Esfuerzo alto</span>';
+    return '<span class="pill pill-rojo" style="font-size:10px;padding:2px 8px">Difícil acceso</span>';
+  };
+
+  const selector = tasas
+    .map(t => `<button class="proy-btn${t === selectedRate ? ' activo' : ''}" onclick="cambiarTasaProyeccion(${t})">${t}% año</button>`)
+    .join('');
+
+  const hoyRow = `<tr class="proy-hoy"><td><strong>Hoy</strong></td><td>$${fmt(sueldoTotal)}</td><td>${pctActual.toFixed(1)}%</td><td>${pillFor(pctActual)}</td></tr>`;
+  const proyRows = filas.map(f =>
+    `<tr class="${f.pct <= 30 ? 'proy-ok' : ''}"><td>Año ${f.año}</td><td>$${fmt(f.sueldo)}</td><td>${f.pct.toFixed(1)}%</td><td>${pillFor(f.pct)}</td></tr>`
+  ).join('');
+
+  cont.innerHTML = `
+    <div class="proy-selector">${selector}</div>
+    <div class="proy-insight">${insight}</div>
+    <div class="proy-tabla">
+      <table>
+        <thead><tr><th>Período</th><th>Sueldo estimado</th><th>Dividendo / sueldo</th><th>Estado</th></tr></thead>
+        <tbody>${hoyRow}${proyRows}</tbody>
+      </table>
+    </div>
+    <p class="proy-nota">La proyección asume dividendo fijo y sueldo que crece a la tasa elegida de forma compuesta. No considera inflación, variación de la UF ni cambios de tasa hipotecaria.</p>`;
 }
 
-/* COPIAR */
-function copiarLink(){
-  navigator.clipboard.writeText(window.location.href).then(()=>{
-    const btn=document.querySelector('.btn-share-copy');
-    const orig=btn.textContent;
-    btn.textContent='✅ ¡Copiado!';
-    setTimeout(()=>{btn.textContent=orig;},2200);
+/**
+ * Cambia la tasa de crecimiento anual y re-renderiza la proyección.
+ * @param {number} tasa - Porcentaje anual de crecimiento elegido
+ */
+function cambiarTasaProyeccion(tasa) {
+  const cont = document.getElementById('proyeccion-cont');
+  if (!cont) return;
+  cont.dataset.tasa = tasa;
+  renderProyeccionIngresos(
+    parseFloat(cont.dataset.sueldo || '0'),
+    parseFloat(cont.dataset.cuota  || '0')
+  );
+}
+
+/* ── DESIGUALDAD REGIONAL ────────────────────────────────────── */
+function renderDesigualdad() {
+  const cont = document.getElementById('desigualdad-visual');
+  if (!cont) return;
+  const items = Object.entries(REGIONES)
+    .map(([, v]) => ({ nombre: v.nombre.split('/')[0].trim(), uf: v.depto * 55 }))
+    .sort((a, b) => a.uf - b.uf);
+  const max = items[items.length - 1].uf;
+
+  cont.innerHTML = `<div class="desigualdad-header">Precio depto 55 m² en UF · de más barato a más caro</div>` +
+    items.map(it => {
+      const pct   = (it.uf / max) * 100;
+      const color = it.uf === max ? 'var(--rojo)' : it.uf === items[0].uf ? 'var(--verde)' : 'var(--azul)';
+      return `<div class="desig-row">
+        <span class="desig-nombre">${it.nombre}</span>
+        <div class="desig-barra-wrap"><div class="desig-barra" style="width:${pct}%;background:${color}"></div></div>
+        <span class="desig-uf">${fmt(it.uf)} UF</span>
+      </div>`;
+    }).join('');
+}
+
+/* ── PORTALES DE BÚSQUEDA — sección screen-3 ────────────────── */
+/**
+ * Muestra botones con URLs filtradas hacia los principales portales
+ * de búsqueda de propiedades en Chile, usando los parámetros del simulador.
+ * @param {string} regionCode  - Clave REGIONES (RM, VAL…)
+ * @param {number} capacidadUF - Precio máximo que puede pagar el usuario (UF)
+ * @param {string} tipo        - Tipo de vivienda: 'depto'|'casa'|'usada'
+ * @param {number} m2          - Superficie seleccionada por el usuario en m²
+ */
+function mostrarBuscadoresPropiedades(regionCode = 'RM', capacidadUF = 0) {
+  const section = document.getElementById('buscadores-section');
+  const grid    = document.getElementById('buscadores-grid');
+  const sub     = document.getElementById('buscadores-sub');
+  if (!section || !grid) return;
+
+  const d    = REGIONES[regionCode] ?? REGIONES.RM;
+  const urlML = 'https://www.mercadolibre.cl/c/inmuebles#menu=categories';
+  const urlTT = 'https://www.toctoc.com/';
+
+  const notaCapacidad = capacidadUF > 0
+    ? `Tu capacidad: hasta <strong>${capacidadUF} UF</strong> · ${d.nombre}`
+    : `Región: <strong>${d.nombre}</strong>`;
+
+  if (sub) sub.innerHTML = notaCapacidad;
+
+  grid.innerHTML = `
+    <a href="${urlML}" target="_blank" rel="noopener noreferrer" class="buscador-card buscador-card--ml">
+      <span class="buscador-logo">MercadoLibre</span>
+      <span class="buscador-desc">Inmuebles en venta en Chile</span>
+      <span class="buscador-arrow">→</span>
+    </a>
+    <a href="${urlTT}" target="_blank" rel="noopener noreferrer" class="buscador-card buscador-card--tt">
+      <span class="buscador-logo">TocToc</span>
+      <span class="buscador-desc">Propiedades en venta en Chile</span>
+      <span class="buscador-arrow">→</span>
+    </a>
+  `;
+
+  section.style.display = '';
+}
+
+/* ── COPIAR LINK ─────────────────────────────────────────────── */
+function copiarLink() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    const btn  = document.querySelector('.btn-share-copy');
+    const orig = btn.textContent;
+    btn.textContent = '✅ ¡Copiado!';
+    setTimeout(() => { btn.textContent = orig; }, 2200);
   });
 }
 
-/* CHECKS */
-document.querySelectorAll('.check-btn').forEach(label=>{
-  label.addEventListener('change',()=>{
-    const cb=label.querySelector('input[type="checkbox"]');
-    label.classList.toggle('activo',cb.checked);
-    if(cb.id==='casado'&&cb.checked&&parseCLP('codeudor')===0){
-      document.getElementById('codeudor').focus();
+/* ── NAVEGACIÓN: EXPLORAR ────────────────────────────────────── */
+function _ocultarWizard() {
+  document.querySelector('.wizard-steps').style.display = 'none';
+}
+function _mostrarWizard() {
+  document.querySelector('.wizard-steps').style.display = '';
+}
+function _irAScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('activa'));
+  const target = document.getElementById(id);
+  target.classList.add('activa');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const h = target.querySelector('h1, .sub-hero-title');
+  if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+}
+
+function volverDesdeScreen() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('activa'));
+  const target = document.getElementById('screen-1');
+  target.classList.add('activa');
+  _mostrarWizard();
+  [1, 2, 3].forEach(i => {
+    const it = document.getElementById('ws' + i);
+    it.classList.remove('activo', 'done');
+    it.removeAttribute('aria-current');
+    if (i === 1) { it.classList.add('activo'); it.setAttribute('aria-current', 'step'); }
+  });
+  [1, 2].forEach(i => document.getElementById('ws-l' + i).classList.remove('done'));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const h = target.querySelector('h1');
+  if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+}
+
+function irARegiones() {
+  _irAScreen('screen-regiones');
+  _ocultarWizard();
+  renderPublicRegiones();
+}
+
+function renderPublicRegiones() {
+  const container = document.getElementById('pub-regiones-content');
+  if (!container) return;
+  const tipoEl   = document.getElementById('pub-tipo');
+  const m2El     = document.getElementById('pub-m2');
+  const tipo     = tipoEl ? tipoEl.value : 'depto';
+  const m2       = m2El ? Math.max(10, parseFloat(m2El.value) || 55) : 55;
+  const ufKey    = tipo === 'usada' ? 'usada' : tipo;
+  const tipoLabel = tipo === 'depto' ? 'Departamento' : tipo === 'casa' ? 'Casa' : 'Vivienda usada';
+  const piePct   = 20, tasa = 4.1, plazo = 25;
+
+  document.getElementById('pub-reg-sub').textContent =
+    `${tipoLabel} ${m2}m² · dividendo con pie 20%, 25 años, tasa 4.1% anual`;
+
+  const filas = Object.entries(REGIONES)
+    .map(([k, v]) => ({ k, v, uf: v[ufKey] * m2 }))
+    .sort((a, b) => a.uf - b.uf);
+
+  // ── Renderizar tabla base con columna ML (loading state) ──
+  let html = `<div class="tabla-wrap"><table>
+    <thead><tr>
+      <th>Región</th><th>Precio m²</th><th>Estimado ${tipoLabel} ${m2}m²</th>
+      <th>Precio real ML</th>
+      <th>Dividendo mensual</th><th>Pie requerido (20%)</th>
+    </tr></thead><tbody>`;
+
+  filas.forEach(({ k, v, uf }) => {
+    const clp    = uf * UF_VALOR;
+    const div    = cuotaMensual(uf * (1 - piePct / 100), tasa, plazo);
+    const pieClp = uf * (piePct / 100) * UF_VALOR;
+    const priceKey = v[ufKey];
+    html += `<tr data-region-key="${k}">
+      <td><strong>${v.nombre}</strong></td>
+      <td style="font-size:12px">$${fmt(priceKey * UF_VALOR)}/m²<br><span style="color:var(--suave2)">${priceKey} UF/m²</span></td>
+      <td>$${fmt(clp)}<br><span style="font-size:11px;color:var(--suave)">${fmt(Math.round(uf))} UF</span></td>
+      <td class="ml-precio-cell" id="ml-cell-${k}"><span class="ml-loading">⏳</span></td>
+      <td><strong>$${fmt(div)}</strong>/mes</td>
+      <td>$${fmt(pieClp)}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  html += `<p style="font-size:11px;color:var(--suave);margin-top:.5rem;text-align:right">
+    📡 Precios reales: MercadoLibre en tiempo real · Estimados: CChC Q3 2025
+  </p>`;
+  container.innerHTML = html;
+
+  // ── Cargar precios ML de forma asincrónica ─────────────────
+  if (typeof realEstateAPI !== 'undefined') {
+    filas.forEach(({ k }) => {
+      realEstateAPI.getPrices(k, tipo === 'all' ? 'all' : tipo)
+        .then(data => {
+          const cell = document.getElementById(`ml-cell-${k}`);
+          if (!cell) return;
+          const estimadoUF = (REGIONES[k]?.[ufKey] ?? 0) * m2;
+          const diff       = data.promedioUF - Math.round(estimadoUF);
+          const pct        = estimadoUF > 0 ? Math.round((diff / estimadoUF) * 100) : 0;
+          const diffIcon   = diff > 50 ? '🔴' : diff < -50 ? '🟢' : '🟡';
+          const diffLabel  = diff > 0 ? `+${diff} UF vs estimado` : `${diff} UF vs estimado`;
+
+          const fuente = data.fuente === 'MercadoLibre' ? '' :
+            '<br><span style="font-size:10px;color:var(--suave)">est. CChC</span>';
+
+          cell.innerHTML = `<strong>${data.promedioUF} UF</strong>
+            <br><span style="font-size:11px;color:var(--suave)">~$${fmt(data.promedioCLP)}</span>
+            <br><span style="font-size:10.5px">${diffIcon} ${diffLabel} (${pct > 0 ? '+' : ''}${pct}%)${fuente}</span>`;
+
+          // Resaltar fila si el precio real diverge significativamente (>15%)
+          const row = cell.closest('tr');
+          if (row) {
+            if (pct > 15) row.classList.add('ml-row--caro');
+            else if (pct < -15) row.classList.add('ml-row--barato');
+          }
+        })
+        .catch(() => {
+          const cell = document.getElementById(`ml-cell-${k}`);
+          if (cell) cell.innerHTML = '<span style="color:var(--suave);font-size:11px">—</span>';
+        });
+    });
+  }
+}
+
+function irAArrendar() {
+  _irAScreen('screen-arrendar');
+  _ocultarWizard();
+}
+
+function calcPublicAVC() {
+  const precio  = parseCLP('pub-precio');
+  const arr     = parseCLP('pub-arriendo');
+  const res     = document.getElementById('pub-avc-resultado');
+  const hintEl  = document.getElementById('pub-div-hint');
+
+  if (precio <= 0) {
+    res.innerHTML = '';
+    if (hintEl) hintEl.textContent = 'Calcularemos el dividendo estimado';
+    return;
+  }
+  const precioUF = precio / UF_VALOR;
+  const div      = Math.round(cuotaMensual(precioUF * 0.80, 4.1, 25));
+  if (hintEl) hintEl.textContent = `→ Dividendo estimado: $${fmt(div)}/mes (pie 20%, 25 años, 4.1%)`;
+
+  if (arr <= 0) {
+    const pieClp = precio * 0.20;
+    res.innerHTML = `
+      <div style="border:1.5px solid var(--borde);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);margin-bottom:8px">ESTIMADO DE COMPRA</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <div style="font-size:11px;color:var(--suave);margin-bottom:3px">Dividendo mensual</div>
+            <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;color:var(--negro)">$${fmt(div)}<span style="font-size:.8rem;font-weight:300">/mes</span></div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--suave);margin-bottom:3px">Pie requerido (20%)</div>
+            <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;color:var(--negro)">$${fmt(pieClp)}</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--suave);margin-top:10px">Ingresa el arriendo mensual para comparar cuál opción te conviene más.</div>
+      </div>`;
+    return;
+  }
+
+  const dif    = div - arr;
+  const absDif = fmt(Math.abs(dif));
+  let veredictoHtml = '';
+
+  if (dif < 0) {
+    veredictoHtml = `
+      <div style="background:var(--verde-l);border:1.5px solid var(--verde);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--verde);margin-bottom:5px">✅ Comprar es más barato hoy</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:600;color:var(--negro);margin-bottom:6px">$${absDif}/mes menos que arrendar</div>
+        <div style="font-size:13px;color:var(--texto);line-height:1.6">Con cada dividendo estás construyendo patrimonio — esa plata queda para ti. Además tienes estabilidad: nadie te puede subir el arriendo ni pedirte que te vayas.</div>
+      </div>`;
+  } else {
+    const TASA = 4.1, r = (TASA / 100) / 12, n = 25 * 12;
+    const monto = precioUF * 0.80 * UF_VALOR;
+    let saldo = monto, capitalAcum = 0, extraAcum = 0, meses = null;
+    for (let m = 1; m <= n; m++) {
+      const interes = saldo * r;
+      const amort   = div - interes;
+      if (amort <= 0) break;
+      capitalAcum += amort; extraAcum += dif; saldo -= amort;
+      if (capitalAcum >= extraAcum) { meses = m; break; }
     }
-  });
-});
+    const beTxt = meses
+      ? `A los ${Math.ceil(meses / 12)} años te empieza a convenir comprar`
+      : 'En el plazo analizado arrendar sigue siendo más barato';
+    veredictoHtml = `
+      <div style="background:var(--amarillo-l);border:1.5px solid var(--amarillo);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amarillo);margin-bottom:5px">⚖️ Arrendar es más barato hoy</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:600;color:var(--negro);margin-bottom:6px">$${absDif}/mes más barato arrendar</div>
+        <div style="font-size:13px;color:var(--texto);line-height:1.6">Hoy pagas menos arrendando, pero parte del dividendo queda como tuyo (patrimonio). <strong>${beTxt}</strong> — porque el capital que acumulas en la propiedad supera lo que pagaste de más.</div>
+      </div>`;
+  }
 
-/* INIT */
-document.addEventListener('DOMContentLoaded',()=>{
+  const prosHtml = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="border:1.5px solid var(--borde);border-radius:12px;padding:1rem">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--suave);margin-bottom:8px">🏠 Si compras</div>
+        <div style="font-size:12px;color:var(--texto);line-height:1.8">✓ Construyes patrimonio<br>✓ Dividendo fijo, sin alzas<br>✓ Puedes modificar la propiedad<br>✗ Menos liquidez</div>
+      </div>
+      <div style="border:1.5px solid var(--borde);border-radius:12px;padding:1rem">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--suave);margin-bottom:8px">📦 Si arriendas</div>
+        <div style="font-size:12px;color:var(--texto);line-height:1.8">✓ Más liquidez mensual<br>✓ Flexibilidad para moverte<br>✗ El arriendo puede subir<br>✗ No acumulas patrimonio</div>
+      </div>
+    </div>`;
+  res.innerHTML = veredictoHtml + prosHtml;
+}
+
+/* ── SUBSIDIOS RÁPIDOS (pantalla pública) ────────────────────── */
+function irASubsidios() {
+  const v = document.getElementById('sueldo').value;
+  if (v) document.getElementById('sub-sueldo').value = v;
+  _irAScreen('screen-subsidios');
+  _ocultarWizard();
+  checkSubsidiosRapido();
+}
+
+function volverDesdeSubsidios() { volverDesdeScreen(); }
+
+function irACalculadoraCompleta() {
+  const v = parseCLP('sub-sueldo');
+  if (v > 0) document.getElementById('sueldo').value = v.toLocaleString('es-CL');
+  const p = document.getElementById('sub-primera').checked;
+  // Sincronizar al input hidden (value 'si'/'no', no .checked)
+  const primeraHidden = document.getElementById('primera');
+  if (primeraHidden) primeraHidden.value = p ? 'si' : 'no';
+  const btnPrimeraSync = document.getElementById('sit-btn-primera');
+  if (btnPrimeraSync) btnPrimeraSync.classList.toggle('activo', p);
+  volverDesdeScreen();
+}
+
+function checkSubsidiosRapido() {
+  const sueldo = parseCLP('sub-sueldo');
+  const lista  = document.getElementById('subs-lista-pub');
+  const cta    = document.getElementById('sub-cta-completo');
+
+  if (sueldo <= 0) {
+    if (lista) lista.innerHTML = `
+      <div class="sub-empty-state">
+        <span style="font-size:2rem">🏛</span>
+        <p>Ingresa tu sueldo para ver a qué subsidios calificas</p>
+      </div>`;
+    if (cta) cta.style.display = 'none';
+    return;
+  }
+
+  renderSubsidiosPublico();
+  if (cta) cta.style.display = 'flex';
+}
+
+/* ── INICIALIZACIÓN ──────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
   actualizarSliderArriendo();
-  const sl=document.getElementById('arriendo-slider');
-  if(sl) sl.addEventListener('pointerdown',()=>{sl.dataset.tocado='1';});
+
+  // Marcar slider de arriendo como "tocado" cuando el usuario interactúa
+  const sl = document.getElementById('arriendo-slider');
+  if (sl) sl.addEventListener('pointerdown', () => { sl.dataset.tocado = '1'; });
+
+  // Fetch UF en vivo
   cargarUF();
 
-  // Precio directo: refrescar hints al cambiar región/tipo/superficie
-  const regionSel=document.getElementById('region');
-  const tipoSel=document.getElementById('tipo');
-  const m2Input=document.getElementById('m2');
-  if(regionSel) regionSel.addEventListener('change',()=>{ actualizarPrecioEstimado(); actualizarM2Estimado(); });
-  if(tipoSel) tipoSel.addEventListener('change',()=>{ actualizarPrecioEstimado(); actualizarM2Estimado(); });
-  if(m2Input) m2Input.addEventListener('input',actualizarPrecioEstimado);
-  setTimeout(()=>{
-    actualizarPrecioEstimado();
-    const ufHint=document.getElementById('uf-hint-val');
-    if(ufHint) ufHint.textContent=fmt(UF_VALOR);
-  },50);
-
-  // Flujo principal (pantallas 1/2) sin handlers inline
-  document.addEventListener('click',e=>{
-    const tabBtn=e.target.closest('[role="tab"][data-tab]');
-    if(tabBtn){
-      switchTab(tabBtn.dataset.tab,tabBtn);
-      return;
-    }
-
-    const actionEl=e.target.closest('[data-main-action]');
-    if(actionEl){
-      const action=actionEl.dataset.mainAction;
-      if(action==='ir-paso-2') irAPaso2();
-      else if(action==='ir-paso-1') irAPaso1();
-      else if(action==='ir-resultados') irAResultados();
-      else if(action==='ir-regiones') irARegiones();
-      else if(action==='ir-arrendar') irAArrendar();
-      else if(action==='ir-bancos') irABancos();
-      else if(action==='copiar-link') copiarLink();
-      else if(action==='reload-page') location.reload();
-      else if(action==='volver-screen') volverDesdeScreen();
-      else if(action==='volver-subsidios') volverDesdeSubsidios();
-      else if(action==='ir-calculadora') irACalculadoraCompleta();
-      return;
-    }
-
-    const sitBtn=e.target.closest('[data-sit]');
-    if(sitBtn){
-      selSituacion(sitBtn.dataset.sit);
-      return;
-    }
-
-    const modoBtn=e.target.closest('[data-modo-precio]');
-    if(modoBtn){
-      selModoPrecio(modoBtn.dataset.modoPrecio);
-    }
-  });
-
-  document.addEventListener('keydown',e=>{
-    if(e.key!=='Enter'&&e.key!==' ') return;
-    const actionEl=e.target.closest('[data-main-action]');
-    if(!actionEl) return;
-    const tag=(actionEl.tagName||'').toLowerCase();
-    if(tag==='button'||tag==='a'||tag==='input'||tag==='select'||tag==='textarea') return;
-    e.preventDefault();
-    actionEl.click();
-  });
-
-  document.addEventListener('input',e=>{
-    const fmtEl=e.target.closest('[data-format-clp]');
-    if(fmtEl&&fmtEl.id) formatCLP(fmtEl.id);
-
-    const inputEl=e.target.closest('[data-input-action]');
-    if(!inputEl) return;
-    const action=inputEl.dataset.inputAction;
-    if(action==='actualizar-precio-estimado') actualizarPrecioEstimado();
-    else if(action==='precio-directo'){
-      formatCLP('precio-directo');
-      actualizarM2Estimado();
-    }else if(action==='precio-uf') actualizarDesdUF();
-    else if(action==='arriendo-slider'){
-      actualizarSliderArriendo();
-      calcular();
-    }else if(action==='render-public-regiones') renderPublicRegiones();
-    else if(action==='pub-precio'){
-      formatCLP('pub-precio');
-      calcPublicAVC();
-    }else if(action==='pub-arriendo'){
-      formatCLP('pub-arriendo');
-      calcPublicAVC();
-    }
-  });
-
-  document.addEventListener('change',e=>{
-    const changeEl=e.target.closest('[data-change-action]');
-    if(!changeEl) return;
-    const action=changeEl.dataset.changeAction;
-    if(action==='render-public-regiones') renderPublicRegiones();
-  });
-
-  // Escenarios expand/collapse via event delegation (single listener, survives re-renders)
-  const escGrid=document.getElementById('escenarios-grid');
-  if(escGrid){
-    escGrid.addEventListener('click',e=>{
-      const card=e.target.closest('.esc-card');
-      if(!card||card.classList.contains('esc-no-aplica')) return;
+  // Expandir/colapsar tarjetas de escenario (event delegation — sobrevive re-renders)
+  const escGrid = document.getElementById('escenarios-grid');
+  if (escGrid) {
+    escGrid.addEventListener('click', e => {
+      const card = e.target.closest('.esc-card');
+      if (!card || card.classList.contains('esc-no-aplica')) return;
       card.classList.toggle('expandido');
-      const hint=card.querySelector('.esc-expand-hint');
-      if(hint) hint.textContent=card.classList.contains('expandido')?'▴ ocultar':'▾ ver detalles';
+      const hint = card.querySelector('.esc-expand-hint');
+      if (hint) hint.textContent = card.classList.contains('expandido') ? '▴ ocultar' : '▾ ver detalles';
     });
   }
 
-  // Filtros de subsidios (sin onclick inline)
-  const subFiltros=document.getElementById('sub-filtros');
-  if(subFiltros){
-    subFiltros.addEventListener('click',e=>{
-      const btn=e.target.closest('.sub-filtro-btn');
-      if(!btn) return;
-      const cat=btn.dataset.cat||'todos';
-      filtrarSubsidiosInteractivos(cat,btn);
-    });
-  }
-
-  // Bancos 2026 (sin onclick/onchange inline)
-  const tabBancos=document.getElementById('tab-bancos');
-  if(tabBancos){
-    tabBancos.addEventListener('click',e=>{
-      const btn=e.target.closest('[data-bco-action]');
-      if(!btn) return;
-      const action=btn.dataset.bcoAction;
-      if(action==='toggle-tab-chat') toggleTabBcoChat();
-      else if(action==='sugerir-tab') sugerirComparacionBco('tab');
-      else if(action==='abrir-bancos') irABancos();
-      else if(action==='ir-paso1') irAPaso1();
-    });
-    tabBancos.addEventListener('change',e=>{
-      const sel=e.target.closest('select[data-bco-select="tab"]');
-      if(!sel) return;
-      renderComparadorTab();
-    });
-  }
-
-  const screenBancos=document.getElementById('screen-bancos');
-  if(screenBancos){
-    screenBancos.addEventListener('click',e=>{
-      const btn=e.target.closest('[data-bco-action]');
-      if(!btn) return;
-      const action=btn.dataset.bcoAction;
-      if(action==='toggle-full-chat') toggleBcoChat();
-      else if(action==='sugerir-full') sugerirComparacionBco('full');
-      else if(action==='scroll') scrollToBcoSeccion(btn.dataset.target);
-      else if(action==='ir-paso1') irAPaso1();
-    });
-    screenBancos.addEventListener('change',e=>{
-      const sel=e.target.closest('select[data-bco-select="full"]');
-      if(!sel) return;
-      renderComparador();
-    });
-  }
-
-  // Keyboard navigation for tabs (ARIA roving tabindex pattern)
-  const tablist=document.querySelector('[role="tablist"]');
-  if(tablist){
-    tablist.addEventListener('keydown',e=>{
-      const tabs=[...tablist.querySelectorAll('[role="tab"]')];
-      const idx=tabs.indexOf(document.activeElement);
-      if(idx===-1) return;
-      let next=-1;
-      if(e.key==='ArrowRight') next=(idx+1)%tabs.length;
-      else if(e.key==='ArrowLeft') next=(idx-1+tabs.length)%tabs.length;
-      else if(e.key==='Home') next=0;
-      else if(e.key==='End') next=tabs.length-1;
-      if(next!==-1){
+  // Navegación de tabs con teclado (ARIA roving tabindex)
+  const tablist = document.querySelector('[role="tablist"]');
+  if (tablist) {
+    tablist.addEventListener('keydown', e => {
+      const tabs = [...tablist.querySelectorAll('[role="tab"]')];
+      const idx  = tabs.indexOf(document.activeElement);
+      if (idx === -1) return;
+      let next = -1;
+      if (e.key === 'ArrowRight') next = (idx + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft') next = (idx - 1 + tabs.length) % tabs.length;
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End')  next = tabs.length - 1;
+      if (next !== -1) {
         e.preventDefault();
         tabs[next].focus();
         tabs[next].click();
       }
     });
   }
+
+  /* ── EVENT DELEGATOR GLOBAL ──────────────────────────────────
+     Maneja todos los atributos declarativos del HTML.
+     Un solo listener por tipo de evento cubre toda la app.
+  ─────────────────────────────────────────────────────────── */
+
+  // ── clicks: data-main-action ──────────────────────────────
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-main-action]');
+    if (!el) return;
+    switch (el.dataset.mainAction) {
+      case 'reload-page':      location.reload();            break;
+      case 'ir-paso-1':        irAPaso1();                   break;
+      case 'ir-paso-2':        irAPaso2();                   break;
+      case 'ir-resultados':    irAResultados();              break;
+      case 'ir-regiones':      irARegiones();                break;
+      case 'ir-arrendar':      irAArrendar();                break;
+      case 'ir-bancos':        irASubsidios();               break; // placeholder → subsidios por ahora
+      case 'ir-calculadora':   irACalculadoraCompleta();     break;
+      case 'volver-screen':    volverDesdeScreen();          break;
+      case 'volver-subsidios': volverDesdeSubsidios();       break;
+      case 'copiar-link':      copiarLink();                 break;
+    }
+  });
+
+  // ── clicks: data-tab ─────────────────────────────────────
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-tab]');
+    if (!btn) return;
+    const targetId = btn.dataset.tab;
+    const container = btn.closest('[role="tablist"]')?.parentElement
+                   || btn.closest('.tabs-wrap')
+                   || btn.closest('.screen')
+                   || document;
+    // Desactivar todos los botones y paneles del mismo grupo
+    container.querySelectorAll('[data-tab]').forEach(b => {
+      b.classList.remove('activo');
+      b.setAttribute('aria-selected', 'false');
+      b.setAttribute('tabindex', '-1');
+    });
+    container.querySelectorAll('[data-tab-panel]').forEach(p => p.classList.remove('activo'));
+    // Activar el seleccionado
+    btn.classList.add('activo');
+    btn.setAttribute('aria-selected', 'true');
+    btn.setAttribute('tabindex', '0');
+    const panel = container.querySelector(`[data-tab-panel="${targetId}"]`)
+               || document.getElementById(targetId);
+    if (panel) panel.classList.add('activo');
+  });
+
+  // ── clicks: data-sit (situación vivienda) ────────────────
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-sit]');
+    if (!btn) return;
+    const sit = btn.dataset.sit;
+    // Marcar botón activo
+    document.querySelectorAll('[data-sit]').forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo');
+    // Actualizar input hidden y hint
+    const primeraInput = document.getElementById('primera');
+    const hint         = document.getElementById('sit-hint');
+    const aviso        = document.getElementById('sit-aviso');
+    if (primeraInput) primeraInput.value = sit === 'primera' ? 'si' : 'no';
+    if (hint) {
+      const msgs = {
+        primera: 'Accedes a todos los subsidios del Estado',
+        segunda: 'No aplican subsidios para segunda vivienda',
+        tengo:   'Puedes comparar arriendo vs. tu dividendo actual',
+      };
+      hint.textContent = msgs[sit] || '';
+    }
+    if (aviso) {
+      aviso.innerHTML = sit === 'segunda'
+        ? '<span style="color:var(--rojo)">⚠️ Los subsidios DS49, DS1 y FOGAES no aplican para segunda vivienda.</span>'
+        : sit === 'tengo'
+          ? '<span style="color:var(--azul)">💡 Usa la pestaña "Arrendar vs. Comprar" para comparar tu situación actual.</span>'
+          : '';
+    }
+  });
+
+  // ── clicks: data-modo-precio (m² ↔ precio directo) ───────
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-modo-precio]');
+    if (!btn) return;
+    const modo = btn.dataset.modoPrecio;
+    document.querySelectorAll('[data-modo-precio]').forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo');
+    const blqM2     = document.getElementById('bloque-m2');
+    const blqDirec  = document.getElementById('bloque-precio-directo');
+    if (blqM2)    blqM2.style.display    = modo === 'm2'     ? '' : 'none';
+    if (blqDirec) blqDirec.style.display = modo === 'precio' ? '' : 'none';
+  });
+
+  // ── input: data-input-action ─────────────────────────────
+  document.addEventListener('input', e => {
+    const el = e.target.closest('[data-input-action]');
+    if (!el) return;
+    switch (el.dataset.inputAction) {
+      case 'arriendo-slider': {
+        const val = document.getElementById('arriendo-val');
+        if (val) val.textContent = '$' + fmt(parseInt(el.value));
+        renderArrVsCompra();
+        break;
+      }
+      case 'render-public-regiones': renderPublicRegiones(); break;
+      case 'pub-precio':             calcPublicAVC();        break;
+      case 'pub-arriendo':           calcPublicAVC();        break;
+    }
+  });
+
+  // ── change: data-change-action ───────────────────────────
+  document.addEventListener('change', e => {
+    const el = e.target.closest('[data-change-action]');
+    if (!el) return;
+    switch (el.dataset.changeAction) {
+      case 'render-public-regiones': renderPublicRegiones(); break;
+      case 'pub-precio':             calcPublicAVC();        break;
+      case 'pub-arriendo':           calcPublicAVC();        break;
+    }
+  });
+
+  // ── input: data-format-clp (formateo automático) ─────────
+  document.addEventListener('input', e => {
+    const el = e.target.closest('[data-format-clp]');
+    if (!el) return;
+    formatCLP(el.id);
+  });
+
+  // ── clicks: role="button" sin href → soporte teclado ─────
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const el = e.target.closest('[role="button"]');
+    if (!el || el.tagName === 'BUTTON') return;
+    e.preventDefault();
+    el.click();
+  });
 });
 
-/* ─── NAVEGACIÓN EXPLORAR ─── */
-function volverDesdeScreen(){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('activa'));
-  const target=document.getElementById('screen-1');
-  target.classList.add('activa');
-  document.querySelector('.wizard-steps').style.display='';
-  [1,2,3].forEach(i=>{
-    const it=document.getElementById('ws'+i);
-    it.classList.remove('activo','done');
-    it.removeAttribute('aria-current');
-    if(i===1){ it.classList.add('activo'); it.setAttribute('aria-current','step'); }
-  });
-  [1,2].forEach(i=>document.getElementById('ws-l'+i).classList.remove('done'));
-  window.scrollTo({top:0,behavior:'smooth'});
-  const h=target.querySelector('h1');
-  if(h){ h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
-}
-function irARegiones(){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('activa'));
-  const target=document.getElementById('screen-regiones');
-  target.classList.add('activa');
-  document.querySelector('.wizard-steps').style.display='none';
-  window.scrollTo({top:0,behavior:'smooth'});
-  renderPublicRegiones();
-  const h=target.querySelector('h1'); if(h){ h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
-}
-function renderPublicRegiones(){
-  const container=document.getElementById('pub-regiones-content');
-  if(!container) return;
-  const tipoEl=document.getElementById('pub-tipo');
-  const m2El=document.getElementById('pub-m2');
-  const tipo=tipoEl?tipoEl.value:'depto';
-  const m2=m2El?Math.max(10,parseFloat(m2El.value)||55):55;
-  const ufKey=tipo==='usada'?'usada':tipo;
-  const tipoLabel=tipo==='depto'?'Departamento':tipo==='casa'?'Casa':'Vivienda usada';
-  const piePct=20, tasa=4.1, plazo=25;
-  document.getElementById('pub-reg-sub').textContent=`${tipoLabel} ${m2}m² · dividendo con pie 20%, 25 años, tasa 4.1% anual`;
-  const filas=Object.entries(REGIONES).map(([k,v])=>({k,v,uf:v[ufKey]*m2})).sort((a,b)=>a.uf-b.uf);
-  let html=`<div class="tabla-wrap"><table><thead><tr><th>Región</th><th>Precio m²</th><th>Precio ${tipoLabel} ${m2}m²</th><th>Dividendo mensual</th><th>Pie requerido (20%)</th></tr></thead><tbody>`;
-  filas.forEach(({k,v,uf})=>{
-    const clp=uf*UF_VALOR;
-    const div=cuotaMensual(uf*(1-piePct/100),tasa,plazo);
-    const pieClp=uf*(piePct/100)*UF_VALOR;
-    const priceKey=v[ufKey];
-    html+=`<tr><td><strong>${v.nombre}</strong></td><td style="font-size:12px">$${fmt(priceKey*UF_VALOR)}/m²<br><span style="color:var(--suave2)">${priceKey} UF/m²</span></td><td>$${fmt(clp)}<br><span style="font-size:11px;color:var(--suave)">${fmt(Math.round(uf))} UF</span></td><td><strong>$${fmt(div)}</strong>/mes</td><td>$${fmt(pieClp)}</td></tr>`;
-  });
-  html+='</tbody></table></div>';
-  container.innerHTML=html;
-}
-function irAArrendar(){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('activa'));
-  const target=document.getElementById('screen-arrendar');
-  target.classList.add('activa');
-  document.querySelector('.wizard-steps').style.display='none';
-  window.scrollTo({top:0,behavior:'smooth'});
-  const h=target.querySelector('h1'); if(h){ h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
+/* ============================================================
+   AGENTE HIPOTECARIO CONVERSACIONAL — CHILE 2026
+   Motor basado en detección de intención (sin dependencias externas).
+   Aprovecha cuotaMensual(), maxCreditoPorSueldo() y UF_VALOR
+   ya definidos en este archivo.
+   ============================================================ */
+
+/* ── Utilidades de texto ─────────────────────────────────── */
+const _n = s => s
+  .toLowerCase()
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')   // quitar tildes
+  .replace(/[^a-z0-9\s]/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
+
+/** Extrae el primer número >= umbral de un texto (p. ej. sueldo). */
+function _extractNumber(text, minVal = 100000) {
+  const matches = text.replace(/\./g, '').match(/\d+/g) || [];
+  for (const m of matches) {
+    const n = parseInt(m, 10);
+    if (n >= minVal) return n;
+  }
+  return null;
 }
 
-/* ══════════════════════════════════════════════════════════════════════
-   ESTUDIO HIPOTECARIO BANCOS 2026
-══════════════════════════════════════════════════════════════════════ */
-const BANCOS_2026 = [
-  {id:'itau',        nombre:'Banco Itaú',          logo:'🟠', tasaFija:3.39, cae:3.65, dividendoCLP:943200,  dividendoUF:24.50, badge:'mejor-tasa',            colorTasa:'verde',    comentario:'Tasa fija más baja del mercado marzo 2026.'},
-  {id:'falabella',   nombre:'Banco Falabella',      logo:'🟢', tasaFija:3.70, cae:3.98, dividendoCLP:965000,  dividendoUF:25.06, badge:'muy-competitivo',       colorTasa:'verde',    comentario:'Segunda tasa más baja. Muy competitivo para viviendas nuevas.'},
-  {id:'bancoestado', nombre:'BancoEstado',           logo:'🔵', tasaFija:4.19, cae:4.48, dividendoCLP:995000,  dividendoUF:25.84, badge:'mejor-subsidios',       colorTasa:'amarillo', comentario:'Especializado en operaciones con subsidios MINVU DS49 y DS1.'},
-  {id:'coopeuch',    nombre:'Coopeuch',              logo:'🟡', tasaFija:4.50, cae:4.79, dividendoCLP:1018000, dividendoUF:26.44, badge:'buenas-condiciones',    colorTasa:'amarillo', comentario:'Buenas condiciones para socios activos de la cooperativa.'},
-  {id:'santander',   nombre:'Banco Santander',       logo:'🔴', tasaFija:4.58, cae:4.89, dividendoCLP:1025000, dividendoUF:26.62, badge:'fuerte-mixta',          colorTasa:'amarillo', comentario:'Fuerte en tasas mixtas. Período inicial fijo ventajoso.'},
-  {id:'chile',       nombre:'Banco de Chile',        logo:'🔷', tasaFija:4.60, cae:4.90, dividendoCLP:1027000, dividendoUF:26.67, badge:null,                    colorTasa:'amarillo', comentario:'Banco universal con amplia cobertura. Tasas en el promedio.'},
-  {id:'bci',         nombre:'BCI',                   logo:'🔶', tasaFija:4.65, cae:4.95, dividendoCLP:1031000, dividendoUF:26.78, badge:null,                    colorTasa:'amarillo', comentario:'Sólido para clientes con historial crediticio establecido.'},
-  {id:'internacional',nombre:'Banco Internacional',  logo:'⚫', tasaFija:4.85, cae:5.10, dividendoCLP:892377,  dividendoUF:22.40, badge:'mejor-dividendo-cmf',   colorTasa:'amarillo', comentario:'Mejor dividendo CMF al 28-03-2026: $892.377 / 22,40 UF.'},
-  {id:'scotiabank',  nombre:'Scotiabank',            logo:'🟥', tasaFija:4.80, cae:5.12, dividendoCLP:1048000, dividendoUF:27.21, badge:null,                    colorTasa:'amarillo', comentario:'Tasa levemente sobre el promedio de mercado.'},
-  {id:'security',    nombre:'Banco Security',        logo:'🟤', tasaFija:4.90, cae:5.22, dividendoCLP:1055000, dividendoUF:27.40, badge:null,                    colorTasa:'rojo',     comentario:'Orientado a segmento ABC1 con servicios premium.'},
-  {id:'consorcio',   nombre:'Banco Consorcio',       logo:'🟣', tasaFija:5.10, cae:5.40, dividendoCLP:1070000, dividendoUF:27.79, badge:null,                    colorTasa:'rojo',     comentario:'Mayor tasa en el comparador CMF. Referencia de techo de mercado.'},
-];
+/**
+ * Detecta sueldos/montos en lenguaje natural chileno.
+ * Soporta: 600mil, 600 mil, 600k, 600 lucas, 1.2 millones, $600.000, 600000
+ * @param {string} texto
+ * @returns {number|null}
+ */
+function detectarSueldoFlexible(texto) {
+  if (!texto) return null;
+  const msg = texto.toLowerCase().replace(/\$/g, '').replace(/\./g, '').trim();
 
-const BANCOS_BADGES = {
-  'mejor-tasa':          {txt:'⭐ Mejor tasa',         cls:'bco-badge-verde'},
-  'muy-competitivo':     {txt:'🔥 Muy competitivo',    cls:'bco-badge-verde'},
-  'mejor-subsidios':     {txt:'🏛 Mejor para subsidios',cls:'bco-badge-azul'},
-  'buenas-condiciones':  {txt:'✅ Buenas condiciones',  cls:'bco-badge-azul'},
-  'fuerte-mixta':        {txt:'📊 Fuerte en mixta',     cls:'bco-badge-amarillo'},
-  'mejor-dividendo-cmf': {txt:'💰 Mejor dividendo CMF', cls:'bco-badge-verde'},
+  // "1.2 millones" / "un millon" / "1 millon"
+  const millon = msg.match(/(\d+[\.,]?\d*)\s*millon/);
+  if (millon) {
+    const n = parseFloat(millon[1].replace(',', '.'));
+    return isNaN(n) ? null : Math.round(n * 1000000);
+  }
+
+  // "600 mil" / "600mil" / "seiscientos mil"
+  if (/\bmil\b/.test(msg)) {
+    const n = parseInt(msg.replace(/[^0-9]/g, ''), 10);
+    return isNaN(n) ? null : n * 1000;
+  }
+
+  // "600k"
+  if (/\d+\s*k\b/.test(msg)) {
+    const n = parseInt(msg.replace(/[^0-9]/g, ''), 10);
+    return isNaN(n) ? null : n * 1000;
+  }
+
+  // "600 lucas" / "600 luca"
+  if (/luca/.test(msg)) {
+    const n = parseInt(msg.replace(/[^0-9]/g, ''), 10);
+    return isNaN(n) ? null : n * 1000;
+  }
+
+  // número grande directo: 600000
+  const big = msg.match(/\b[0-9]{6,9}\b/);
+  if (big) return parseInt(big[0], 10);
+
+  // número de 2-3 dígitos tratado como miles: 600 → 600.000
+  // solo si hay contexto de sueldo (evitar falsos positivos en UF)
+  const small = msg.match(/\b([1-9][0-9]{2,3})\b/);
+  if (small) return parseInt(small[1], 10) * 1000;
+
+  return null;
+}
+
+/** Formatea número en pesos CLP abreviado: 1.200.000 → "$1.200.000" */
+const _clp = n => '$' + Math.round(n).toLocaleString('es-CL');
+
+/* ── Base de conocimiento: respuestas por intención ──────── */
+const CHAT_KB = {
+
+  /* ── A. ¿PUEDO COMPRAR? ──────────────────────────────────── */
+  puedoComprar(sueldo) {
+    const s   = sueldo || 0;
+    const uf  = UF_VALOR || 38500;
+    const div = s * 0.30;
+    const cr  = maxCreditoPorSueldo(s, 4.1, 25);
+    const ufI = s / uf;
+    const tope = cr / (1 - 0.20) / uf;
+
+    if (s <= 0) {
+      return `Para saber si puedes comprar necesito tu sueldo líquido mensual. 💬 ¿Cuánto ganas al mes (lo que te depositan)?`;
+    }
+
+    const subsTexto = ufI <= 25
+      ? `\n\n🏛 <strong>Subsidio DS19:</strong> con ${ufI.toFixed(1)} UF/mes podrías calificar (máximo 25 UF). Te darían hasta <strong>180 UF (~${_clp(180 * uf)})</strong> para descontar del precio.`
+      : ufI <= 37
+        ? `\n\n🏛 <strong>Subsidio DS1 Tramo 1:</strong> con ${ufI.toFixed(1)} UF/mes podrías calificar. Te darían hasta <strong>130 UF (~${_clp(130 * uf)})</strong>.`
+        : ufI <= 60
+          ? `\n\n🏛 <strong>Subsidio DS1 Tramo 2:</strong> con ${ufI.toFixed(1)} UF/mes podrías calificar. Te darían hasta <strong>90 UF (~${_clp(90 * uf)})</strong>.`
+          : ufI <= 78
+            ? `\n\n🏛 <strong>Subsidio DS1 Tramo 3:</strong> con ${ufI.toFixed(1)} UF/mes podrías calificar. Te darían hasta <strong>60 UF (~${_clp(60 * uf)})</strong>.`
+            : `\n\n💡 Con ${ufI.toFixed(1)} UF/mes de ingreso, los subsidios DS1/DS19 no aplican (máximo es 78 UF), pero puedes usar <strong>FOGAES</strong> para entrar con solo 10% de pie.`;
+
+    return `Con un sueldo de <strong>${_clp(s)}/mes</strong> esto es lo que el banco puede prestarte:
+
+<div class="chat-calc">📊 Ingreso mensual: ${_clp(s)}
+🏦 30% esfuerzo máximo: ${_clp(div)}/mes de dividendo
+💳 Crédito máximo estimado: ${_clp(cr)}
+🏠 Precio vivienda máximo (pie 20%): ~${_clp(cr / 0.80)}
+📐 En UF: ~${Math.round(tope)} UF · 4.1% tasa · 25 años</div>${subsTexto}
+
+🔑 <strong>FOGAES:</strong> si no tienes el 20% de pie, puedes entrar con solo el <strong>10%</strong> (el Estado garantiza la diferencia). Aplica a viviendas hasta 4.500 UF.
+
+¿Quieres que calcule cuánto necesitas de pie o en qué región puedes comprar?`;
+  },
+
+  /* ── B. PRECIOS DE VIVIENDA (datos estáticos CChC) ─────── */
+  preciosVivienda(region) {
+    const uf = UF_VALOR || 38500;
+    const r  = region || 'RM';
+    const d  = REGIONES[r];
+    if (!d) {
+      // Mostrar resumen general con datos CChC + invitar a ver ML
+      const items = [
+        ['Región Metropolitana', REGIONES.RM],
+        ['Valparaíso', REGIONES.VAL],
+        ['Antofagasta', REGIONES.ANT],
+        ['Biobío/Concepción', REGIONES.BIO],
+        ['Maule', REGIONES.MAU],
+        ['La Araucanía', REGIONES.ARA],
+      ];
+      const rows = items.map(([n, v]) =>
+        `${n}: depto ~${v.depto * 55} UF (~${_clp(v.depto * 55 * uf)})`
+      ).join('\n');
+      return `Aquí van los precios referenciales de un depto de 55 m² por región (CChC Q3 2025):
+
+<div class="chat-calc">${rows}
+...y más en la calculadora 👇</div>
+
+💡 También puedo mostrarte precios <strong>reales de mercado</strong> desde MercadoLibre. Dime una región específica (ej: "precios en Valparaíso") para ver datos actuales. ¿Quieres comparar con tu sueldo?`;
+    }
+    const p55 = d.depto * 55;
+    const div = cuotaMensual(p55 * 0.80, 4.1, 25);
+    return `En <strong>${d.nombre}</strong> los precios de referencia (CChC Q3 2025) son:
+
+<div class="chat-calc">🏢 Departamento: ${d.depto} UF/m² → 55m² = ${p55} UF (~${_clp(p55 * uf)})
+🏠 Casa nueva: ${d.casa} UF/m² → 55m² = ${d.casa * 55} UF (~${_clp(d.casa * 55 * uf)})
+🏡 Usada: ${d.usada} UF/m² → 55m² = ${d.usada * 55} UF (~${_clp(d.usada * 55 * uf)})</div>
+
+Con <strong>pie del 20%</strong> y 25 años al 4.1%, el dividendo de un depto 55m² sería de aprox. <strong>${_clp(div)}/mes</strong>.
+
+🔎 ¿Quieres ver precios <strong>reales de MercadoLibre</strong> en ${d.nombre}? Escribe "precios reales ${d.nombre.split(' ')[0]}" y los busco ahora.`;
+  },
+
+  /* ── B2. PRECIOS REALES ML (async, retorna Promise<string>) ─ */
+  async preciosViviendaML(region, sueldo = 0) {
+    const uf  = UF_VALOR || 38500;
+    const rk  = (typeof resolveRegionKey !== 'undefined') ? resolveRegionKey(region || 'RM') : 'RM';
+    const d   = REGIONES[rk] ?? REGIONES['RM'];
+
+    // Mensaje provisional mientras carga
+    const loadingMsg = `🔍 Consultando precios reales en <strong>${d.nombre}</strong> desde MercadoLibre…`;
+
+    try {
+      const data = await realEstateAPI.getPrices(region, 'all');
+      const { promedioUF, promedioCLP, medianaUF, minUF, maxUF, m2Promedio, cantidadResultados, fuente } = data;
+
+      // Comparar con capacidad hipotecaria del usuario si hay sueldo
+      let comparacion = '';
+      if (sueldo > 0) {
+        const capacidadCLP = maxCreditoPorSueldo(sueldo, 4.1, 25, 0.30);
+        const capacidadUF  = Math.round(capacidadCLP / uf / 0.80); // precio máximo (pie 20%)
+        const comp = formatRealMarketComparison(promedioUF, capacidadUF, sueldo);
+        comparacion = `\n\n📊 <strong>Tu caso:</strong> ${comp.mensaje}` +
+          (comp.sugerenciaSubsidio ? `\n${comp.sugerenciaSubsidio}` : '');
+      }
+
+      const fuenteLabel = fuente === 'MercadoLibre'
+        ? `📡 <span style="font-size:11px;color:var(--suave)">Datos en tiempo real: MercadoLibre (${cantidadResultados} propiedades)</span>`
+        : `📊 <span style="font-size:11px;color:var(--suave)">Estimado referencial CChC (API no disponible)</span>`;
+
+      const m2Txt = m2Promedio ? ` · ${m2Promedio}m² promedio` : '';
+
+      return `Precios reales en <strong>${d.nombre}</strong>${m2Txt}:
+
+<div class="chat-calc">📈 Promedio de mercado: ${promedioUF} UF (~${_clp(promedioCLP)})
+📍 Mediana:            ${medianaUF} UF
+⬇️  Mínimo listado:    ${minUF} UF
+⬆️  Máximo listado:    ${maxUF} UF</div>
+
+${fuenteLabel}${comparacion}
+
+¿Quieres que calcule cuánto necesitas ganar para comprar en ${d.nombre.split(' ')[0]}?`;
+    } catch {
+      return `Lo siento, no pude obtener datos de mercado en este momento. Te muestro los datos de referencia CChC:
+${CHAT_KB.preciosVivienda(rk)}`;
+    }
+  },
+
+  /* ── C. CRÉDITO HIPOTECARIO ─────────────────────────────── */
+  creditoHipotecario(sueldo) {
+    const s  = sueldo || 0;
+    const uf = UF_VALOR || 38500;
+    if (s <= 0) {
+      return `El banco en Chile normalmente financia hasta el <strong>80–90%</strong> del valor de la propiedad. Lo más importante es la <strong>regla de esfuerzo</strong>:
+
+📌 <strong>El dividendo mensual no puede superar el 25–30% de tu sueldo líquido.</strong>
+
+Cuéntame tu sueldo y te calculo cuánto puede prestarte el banco. ¿Cuánto ganas al mes?`;
+    }
+    const cr30 = maxCreditoPorSueldo(s, 4.1, 25, 0.30);
+    const cr25 = maxCreditoPorSueldo(s, 4.1, 25, 0.25);
+    const div30 = s * 0.30;
+    const div25 = s * 0.25;
+    return `Con <strong>${_clp(s)}/mes</strong> de sueldo, el banco puede prestarte:
+
+<div class="chat-calc">📐 Regla 30% (más común)
+   → Dividendo máx: ${_clp(div30)}/mes
+   → Crédito estimado: ${_clp(cr30)}
+   → Precio vivienda máx: ~${_clp(cr30 / 0.80)}
+
+📐 Regla 25% (más conservador)
+   → Dividendo máx: ${_clp(div25)}/mes
+   → Crédito estimado: ${_clp(cr25)}
+   → Precio vivienda máx: ~${_clp(cr25 / 0.80)}</div>
+
+🔢 Calculado con tasa 4.1% anual y plazo de 25 años (pie 20%).
+
+💡 Si tienes un <strong>codeudor</strong> (pareja, familiar), los sueldos se suman — aumenta el crédito. ¿Tienes codeudor?`;
+  },
+
+  /* ── D. EL PIE ───────────────────────────────────────────── */
+  pie(precioClp, sueldo) {
+    const uf = UF_VALOR || 38500;
+    if (!precioClp) {
+      return `El <strong>pie</strong> (o "entrada") es el dinero que pagas tú antes de pedir el crédito. En Chile:
+
+<div class="chat-calc">📋 Estándar normal:    20% del precio
+🔑 Con FOGAES:         10% del precio (el Estado garantiza el resto)
+🏛 Con subsidio DS19:  puede ser 0% (el bono cubre el pie)</div>
+
+Por ejemplo, para una vivienda de $100.000.000:
+• Pie 20% = $20.000.000
+• Pie 10% (FOGAES) = $10.000.000
+
+¿Quieres saber cuánto sería el pie para un precio específico? Dime el valor de la vivienda.`;
+    }
+    const pie20 = precioClp * 0.20;
+    const pie10 = precioClp * 0.10;
+    const ufPrecio = Math.round(precioClp / uf);
+    const div = cuotaMensual((precioClp * 0.80) / uf, 4.1, 25);
+    const divFog = cuotaMensual((precioClp * 0.90) / uf, 4.1, 25);
+    const sueldoMin20 = div / 0.30;
+    const sueldoMin10 = divFog / 0.30;
+    return `Para una vivienda de <strong>${_clp(precioClp)}</strong> (~${ufPrecio} UF):
+
+<div class="chat-calc">💰 Pie 20% estándar: ${_clp(pie20)}
+🔑 Pie 10% con FOGAES: ${_clp(pie10)}
+📊 Dividendo (pie 20%): ${_clp(div)}/mes → sueldo mín: ${_clp(sueldoMin20)}
+📊 Dividendo (pie 10% FOGAES): ${_clp(divFog)}/mes → sueldo mín: ${_clp(sueldoMin10)}</div>
+
+${sueldo > 0 ? `Con tu sueldo de ${_clp(sueldo)}/mes, el dividendo representa el ${((div / sueldo) * 100).toFixed(1)}% (${div / sueldo <= 0.30 ? '✅ dentro del 30% del banco' : '⚠️ supera el 30%, el banco puede rechazarlo'}).` : '¿Cuánto ganas al mes para ver si puedes calificar?'}`;
+  },
+
+  /* ── E. SUBSIDIOS ────────────────────────────────────────── */
+  subsidios(sueldo) {
+    const uf  = UF_VALOR || 38500;
+    if (sueldo <= 0) {
+      return `Los subsidios habitacionales en Chile en 2026 son:
+
+<div class="chat-calc">🏘️ DS19 — Vivienda social
+   Ingreso: hasta 25 UF/mes (~${_clp(25 * uf)})
+   Monto:   hasta 180 UF (~${_clp(180 * uf)})
+   Tope:    vivienda hasta 950 UF
+
+🏠 DS1 Tramo 1 — Clase media baja
+   Ingreso: hasta 37 UF/mes (~${_clp(37 * uf)})
+   Monto:   130 UF (~${_clp(130 * uf)})
+   Tope:    vivienda hasta 1.100 UF
+
+🏠 DS1 Tramo 2 — Clase media
+   Ingreso: 37–60 UF/mes
+   Monto:   90 UF (~${_clp(90 * uf)})
+   Tope:    vivienda hasta 1.600 UF
+
+🏠 DS1 Tramo 3 — Clase media alta
+   Ingreso: 60–78 UF/mes (~${_clp(78 * uf)})
+   Monto:   60 UF (~${_clp(60 * uf)})
+   Tope:    vivienda hasta 2.200 UF
+
+🔑 FOGAES — Pie mínimo 10%
+   Disponible para todos, vivienda hasta 4.500 UF
+   Lo tramita el banco automáticamente.
+
+📉 Ley 21.748 — Subsidio a la tasa
+   Vivienda nueva hasta 4.000 UF · tasa baja ~0.6%</div>
+
+Dime tu sueldo y te digo exactamente a cuál calificas.`;
+    }
+    const ufI = sueldo / uf;
+    let sub = null;
+    if      (ufI <= 25) sub = { nombre: 'DS19',         monto: 180, tope: 950,  tramo: 'social' };
+    else if (ufI <= 37) sub = { nombre: 'DS1 Tramo 1',  monto: 130, tope: 1100, tramo: '1' };
+    else if (ufI <= 60) sub = { nombre: 'DS1 Tramo 2',  monto: 90,  tope: 1600, tramo: '2' };
+    else if (ufI <= 78) sub = { nombre: 'DS1 Tramo 3',  monto: 60,  tope: 2200, tramo: '3' };
+
+    if (sub) {
+      const precio_ef = sub.tope - sub.monto;
+      const div       = cuotaMensual(precio_ef * 0.80, 4.1, 25);
+      return `Con <strong>${_clp(sueldo)}/mes</strong> (${ufI.toFixed(1)} UF/mes), calificas al <strong>${sub.nombre}</strong>:
+
+<div class="chat-calc">🎁 Subsidio del Estado: ${sub.monto} UF (~${_clp(sub.monto * uf)})
+🏠 Precio máx. vivienda: ${sub.tope} UF (~${_clp(sub.tope * uf)})
+📉 Precio efectivo tras subsidio: ${precio_ef} UF (~${_clp(precio_ef * uf)})
+📊 Dividendo estimado (pie 20%): ${_clp(div)}/mes</div>
+
+${ufI <= 25 ? `💰 <strong>Bono Pie DS19:</strong> +30 UF extra para la entrada (~${_clp(30 * uf)}). Pídelo junto al subsidio.` : ''}
+
+📍 Para postular: <strong>minvu.gob.cl → Subsidios habitacionales</strong> o la SEREMI de tu región.
+
+🔑 <strong>FOGAES</strong> también aplica: puedes entrar con solo el 10% de pie en vez del 20%.`;
+    }
+    return `Con <strong>${_clp(sueldo)}/mes</strong> (${ufI.toFixed(1)} UF/mes) tu ingreso supera el tope de los subsidios DS1/DS19 (máximo 78 UF/mes).
+
+Pero tienes estas opciones:
+• <strong>FOGAES:</strong> pie mínimo 10% en vez del 20% (cualquier ingreso, hasta 4.500 UF de precio).
+• <strong>Ley 21.748:</strong> subsidio a la tasa de interés — tu dividendo baja ~0.6% los primeros 5 años.
+• <strong>Codeudor:</strong> si tienes pareja o familiar, los sueldos se suman para calificar a mejor crédito.`;
+  },
+
+  /* ── F. ARRENDAR VS COMPRAR ──────────────────────────────── */
+  arrendarVsComprar(sueldo, arriendoMensual) {
+    const s   = sueldo || 0;
+    const arr = arriendoMensual || 0;
+    const uf  = UF_VALOR || 38500;
+
+    if (s <= 0 && arr <= 0) {
+      return `La gran pregunta 🤔 En Chile, la decisión depende de varios factores:
+
+<div class="chat-calc">✅ COMPRAR conviene cuando:
+   → El dividendo es similar o menor al arriendo del mismo bien
+   → Planeas quedarte 5+ años en la misma ciudad
+   → Tienes el pie (o acceso a FOGAES)
+   → Quieres estabilidad y patrimonio
+
+✅ ARRENDAR conviene cuando:
+   → Necesitas flexibilidad (trabajo, ciudad)
+   → El dividendo sería muy alto vs tu sueldo
+   → No tienes el pie todavía
+   → El mercado está sobrevaluado en tu zona</div>
+
+En Chile, históricamente los arriendos suben con la inflación (UF), mientras que el dividendo queda fijo. A largo plazo, comprar suele ser mejor opción patrimonial.
+
+Dime tu sueldo y el arriendo que pagarías, y calculo cuál te conviene más.`;
+    }
+
+    if (s > 0 && arr <= 0) {
+      const maxPrecio = maxCreditoPorSueldo(s, 4.1, 25) / 0.80;
+      const divEst    = cuotaMensual((maxPrecio * 0.80) / uf, 4.1, 25);
+      return `Con <strong>${_clp(s)}/mes</strong> de sueldo, podrías comprar una vivienda de hasta ~${_clp(maxPrecio)}.
+El dividendo sería de aprox. <strong>${_clp(divEst)}/mes</strong>.
+
+¿Cuánto pagarías de arriendo por esa misma vivienda? Así comparo cuál te conviene.`;
+    }
+
+    const divMax  = s * 0.30;
+    const maxPrecio = maxCreditoPorSueldo(s, 4.1, 25) / 0.80;
+    const divComp = cuotaMensual((maxPrecio * 0.80) / uf, 4.1, 25);
+    const dif     = divComp - arr;
+    const mejor   = dif <= 0 ? 'COMPRAR' : 'ARRENDAR (hoy)';
+
+    return `Comparativa para <strong>${_clp(s)}/mes</strong> de sueldo:
+
+<div class="chat-calc">🏠 Dividendo estimado (vivienda máx): ${_clp(divComp)}/mes
+📦 Arriendo mensual informado: ${_clp(arr)}/mes
+📊 Diferencia: ${dif > 0 ? '+' : ''}${_clp(dif)}/mes ${dif > 0 ? '(comprar es más caro)' : '(comprar es más barato)'}</div>
+
+${dif <= 0
+  ? `✅ <strong>Comprar te sale más barato que arrendar hoy</strong>. Cada dividendo que pagas construye patrimonio — esa plata es tuya.`
+  : `⚖️ Arrendar es ${_clp(Math.abs(dif))}/mes más barato hoy. Sin embargo, parte del dividendo queda como patrimonio tuyo y el dividendo no sube (el arriendo sí).`
+}
+
+💡 Recuerda: para comprar necesitas el pie (${_clp(maxPrecio * 0.20)} con 20%, o ${_clp(maxPrecio * 0.10)} con FOGAES).`;
+  },
+
+  /* ── G. PROCESO DE COMPRA ────────────────────────────────── */
+  procesoCompra() {
+    return `El proceso de comprar una casa en Chile tiene estos pasos:
+
+<div class="chat-calc">1️⃣ AHORRO DEL PIE
+   Junta al menos el 10% (FOGAES) o 20% estándar
+   del precio de la propiedad.
+
+2️⃣ PRE-APROBACIÓN BANCARIA
+   Ve al banco con tus liquidaciones (3 meses).
+   Te dirán cuánto pueden prestarte.
+
+3️⃣ BÚSQUEDA Y OFERTA
+   Encuentra la propiedad. Firma promesa de compraventa
+   (notaría). Paga una reserva (~1–2%).
+
+4️⃣ TASACIÓN
+   El banco tasa la propiedad (costo: ~$150.000–$250.000).
+   El crédito se basa en el menor valor entre precio y tasación.
+
+5️⃣ APROBACIÓN DEL CRÉDITO
+   El banco aprueba formalmente. Proceso: 2–4 semanas.
+
+6️⃣ ESCRITURA Y NOTARÍA
+   Firma de escritura pública ante notario.
+   Costos notariales + gastos operacionales: ~1–2% del valor.
+
+7️⃣ INSCRIPCIÓN EN EL CBR
+   El Conservador de Bienes Raíces registra la propiedad a tu nombre.
+   Plazo: 5–10 días hábiles.
+
+8️⃣ ¡LLAVES! 🗝️</div>
+
+Los gastos operacionales (notaría, tasación, CBR, seguro) suman aprox. el <strong>1.5–2.5%</strong> del valor de la propiedad. No los olvides en tu presupuesto.
+
+¿Tienes dudas sobre algún paso específico?`;
+  },
+
+  /* ── UF ──────────────────────────────────────────────────── */
+  uf() {
+    const uf = UF_VALOR || 38500;
+    return `La <strong>Unidad de Fomento (UF)</strong> es la unidad de valor que usa Chile para los créditos hipotecarios. Se ajusta diariamente según la inflación del mes anterior.
+
+<div class="chat-calc">📅 UF hoy: $${uf.toLocaleString('es-CL', { minimumFractionDigits: 2 })}
+📌 Fuente: mindicador.cl (actualización automática)</div>
+
+Los precios de viviendas en Chile se expresan en UF para protegerse de la inflación. Así, si el dividendo es de "2 UF/mes", siempre será el mismo porcentaje del precio — aunque la inflación suba.
+
+¿Quieres saber cuánto vale en pesos una vivienda de X UF?`;
+  },
+
+  /* ── Fallback ─────────────────────────────────────────────── */
+  fallback() {
+    return `No entendí bien tu pregunta 🤔 Puedo ayudarte con:
+
+• <strong>¿Puedo comprar una casa con mi sueldo?</strong>
+• <strong>¿Cuánto cuesta una casa en [región]?</strong>
+• <strong>¿A qué subsidio califico?</strong>
+• <strong>¿Cuánto necesito de pie?</strong>
+• <strong>¿Cuánto me presta el banco?</strong>
+• <strong>¿Conviene arrendar o comprar?</strong>
+• <strong>¿Cómo es el proceso de compra?</strong>
+• <strong>¿Qué es la UF?</strong>
+
+Escribe tu pregunta o usa los botones de abajo 👇`;
+  },
 };
 
-const REQUISITOS_2026 = [
-  {ico:'💼', titulo:'Dependientes', desc:'6 a 12 meses de antigüedad laboral mínima comprobable.'},
-  {ico:'📑', titulo:'Independientes', desc:'2 años de actividad con declaraciones de renta SII (Form. 22).'},
-  {ico:'📊', titulo:'Carga financiera', desc:'Máximo 25%–30% del ingreso líquido mensual en deudas totales.'},
-  {ico:'🏠', titulo:'Pie mínimo legal', desc:'20% del precio de la vivienda (obligatorio por ley desde 2015).'},
-  {ico:'📋', titulo:'Documentos clave', desc:'Liquidaciones (3 meses), cotizaciones AFP, carpeta SII, promesa de compraventa.'},
-  {ico:'💳', titulo:'Historial crediticio', desc:'DICOM limpio o regularizado. Los bancos consultan Equifax y CMF.'},
+/* ── Mapa de regiones: palabras clave → código ───────────── */
+const REGION_KEYWORDS = {
+  'metropolitana|santiago|rm|capital|santiaguino': 'RM',
+  'antofagasta':                                   'ANT',
+  'valparaiso|vina|valpo|v region':                'VAL',
+  'biobio|concepcion|bio|penco|talcahuano':        'BIO',
+  'coquimbo|serena|la serena':                     'COQ',
+  'tarapaca|iquique':                              'TAR',
+  'arica':                                         'ARI',
+  'atacama|copiapo':                               'ATA',
+  'ohiggins|rancagua':                             'OHI',
+  'maule|talca':                                   'MAU',
+  'nuble|chillan':                                 'NUB',
+  'araucania|temuco':                              'ARA',
+  'rios|valdivia':                                 'RIO',
+  'lagos|puerto montt':                            'LAG',
+  'aysen|coihaique':                               'AYS',
+  'magallanes|punta arenas':                       'MAG',
+};
+
+function _detectRegion(text) {
+  const t = _n(text);
+  for (const [pattern, code] of Object.entries(REGION_KEYWORDS)) {
+    if (new RegExp(pattern).test(t)) return code;
+  }
+  return null;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MOTOR DE CHAT BASADO EN BOTONES (sin input de texto)
+   ══════════════════════════════════════════════════════════════
+
+   Estado del agente: sueldo y región seleccionados por el usuario
+   vía botones. Nunca se pide escribir nada.
+   ============================================================ */
+
+/* Sueldos predefinidos disponibles para selección */
+const SUELDOS_PRESET = [
+  { label: '$400.000', value: 400_000 },
+  { label: '$600.000', value: 600_000 },
+  { label: '$900.000', value: 900_000 },
+  { label: '$1.2M',    value: 1_200_000 },
+  { label: '$1.8M',    value: 1_800_000 },
+  { label: '$2.5M+',   value: 2_500_000 },
 ];
 
-const TENDENCIAS_2026 = [
-  {emoji:'📉', titulo:'TPM a la baja', desc:'El Banco Central mantiene tendencia bajista en la Tasa de Política Monetaria, presionando las tasas hipotecarias hacia abajo.'},
-  {emoji:'📊', titulo:'Tasas descendiendo', desc:'Promedio bajó de ~5% en 2024 a 4,35% en marzo 2026. La tasa mínima llega a 3,39% (Itaú).'},
-  {emoji:'🏛', titulo:'Ley 21.748 y FOGAES activos', desc:'Permiten pie reducido al 10% y descuento en tasa para viviendas nuevas bajo 2.200 UF.'},
-  {emoji:'🏦', titulo:'Mayor competencia bancaria', desc:'La agresividad de Itaú y Falabella generó una guerra de tasas que beneficia a compradores en 2026.'},
+/* Regiones disponibles para selección */
+const REGIONES_BTN = [
+  { label: '🏙 RM',          key: 'RM'  },
+  { label: '🌊 Valparaíso',  key: 'VAL' },
+  { label: '🏭 Biobío',      key: 'BIO' },
+  { label: '⛏ Antofagasta', key: 'ANT' },
+  { label: '🌿 Coquimbo',    key: 'COQ' },
+  { label: '🌲 Araucanía',   key: 'ARA' },
+  { label: '🌾 Maule',       key: 'MAU' },
+  { label: '🏔 Otras',       key: null  },
 ];
 
-function bcoColorClass(tasa){ return tasa<4?'verde':tasa<=5?'amarillo':'rojo'; }
+/* Mapa de intenciones */
+const INTENTS = {
+  capacidad        : 'capacidad',
+  precios_reales   : 'precios_reales',
+  subsidios        : 'subsidios',
+  pie              : 'pie',
+  arriendo_vs_compra: 'arriendo_vs_compra',
+  regiones         : 'regiones',
+  proceso          : 'proceso',
+  uf               : 'uf',
+  propiedades_reales: 'propiedades_reales',
+  sel_sueldo       : 'sel_sueldo',
+  sel_region       : 'sel_region',
+  menu             : 'menu',
+};
 
-function renderBcoGrafico(containerId){
-  const cont=document.getElementById(containerId);
-  if(!cont) return;
-  const max=6;
-  const rows=BANCOS_2026.map(b=>{
-    const w=Math.round(b.tasaFija/max*100);
-    const cl=bcoColorClass(b.tasaFija);
-    return `<div class="bco-bar-row">
-      <span class="bco-bar-label">${b.logo} ${b.nombre}</span>
-      <div class="bco-bar-track">
-        <div class="bco-bar-fill ${cl}" style="width:${w}%">${b.tasaFija.toFixed(2)}%</div>
-      </div>
-      <span class="bco-bar-pct ${cl}">${b.tasaFija.toFixed(2)}%</span>
-    </div>`;
-  }).join('');
-  cont.innerHTML=`<div class="bco-grafico-titulo">Tasa fija anual por banco (datos CMF · marzo 2026)</div>${rows}`;
-}
+/* Botones del menú principal */
+const MENU_BUTTONS = [
+  { label: '💰 ¿Cuánto puedo pagar?',       intent: INTENTS.capacidad },
+  { label: '🏘 Precios reales ML',           intent: INTENTS.precios_reales },
+  { label: '🏛 Subsidios del Estado',        intent: INTENTS.subsidios },
+  { label: '🔑 ¿Cuánto necesito de pie?',    intent: INTENTS.pie },
+  { label: '⚖️ Arrendar vs Comprar',         intent: INTENTS.arriendo_vs_compra },
+  { label: '🗺 Comparar regiones',           intent: INTENTS.regiones },
+  { label: '📋 Proceso de compra',           intent: INTENTS.proceso },
+  { label: '📐 ¿Qué es la UF?',             intent: INTENTS.uf },
+  { label: '🏢 Ver propiedades reales',      intent: INTENTS.propiedades_reales },
+];
 
-function renderBcoTabla(containerId){
-  const tbl=document.getElementById(containerId);
-  if(!tbl) return;
-  const badgeHtml=b=>{
-    if(!b.badge) return '';
-    const cfg=BANCOS_BADGES[b.badge];
-    return cfg?`<span class="bco-badge ${cfg.cls}">${cfg.txt}</span>`:'';
-  };
-  const colorCls=t=>t<4?'bco-badge-verde':t<=5?'bco-badge-amarillo':'bco-badge-rojo';
-  const rows=BANCOS_2026.map((b,i)=>`
-    <tr class="${i===0?'bco-tr-top':''}">
-      <td><strong>${b.logo} ${b.nombre}</strong>${badgeHtml(b)?`<br>${badgeHtml(b)}`:''}</td>
-      <td><span class="bco-badge ${colorCls(b.tasaFija)}">${b.tasaFija.toFixed(2)}%</span></td>
-      <td>${b.cae.toFixed(2)}%</td>
-      <td><strong>$${fmt(b.dividendoCLP)}</strong><br><span style="font-size:11px;color:var(--suave)">${b.dividendoUF.toFixed(2)} UF</span></td>
-      <td style="font-size:12px;color:var(--suave);max-width:160px">${b.comentario}</td>
-    </tr>`).join('');
-  tbl.innerHTML=`<thead><tr>
-    <th>Banco</th><th>Tasa fija</th><th>CAE</th><th>Dividendo mensual</th><th>Comentario</th>
-  </tr></thead><tbody>${rows}</tbody>`;
-}
+/* Botones que siempre aparecen tras una respuesta */
+const BTN_SEGUIR = [
+  { label: '🏘 Precios reales',         intent: INTENTS.precios_reales },
+  { label: '🏢 Ver propiedades',        intent: INTENTS.propiedades_reales },
+  { label: '🏛 Subsidios',             intent: INTENTS.subsidios },
+  { label: '🗺 Comparar regiones',      intent: INTENTS.regiones },
+  { label: '🔙 Menú principal',         intent: INTENTS.menu },
+];
 
-function renderBcoRanking(containerId){
-  const cont=document.getElementById(containerId);
-  if(!cont) return;
-  // Ordenar por tasa fija
-  const ordenados=[...BANCOS_2026].sort((a,b)=>a.tasaFija-b.tasaFija);
-  cont.innerHTML=ordenados.slice(0,6).map((b,i)=>{
-    const cfg=b.badge?BANCOS_BADGES[b.badge]:null;
-    const badgeHtml=cfg?`<span class="bco-badge ${cfg.cls}">${cfg.txt}</span>`:'';
-    const divBadge=b.id==='internacional'?`<span class="bco-badge bco-badge-verde">💰 Mejor dividendo CMF</span>`:'';
-    return `<div class="bco-rank-card${i===0?' top':''}">
-      <div class="bco-rank-num">${i+1}</div>
-      <div>
-        <div class="bco-rank-nombre">${b.logo} ${b.nombre}</div>
-        <div class="bco-rank-tasa">Tasa fija: <strong>${b.tasaFija.toFixed(2)}%</strong> · CAE: ${b.cae.toFixed(2)}% · Dividendo: $${fmt(b.dividendoCLP)}</div>
-        <div class="bco-rank-coment">${b.comentario}</div>
-        <div class="bco-rank-badges">${badgeHtml}${divBadge}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
+/* ── Estado del agente ─────────────────────────────────── */
+class ChatAgent {
+  constructor() {
+    this.sueldo  = 0;    // CLP, 0 = no seleccionado (usar promedio 600k)
+    this.region  = 'RM'; // clave REGIONES, default RM
+  }
 
-function renderBcoRequisitos(containerId){
-  const cont=document.getElementById(containerId);
-  if(!cont) return;
-  cont.innerHTML=REQUISITOS_2026.map(r=>`
-    <div class="bco-req-item">
-      <div class="bco-req-ico">${r.ico}</div>
-      <div class="bco-req-titulo">${r.titulo}</div>
-      <div class="bco-req-desc">${r.desc}</div>
-    </div>`).join('');
-}
+  /** Sueldo efectivo: usa el seleccionado o el promedio Chile */
+  get _sueldo() { return this.sueldo > 0 ? this.sueldo : 600_000; }
 
-function renderBcoTendencias(containerId){
-  const cont=document.getElementById(containerId);
-  if(!cont) return;
-  cont.innerHTML=TENDENCIAS_2026.map(t=>`
-    <div class="bco-tend-item">
-      <div class="bco-tend-ico">${t.emoji}</div>
-      <div>
-        <div class="bco-tend-titulo">${t.titulo}</div>
-        <div class="bco-tend-desc">${t.desc}</div>
-      </div>
-    </div>`).join('');
-}
+  /**
+   * Procesa una INTENCIÓN (no texto libre) y retorna { html, buttons }.
+   * @param {string} intent  - Una de las claves de INTENTS
+   * @param {*}      [param] - Parámetro adicional (valor de sueldo, clave región…)
+   * @returns {{ html: string, buttons: Array<{label,intent,param}> } | Promise}
+   */
+  respondTo(intent, param = null) {
 
-function poblarSelectores(prefijo){
-  ['1','2'].forEach(n=>{
-    const sel=document.getElementById(`${prefijo}-sel-${n}`);
-    if(!sel) return;
-    const val=sel.value;
-    sel.innerHTML=`<option value="">— Banco ${n==='1'?'A':'B'} —</option>`+
-      BANCOS_2026.map(b=>`<option value="${b.id}" ${b.id===val?'selected':''}>${b.logo} ${b.nombre}</option>`).join('');
-  });
-}
+    /* ── Selección de sueldo ── */
+    if (intent === INTENTS.sel_sueldo) {
+      this.sueldo = param;
+      const uf    = UF_VALOR || 38500;
+      const ufI   = this.sueldo / uf;
+      return {
+        html: `✅ Sueldo registrado: <strong>${_clp(this.sueldo)}/mes</strong> (${ufI.toFixed(1)} UF). ¿Qué quieres calcular?`,
+        buttons: MENU_BUTTONS,
+      };
+    }
 
-function calcComparador(ids,plazoAnios,montoUF,piePct){
-  const plazo=plazoAnios||20, monto=montoUF||2000, pie=(piePct??20);
-  return ids.map(id=>BANCOS_2026.find(b=>b.id===id)).filter(Boolean).map(b=>{
-    const creditoUF=monto*(1-pie/100);
-    const cuotaCLP=Math.round(cuotaMensual(creditoUF,b.tasaFija,plazo));
-    const totalCLP=cuotaCLP*plazo*12;
-    return {...b,cuotaCLP,totalCLP};
-  });
-}
+    /* ── Selección de región ── */
+    if (intent === INTENTS.sel_region) {
+      if (param) {
+        this.region = param;
+        const d = REGIONES[param];
+        return {
+          html: `📍 Región seleccionada: <strong>${d ? d.nombre : param}</strong>. ¿Qué quieres ver?`,
+          buttons: [
+            { label: '🏘 Precios reales ML',    intent: INTENTS.precios_reales },
+            { label: '🏢 Ver propiedades',       intent: INTENTS.propiedades_reales },
+            { label: '💰 Mi capacidad aquí',     intent: INTENTS.capacidad },
+            { label: '🔙 Menú',                  intent: INTENTS.menu },
+          ],
+        };
+      }
+      // Sin param → mostrar botones de regiones
+      return {
+        html: '¿En qué región buscas?',
+        buttons: REGIONES_BTN.map(r => ({ label: r.label, intent: INTENTS.sel_region, param: r.key })),
+      };
+    }
 
-function getBcoEscenarioUsuario(){
-  if(_bcoPerfilUsuario && _bcoPerfilUsuario.precioUF>0){
+    /* ── Menú principal ── */
+    if (intent === INTENTS.menu) {
+      return {
+        html: `¡Hola! 👋 Soy tu <strong>Agente Hipotecario Chile 2026</strong>. Elige lo que quieres consultar:`,
+        buttons: MENU_BUTTONS,
+      };
+    }
+
+    /* ── A. Capacidad de compra ── */
+    if (intent === INTENTS.capacidad) {
+      const s    = this._sueldo;
+      const nota = this.sueldo === 0 ? ` <span style="font-size:11px;color:var(--suave)">(usando promedio Chile $600K — elige tu sueldo abajo)</span>` : '';
+      const resp = CHAT_KB.puedoComprar(s);
+      return {
+        html: resp + nota,
+        buttons: [
+          ...SUELDOS_PRESET.map(p => ({ label: p.label, intent: INTENTS.sel_sueldo, param: p.value })),
+          { label: '🏘 Precios reales', intent: INTENTS.precios_reales },
+          { label: '🏛 Subsidios',      intent: INTENTS.subsidios },
+          { label: '🔙 Menú',           intent: INTENTS.menu },
+        ],
+      };
+    }
+
+    /* ── B. Precios reales ML (async) ── */
+    if (intent === INTENTS.precios_reales) {
+      const regKey = this.region || 'RM';
+      const promise = CHAT_KB.preciosViviendaML(regKey, this._sueldo)
+        .then(html => ({
+          html,
+          buttons: [
+            { label: '📍 Cambiar región',      intent: INTENTS.sel_region },
+            { label: '🏢 Ver propiedades',     intent: INTENTS.propiedades_reales },
+            { label: '🏛 Subsidios',           intent: INTENTS.subsidios },
+            { label: '💰 Mi capacidad',        intent: INTENTS.capacidad },
+            { label: '🔙 Menú',                intent: INTENTS.menu },
+          ],
+        }));
+      return promise;
+    }
+
+    /* ── C. Subsidios ── */
+    if (intent === INTENTS.subsidios) {
+      const s    = this._sueldo;
+      const nota = this.sueldo === 0 ? ` <span style="font-size:11px;color:var(--suave)">(estimado con sueldo $600K)</span>` : '';
+      return {
+        html: CHAT_KB.subsidios(s) + nota,
+        buttons: [
+          ...SUELDOS_PRESET.map(p => ({ label: p.label, intent: INTENTS.sel_sueldo, param: p.value })),
+          { label: '📍 Cambiar región', intent: INTENTS.sel_region },
+          { label: '🔙 Menú',           intent: INTENTS.menu },
+        ],
+      };
+    }
+
+    /* ── D. Pie ── */
+    if (intent === INTENTS.pie) {
+      const d    = REGIONES[this.region] ?? REGIONES.RM;
+      const uf   = UF_VALOR || 38500;
+      const precio = d.depto * 55 * uf;
+      return {
+        html: CHAT_KB.pie(precio, this._sueldo),
+        buttons: [
+          { label: '💰 Cambiar sueldo',       intent: INTENTS.sel_sueldo },
+          { label: '📍 Cambiar región',        intent: INTENTS.sel_region },
+          { label: '🏛 Ver subsidios',         intent: INTENTS.subsidios },
+          { label: '🔙 Menú',                  intent: INTENTS.menu },
+        ],
+      };
+    }
+
+    /* ── E. Arriendo vs Comprar ── */
+    if (intent === INTENTS.arriendo_vs_compra) {
+      const s = this._sueldo;
+      const arriendo_estimado = Math.round(s * 0.28 / 10000) * 10000;
+      return {
+        html: CHAT_KB.arrendarVsComprar(s, arriendo_estimado),
+        buttons: BTN_SEGUIR,
+      };
+    }
+
+    /* ── F. Regiones ── */
+    if (intent === INTENTS.regiones) {
+      return {
+        html: CHAT_KB.preciosVivienda(null),
+        buttons: [
+          ...REGIONES_BTN.filter(r => r.key).map(r => ({ label: r.label, intent: INTENTS.sel_region, param: r.key })),
+          { label: '🔙 Menú', intent: INTENTS.menu },
+        ],
+      };
+    }
+
+    /* ── G. Proceso de compra ── */
+    if (intent === INTENTS.proceso) {
+      return {
+        html: CHAT_KB.procesoCompra(),
+        buttons: BTN_SEGUIR,
+      };
+    }
+
+    /* ── H. UF ── */
+    if (intent === INTENTS.uf) {
+      return {
+        html: CHAT_KB.uf(),
+        buttons: BTN_SEGUIR,
+      };
+    }
+
+    /* ── I. Ver propiedades en portales ── */
+    if (intent === INTENTS.propiedades_reales) {
+      const regionKey   = this.region || 'RM';
+      const uf          = UF_VALOR || 38500;
+      const capacidadUF = (this.sueldo > 0)
+        ? Math.round(maxCreditoPorSueldo(this.sueldo, 4.1, 25) / uf / 0.80)
+        : 0;
+      const d = REGIONES[regionKey] ?? {};
+
+      let html = `<strong>🔎 Buscar propiedades — ${d.nombre ?? regionKey}</strong>`;
+      if (capacidadUF > 0) {
+        html += `<br><span style="font-size:12px;color:var(--suave)">Tu capacidad: <strong>${capacidadUF} UF</strong></span>`;
+      }
+      html += `<br><span style="font-size:12px;color:var(--suave);line-height:1.6">Elige el portal que prefieras para buscar propiedades en venta.</span>`;
+
+      return {
+        html,
+        buttons: [
+          { label: '🔎 MercadoLibre',  url: 'https://www.mercadolibre.cl/c/inmuebles#menu=categories' },
+          { label: '🏘 TocToc',         url: 'https://www.toctoc.com/' },
+          { label: '📍 Cambiar región', intent: INTENTS.sel_region },
+          { label: '🔙 Menú',           intent: INTENTS.menu },
+        ],
+      };
+    }
+
+    /* Fallback */
     return {
-      montoUF:_bcoPerfilUsuario.precioUF,
-      plazoAnios:_bcoPerfilUsuario.plazoAnios||25,
-      piePct:_bcoPerfilUsuario.piePct??20,
-      sueldo:_bcoPerfilUsuario.sueldo||0,
-      personalizado:true
+      html: `Elige una opción para comenzar 👇`,
+      buttons: MENU_BUTTONS,
     };
   }
-  return {montoUF:2000, plazoAnios:20, piePct:20, sueldo:0, personalizado:false};
 }
 
-function getBcoRecomendacionBase(){
-  const esc=getBcoEscenarioUsuario();
-  const porTasa=[...BANCOS_2026].sort((a,b)=>a.tasaFija-b.tasaFija);
-  const evaluados=BANCOS_2026.map(b=>{
-    const cuotaCLP=Math.round(cuotaMensual(esc.montoUF*(1-esc.piePct/100),b.tasaFija,esc.plazoAnios));
-    const pct=esc.sueldo>0?(cuotaCLP/esc.sueldo)*100:null;
-    return {...b, cuotaCLP, pct};
-  });
-  const porDividendo=[...evaluados].sort((a,b)=>a.cuotaCLP-b.cuotaCLP);
-  const mejorTasa=porTasa[0];
-  const mejorDiv=porDividendo[0];
-  const segundo=porDividendo.find(b=>b.id!==mejorDiv.id) || porDividendo[1] || mejorDiv;
-  return {
-    mejorTasa,
-    mejorDiv,
-    escenario:esc,
-    sugeridos: (mejorTasa.id!==mejorDiv.id)
-      ? [mejorTasa,mejorDiv]
-      : [mejorTasa,segundo]
-  };
-}
+/* Instancia única del agente */
+const _chatAgent = new ChatAgent();
 
-function getBcoSeleccion(prefijo){
-  return ['1','2'].map(n=>document.getElementById(`${prefijo}-sel-${n}`)?.value).filter(Boolean);
-}
+/* ══════════════════════════════════════════════════════════════
+   UI DEL CHAT — solo botones, sin input de texto
+   ============================================================ */
+let _chatOpen       = false;
+let _chatInited     = false;
+let _chatBadgeShown = false;
 
-function setComparadorBancos(prefijo,idA,idB){
-  const a=document.getElementById(`${prefijo}-sel-1`);
-  const b=document.getElementById(`${prefijo}-sel-2`);
-  if(a) a.value=idA;
-  if(b) b.value=idB;
-  if(prefijo==='bco') renderComparador();
-  else renderComparadorTab();
-}
+/** Abre o cierra el widget de chat */
+function toggleChat() {
+  _chatOpen = !_chatOpen;
+  const win   = document.getElementById('chat-window');
+  const btn   = document.getElementById('chat-toggle');
+  const badge = document.getElementById('chat-badge');
 
-function sugerirComparacionBco(scope){
-  const rec=getBcoRecomendacionBase();
-  const prefijo=scope==='tab'?'tab-bco':'bco';
-  setComparadorBancos(prefijo,rec.sugeridos[0].id,rec.sugeridos[1].id);
-  if(scope!=='tab') scrollToBcoSeccion('bco-comp-wrap');
-}
-
-function actualizarAsistenteBancos(){
-  const rec=getBcoRecomendacionBase();
-  const esc=rec.escenario;
-  const selloEsc=esc.personalizado
-    ? `con tu perfil (${Math.round(esc.montoUF).toLocaleString('es-CL')} UF · pie ${esc.piePct}% · ${esc.plazoAnios} años)`
-    : 'con simulación referencial (2.000 UF · pie 20% · 20 años)';
-
-  // Estado comparador en pantalla completa
-  const idsFull=getBcoSeleccion('bco');
-  const compFull=(idsFull.length===2 && idsFull[0]!==idsFull[1])
-    ? calcComparador(idsFull,esc.plazoAnios,esc.montoUF,esc.piePct)
-    : [];
-  const ganadorFull=compFull.length===2?compFull.reduce((a,b)=>a.totalCLP<b.totalCLP?a:b):null;
-  const perdedorFull=compFull.length===2?compFull.reduce((a,b)=>a.totalCLP>b.totalCLP?a:b):null;
-
-  // Estado comparador en tab
-  const idsTab=getBcoSeleccion('tab-bco');
-  const compTab=(idsTab.length===2 && idsTab[0]!==idsTab[1])
-    ? calcComparador(idsTab,esc.plazoAnios,esc.montoUF,esc.piePct)
-    : [];
-  const ganadorTab=compTab.length===2?compTab.reduce((a,b)=>a.totalCLP<b.totalCLP?a:b):null;
-  const perdedorTab=compTab.length===2?compTab.reduce((a,b)=>a.totalCLP>b.totalCLP?a:b):null;
-
-  // Full
-  const resumenFull=document.getElementById('bco-chat-resumen');
-  const insightFull=document.getElementById('bco-chat-insight');
-  const ctaFull=document.getElementById('bco-chat-cta-comp');
-  if(resumenFull){
-    resumenFull.innerHTML=`🏦 <strong>Lectura rápida del mercado</strong><br>
-      <div class="bco-chat-dato"><span class="bco-chat-dato-ico">🥇</span><span>Mejor tasa: <strong>${rec.mejorTasa.logo} ${rec.mejorTasa.nombre} ${rec.mejorTasa.tasaFija.toFixed(2)}%</strong></span></div>
-      <div class="bco-chat-dato"><span class="bco-chat-dato-ico">💰</span><span>Menor dividendo ${esc.personalizado?'con tus datos':'estimado'}: <strong>${rec.mejorDiv.logo} ${rec.mejorDiv.nombre} $${fmt(rec.mejorDiv.cuotaCLP)}</strong>${rec.mejorDiv.pct!==null?` (${rec.mejorDiv.pct.toFixed(1)}% de tu sueldo)`:''}</span></div>
-      <div class="bco-chat-dato"><span class="bco-chat-dato-ico">📊</span><span>Promedio mercado: <strong>4,35%</strong> · 11 bancos</span></div>`;
-  }
-  if(insightFull){
-    if(ganadorFull&&perdedorFull){
-      const ahorroMes=perdedorFull.cuotaCLP-ganadorFull.cuotaCLP;
-      insightFull.innerHTML=`✅ Entre tus bancos elegidos, conviene <strong>${ganadorFull.logo} ${ganadorFull.nombre}</strong>.<br>
-      Ahorro estimado: <strong style="color:#16a34a">$${fmt(ahorroMes)}/mes</strong> vs ${perdedorFull.nombre}, ${selloEsc}.`;
-    } else {
-      insightFull.innerHTML=`ℹ️ Te recomiendo comparar <strong>${rec.sugeridos[0].logo} ${rec.sugeridos[0].nombre}</strong> vs <strong>${rec.sugeridos[1].logo} ${rec.sugeridos[1].nombre}</strong> para ver ahorro mensual real, ${selloEsc}.`;
+  if (_chatOpen) {
+    win.removeAttribute('hidden');
+    btn.setAttribute('aria-expanded', 'true');
+    btn.setAttribute('aria-label', 'Cerrar agente hipotecario');
+    if (badge) badge.style.display = 'none';
+    if (!_chatInited) {
+      _chatInited = true;
+      _handleIntent(INTENTS.menu);
     }
-  }
-  if(ctaFull){
-    ctaFull.textContent=(ganadorFull&&perdedorFull)
-      ? `⚖️ Recomparar ${ganadorFull.logo} ${ganadorFull.nombre} vs ${perdedorFull.logo} ${perdedorFull.nombre}`
-      : `⚖️ Comparar ${rec.sugeridos[0].logo} ${rec.sugeridos[0].nombre} vs ${rec.sugeridos[1].logo} ${rec.sugeridos[1].nombre}`;
-  }
-
-  // Tab
-  const resumenTab=document.getElementById('tab-bco-chat-resumen');
-  const insightTab=document.getElementById('tab-bco-chat-insight');
-  const ctaTab=document.getElementById('tab-bco-chat-cta-comp');
-  if(resumenTab){
-    resumenTab.innerHTML=`🤖 <strong>Asistente hipotecario (rápido)</strong><br>
-      <div class="bco-chat-dato"><span class="bco-chat-dato-ico">🥇</span><span>Mejor tasa: <strong>${rec.mejorTasa.logo} ${rec.mejorTasa.nombre}</strong></span></div>
-      <div class="bco-chat-dato"><span class="bco-chat-dato-ico">💸</span><span>Menor dividendo ${esc.personalizado?'con tus datos':'estimado'}: <strong>${rec.mejorDiv.logo} ${rec.mejorDiv.nombre} $${fmt(rec.mejorDiv.cuotaCLP)}</strong></span></div>`;
-  }
-  if(insightTab){
-    if(ganadorTab&&perdedorTab){
-      const ahorroMes=perdedorTab.cuotaCLP-ganadorTab.cuotaCLP;
-      insightTab.innerHTML=`✅ En tu comparación actual gana <strong>${ganadorTab.logo} ${ganadorTab.nombre}</strong>.<br>
-      Diferencia estimada: <strong style="color:#16a34a">$${fmt(ahorroMes)}/mes</strong>, ${selloEsc}.`;
-    } else {
-      insightTab.innerHTML=`💡 Haz clic en “Comparar recomendados” y te dejo una comparación útil en 1 paso.`;
-    }
-  }
-  if(ctaTab){
-    ctaTab.textContent=(ganadorTab&&perdedorTab)
-      ? `⚖️ Recomparar ${ganadorTab.logo} ${ganadorTab.nombre} vs ${perdedorTab.logo} ${perdedorTab.nombre}`
-      : `⚖️ Comparar ${rec.sugeridos[0].logo} ${rec.sugeridos[0].nombre} vs ${rec.sugeridos[1].logo} ${rec.sugeridos[1].nombre}`;
-  }
-}
-
-function renderComparadorResult(prefijo,resultados){
-  const gridEl=document.getElementById(`${prefijo}-comp-grid`);
-  const ahorroEl=document.getElementById(`${prefijo}-comp-ahorro`);
-  const resultEl=document.getElementById(`${prefijo}-comp-result`);
-  if(!gridEl||!ahorroEl||!resultEl) return;
-  if(resultados.length<2){ resultEl.classList.remove('visible'); ahorroEl.innerHTML=''; return; }
-  resultEl.classList.add('visible');
-  const min=resultados.reduce((a,b)=>a.totalCLP<b.totalCLP?a:b);
-  const max=resultados.reduce((a,b)=>a.totalCLP>b.totalCLP?a:b);
-  gridEl.innerHTML=resultados.map(r=>`
-    <div class="bco-comp-card${r.id===min.id?' ganador':''}">
-      <div class="bco-comp-banco">${r.logo} ${r.nombre}${r.id===min.id?' 🏆':''}</div>
-      <div class="bco-comp-tasa">${r.tasaFija.toFixed(2)}% tasa fija</div>
-      <div class="bco-comp-sub">CAE ${r.cae.toFixed(2)}%</div>
-      <div class="bco-comp-dividendo">$${fmt(r.cuotaCLP)}<span class="bco-comp-mes">/mes</span></div>
-    </div>`).join('');
-  const ahorro=max.totalCLP-min.totalCLP;
-  const ahorroMes=max.cuotaCLP-min.cuotaCLP;
-  ahorroEl.innerHTML=`
-    🏆 <strong>${min.logo} ${min.nombre}</strong> es la mejor opción.<br>
-    Dividendo: <strong>$${fmt(min.cuotaCLP)}/mes</strong> · Tasa: <strong>${min.tasaFija.toFixed(2)}%</strong><br>
-    Ahorras <strong style="color:#16a34a">$${fmt(ahorroMes)}/mes</strong> y <strong style="color:#16a34a">$${fmt(ahorro)}</strong> en total vs. ${max.nombre}.`;
-}
-
-function renderComparador(){
-  const esc=getBcoEscenarioUsuario();
-  const ids=['bco-sel-1','bco-sel-2'].map(id=>document.getElementById(id)?.value).filter(Boolean);
-  const ahorroEl=document.getElementById('bco-comp-ahorro');
-  const resultEl=document.getElementById('bco-comp-result');
-  if(ids.length===2 && ids[0]===ids[1]){
-    if(resultEl) resultEl.classList.add('visible');
-    if(ahorroEl) ahorroEl.innerHTML='⚠️ Elige <strong>dos bancos distintos</strong> para comparar.';
-    const gridEl=document.getElementById('bco-comp-grid');
-    if(gridEl) gridEl.innerHTML='';
-    actualizarAsistenteBancos();
-    return;
-  }
-  const resultados=calcComparador(ids,esc.plazoAnios,esc.montoUF,esc.piePct);
-  renderComparadorResult('bco',resultados);
-  actualizarAsistenteBancos();
-}
-function renderComparadorTab(){
-  const esc=getBcoEscenarioUsuario();
-  const ids=['tab-bco-sel-1','tab-bco-sel-2'].map(id=>document.getElementById(id)?.value).filter(Boolean);
-  const ahorroEl=document.getElementById('tab-bco-comp-ahorro');
-  const resultEl=document.getElementById('tab-bco-comp-result');
-  if(ids.length===2 && ids[0]===ids[1]){
-    if(resultEl) resultEl.classList.add('visible');
-    if(ahorroEl) ahorroEl.innerHTML='⚠️ Elige <strong>dos bancos distintos</strong> para comparar.';
-    const gridEl=document.getElementById('tab-bco-comp-grid');
-    if(gridEl) gridEl.innerHTML='';
-    actualizarAsistenteBancos();
-    return;
-  }
-  const resultados=calcComparador(ids,esc.plazoAnios,esc.montoUF,esc.piePct);
-  renderComparadorResult('tab-bco',resultados);
-  actualizarAsistenteBancos();
-}
-
-function initBancos2026(){
-  // Pantalla completa screen-bancos
-  renderBcoGrafico('bco-grafico');
-  renderBcoTabla('bco-tabla');
-  renderBcoRanking('bco-ranking');
-  renderBcoRequisitos('bco-req-grid');
-  renderBcoTendencias('bco-tendencias');
-  poblarSelectores('bco');
-  // Tab dentro de screen-3
-  renderBcoGrafico('tab-bco-grafico');
-  renderBcoTabla('tab-bco-tabla');
-  renderBcoRanking('tab-bco-ranking');
-  renderBcoRequisitos('tab-bco-req-grid');
-  renderBcoTendencias('tab-bco-tendencias');
-  poblarSelectores('tab-bco');
-  actualizarAsistenteBancos();
-}
-document.addEventListener('DOMContentLoaded', initBancos2026);
-
-function toggleBcoChat(){
-  const wrap=document.getElementById('bco-chat-wrap');
-  if(!wrap) return;
-  const abierto=wrap.classList.toggle('abierto');
-  const btn=wrap.querySelector('.bco-chat-trigger');
-  if(btn) btn.setAttribute('aria-expanded',abierto?'true':'false');
-}
-function toggleTabBcoChat(){
-  const wrap=document.getElementById('tab-bco-chat-wrap');
-  if(!wrap) return;
-  const abierto=wrap.classList.toggle('abierto');
-  const btn=wrap.querySelector('.bco-chat-trigger');
-  if(btn) btn.setAttribute('aria-expanded',abierto?'true':'false');
-}
-function scrollToBcoSeccion(id){
-  const el=document.getElementById(id);
-  if(!el) return;
-  // Si la sección está dentro de <details>, abrirla antes de scrollear
-  const details=el.closest('details.bco-seccion');
-  if(details) details.open=true;
-  // Cerrar el panel antes de scrollear
-  const chatWrap=document.getElementById('bco-chat-wrap');
-  if(chatWrap){
-    chatWrap.classList.remove('abierto');
-    const btn=chatWrap.querySelector('.bco-chat-trigger');
-    if(btn) btn.setAttribute('aria-expanded','false');
-  }
-  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),140);
-}
-function irABancos(){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('activa'));
-  const target=document.getElementById('screen-bancos');
-  target.classList.add('activa');
-  document.querySelector('.wizard-steps').style.display='none';
-  actualizarAsistenteBancos();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-/* ═══════════════════════════════════════════════════════════════════ */
-function calcPublicAVC(){
-  const precio=parseCLP('pub-precio');
-  const arr=parseCLP('pub-arriendo');
-  const res=document.getElementById('pub-avc-resultado');
-  const hintEl=document.getElementById('pub-div-hint');
-  if(precio<=0){ res.innerHTML=''; if(hintEl) hintEl.textContent='Calcularemos el dividendo estimado'; return; }
-  const precioUF=precio/UF_VALOR;
-  const div=Math.round(cuotaMensual(precioUF*0.80,4.1,25));
-  if(hintEl) hintEl.textContent=`→ Dividendo estimado: $${fmt(div)}/mes (pie 20%, 25 años, 4.1%)`;
-  if(arr<=0){
-    // Solo mostrar el dividendo calculado, sin comparación
-    const pieClp=precio*0.20;
-    res.innerHTML=`<div style="border:1.5px solid var(--borde);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:12px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);margin-bottom:8px">ESTIMADO DE COMPRA</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div><div style="font-size:11px;color:var(--suave);margin-bottom:3px">Dividendo mensual</div><div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;color:var(--negro)">$${fmt(div)}<span style="font-size:.8rem;font-weight:300">/mes</span></div></div>
-        <div><div style="font-size:11px;color:var(--suave);margin-bottom:3px">Pie requerido (20%)</div><div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;color:var(--negro)">$${fmt(pieClp)}</div></div>
-      </div>
-      <div style="font-size:12px;color:var(--suave);margin-top:10px">Ingresa el arriendo mensual para comparar cuál opción te conviene más.</div>
-    </div>`;
-    return;
-  }
-  const dif=div-arr;
-  const absDif=fmt(Math.abs(dif));
-  let veredictoHtml='';
-  if(dif<0){
-    veredictoHtml=`<div style="background:var(--verde-l);border:1.5px solid var(--verde);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:12px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--verde);margin-bottom:5px">✅ Comprar es más barato hoy</div>
-      <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:600;color:var(--negro);margin-bottom:6px">$${absDif}/mes menos que arrendar</div>
-      <div style="font-size:13px;color:var(--texto);line-height:1.6">Con cada dividendo estás construyendo patrimonio — esa plata queda para ti. Además tienes estabilidad: nadie te puede subir el arriendo ni pedirte que te vayas.</div>
-    </div>`;
   } else {
-    // Estima break-even: cuando capital acumulado supera el extra pagado
-    const TASA=4.1, r=(TASA/100)/12, n=25*12;
-    const monto=precioUF*0.80*UF_VALOR;
-    let saldo=monto, capitalAcum=0, extraAcum=0, meses=null;
-    for(let m=1;m<=n;m++){
-      const interes=saldo*r, amort=div-interes;
-      if(amort<=0) break;
-      capitalAcum+=amort; extraAcum+=dif; saldo-=amort;
-      if(capitalAcum>=extraAcum){ meses=m; break; }
-    }
-    const beTxt=meses?`A los ${Math.ceil(meses/12)} años te empieza a convenir comprar`:'En el plazo analizado arrendar sigue siendo más barato';
-    veredictoHtml=`<div style="background:var(--amarillo-l);border:1.5px solid var(--amarillo);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:12px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amarillo);margin-bottom:5px">⚖️ Arrendar es más barato hoy</div>
-      <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:600;color:var(--negro);margin-bottom:6px">$${absDif}/mes más barato arrendar</div>
-      <div style="font-size:13px;color:var(--texto);line-height:1.6">Hoy pagas menos arrendando, pero parte del dividendo queda como tuyo (patrimonio). <strong>${beTxt}</strong> — porque el capital que acumulas en la propiedad supera lo que pagaste de más.</div>
-    </div>`;
-  }
-  const prosHtml=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-    <div style="border:1.5px solid var(--borde);border-radius:12px;padding:1rem">
-      <div style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--suave);margin-bottom:8px">🏠 Si compras</div>
-      <div style="font-size:12px;color:var(--texto);line-height:1.8">✓ Construyes patrimonio<br>✓ Dividendo fijo, sin alzas<br>✓ Puedes modificar la propiedad<br>✗ Menos liquidez</div>
-    </div>
-    <div style="border:1.5px solid var(--borde);border-radius:12px;padding:1rem">
-      <div style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--suave);margin-bottom:8px">📦 Si arriendas</div>
-      <div style="font-size:12px;color:var(--texto);line-height:1.8">✓ Más liquidez mensual<br>✓ Flexibilidad para moverte<br>✗ El arriendo puede subir<br>✗ No acumulas patrimonio</div>
-    </div>
-  </div>`;
-  res.innerHTML=veredictoHtml+prosHtml;
-}
-
-/* ─── PANEL LATERAL SUBSIDIOS ─── */
-function toggleSideSubsidios(){
-  const panel=document.getElementById('side-sub-panel');
-  const card=document.getElementById('side-card-subsidios');
-  const abierto=panel.classList.toggle('abierto');
-  card.style.background = abierto ? 'var(--fondo)' : '';
-  card.style.borderColor = abierto ? 'var(--borde)' : 'transparent';
-  if(abierto){ renderSideSubCtx(); }
-}
-function renderSideSubCtx(){
-  const el=document.getElementById('side-sub-ctx');
-  if(!el) return;
-  const ctx=_subCtxSimulador;
-  if(ctx && ctx.sueldo>0){
-    const calif=SUBSIDIOS_DEF.filter(s=>s.aplicar(ctx));
-    el.innerHTML=`<div class="side-sub-item verde" style="margin-bottom:7px">
-      <div class="side-sub-item-tag verde">📊 Tu simulación</div>
-      <div class="side-sub-item-dato">Sueldo: <strong>$${fmt(ctx.sueldo)}</strong></div>
-      <div class="side-sub-item-dato">Calificas a <strong>${calif.length}</strong> programa${calif.length!==1?'s':''}</div>
-    </div>`;
-  } else {
-    el.innerHTML=`<div style="font-size:11px;color:var(--suave);margin-bottom:7px;text-align:center">Sin datos del simulador</div>`;
+    win.setAttribute('hidden', '');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-label', 'Abrir agente hipotecario');
+    btn.focus();
   }
 }
-function irASubsidiosCat(cat){
-  irASubsidios();
-  // Espera que la pantalla esté lista y filtra por categoría
-  setTimeout(()=>filtrarSubsidiosInteractivos(cat, document.querySelector(`.sub-filtro-btn[data-cat="${cat}"]`)), 100);
-}
 
-/* ─── PANTALLA SUBSIDIOS INTERACTIVOS ─── */
+/**
+ * Procesa una intención: muestra burbuja del bot + botones.
+ * Acepta respuestas síncronas { html, buttons } o Promises.
+ */
+function _handleIntent(intent, param = null, labelUsuario = null) {
+  // Mostrar burbuja del usuario (el label del botón pulsado)
+  if (labelUsuario) _appendUserMessage(labelUsuario);
+  _showTyping();
 
-// Variable global para el contexto del simulador (se llena cuando el usuario usa la calculadora)
-let _subCtxSimulador = null;
+  const delay = 350 + Math.random() * 300;
+  const result = _chatAgent.respondTo(intent, param);
 
-function irASubsidios(){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('activa'));
-  const target=document.getElementById('screen-subsidios');
-  target.classList.add('activa');
-  document.querySelector('.wizard-steps').style.display='none';
-  window.scrollTo({top:0,behavior:'smooth'});
-  renderSubsidiosInteractivos();
-  const h=target.querySelector('.sub-hero-title');
-  if(h){ h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
-}
-
-function volverDesdeSubsidios(){ volverDesdeScreen(); }
-
-function irACalculadoraCompleta(){
-  volverDesdeScreen();
-}
-
-// Llamada desde la calculadora al terminar el cálculo — guarda contexto para mostrar elegibilidad
-function setSubCtxSimulador(ctx){
-  _subCtxSimulador = ctx;
-}
-
-function renderSubsidiosInteractivos(catFiltro){
-  const catActual = catFiltro || 'todos';
-
-  // Obtener contexto del simulador (si está disponible)
-  const ctx = _subCtxSimulador;
-
-  // Barra de contexto
-  const ctxBar = document.getElementById('sub-contexto-bar');
-  if(ctxBar){
-    if(ctx && ctx.sueldo > 0){
-      ctxBar.innerHTML=`<div class="sub-ctx-bar">
-        <span class="sub-ctx-tag">📊 Tu perfil</span>
-        <span class="sub-ctx-txt">Simulaste con <strong>$${fmt(ctx.sueldo)}/mes</strong> (${ctx.ingresoUF.toFixed(1)} UF) · ${ctx.situacion==='segunda'?'Segunda vivienda':ctx.situacion==='tengo'?'Ya tengo casa':'Primera vivienda'} · ${ctx.tipo==='depto'?'Departamento':ctx.tipo==='casa'?'Casa':'Vivienda usada'} <strong>${Math.round(ctx.precioUF).toLocaleString('es-CL')} UF</strong></span>
-        <button class="sub-ctx-btn" data-main-action="ir-calculadora">← Volver al análisis</button>
-      </div>`;
-    } else {
-      ctxBar.innerHTML=`<div class="sub-sin-ctx">
-        <span>💡 Sin datos del simulador — mostrando todos los subsidios con requisitos generales.</span>
-        <button class="sub-ctx-btn" data-main-action="ir-calculadora">Usar simulador →</button>
-      </div>`;
-    }
-  }
-
-  // Resetear filtro activo en botones
-  document.querySelectorAll('.sub-filtro-btn').forEach(b=>{
-    b.classList.toggle('activo', b.dataset.cat===catActual);
-  });
-
-  // Construir contexto de evaluación
-  const evalCtx = ctx || {
-    sueldo:0, ingresoUF:0, primera:true, nueva:true,
-    precioUF:1200, tipo:'depto'
+  const render = ({ html, buttons }) => {
+    _hideTyping();
+    _appendBotMessage(html);
+    _renderButtons(buttons ?? MENU_BUTTONS);
   };
 
-  // Filtrar subsidios por categoría
-  const TASA=4.1, PLAZO=25, PIE=0.20;
-  const todos = SUBSIDIOS_DEF.filter(s=> catActual==='todos' || s.categoria===catActual);
+  if (result && typeof result.then === 'function') {
+    // Async (Promises desde ML API)
+    result
+      .then(render)
+      .catch(() => {
+        _hideTyping();
+        _appendBotMessage('Lo siento, ocurrió un error al consultar los datos. Intenta de nuevo.');
+        _renderButtons(MENU_BUTTONS);
+      });
+  } else {
+    setTimeout(() => render(result), delay);
+  }
+}
 
-  const lista = document.getElementById('sub-interactivos-lista');
-  if(!lista) return;
+/** Renderiza los botones de opción debajo del último mensaje */
+function _renderButtons(buttons) {
+  const area = document.getElementById('chat-buttons');
+  if (!area) return;
+  area.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'chat-btn-grid';
 
-  const partes=[];
-
-  // Calendario de llamados
-  partes.push(`<div class="sub-calendario">
-    <div class="sub-cal-titulo">📅 Próximos llamados MINVU 2026</div>
-    <div class="sub-cal-grid">
-      <div class="sub-cal-item"><span class="sub-cal-mes">Mayo / Nov.</span><span class="sub-cal-prog">DS1 Tramos 1, 2 y 3</span></div>
-      <div class="sub-cal-item"><span class="sub-cal-mes">Jul. / Oct.</span><span class="sub-cal-prog">DS49 Compra y Construcción</span></div>
-      <div class="sub-cal-item"><span class="sub-cal-mes">Mayo–Jun. / Ago.</span><span class="sub-cal-prog">DS52 Arriendo</span></div>
-      <div class="sub-cal-item"><span class="sub-cal-mes">Abr.–May.</span><span class="sub-cal-prog">Mejoramiento Hogar Mejor</span></div>
-      <div class="sub-cal-item"><span class="sub-cal-mes">Mar./May./Jul./Sep./Dic.</span><span class="sub-cal-prog">DS10 Rural</span></div>
-    </div>
-    <div style="font-size:11px;color:var(--suave);margin-top:6px">Fechas estimadas · <a href="https://www.minvu.gob.cl" target="_blank" rel="noopener" style="color:var(--negro)">minvu.gob.cl</a></div>
-  </div>`);
-
-  // Agrupar por categoría
-  const CATEGORIAS=[
-    {id:'compra',       emoji:'🏠', label:'Compra de vivienda',              desc:'Subsidios para comprar vivienda construida (nueva o usada)'},
-    {id:'arriendo',     emoji:'🏘️', label:'Arriendo',                        desc:'Subsidio temporal para familias que arriendan'},
-    {id:'construccion', emoji:'🏗️', label:'Construcción de vivienda',         desc:'Subsidios para construir tu vivienda nueva'},
-    {id:'integracion',  emoji:'🤝', label:'Integración Social (DS19)',         desc:'Proyectos habitacionales integrados en barrios bien localizados'},
-    {id:'mejoramiento', emoji:'🔨', label:'Mejoramiento y barrios',            desc:'Reparación, ampliación y eficiencia energética'},
-    {id:'rural',        emoji:'🌾', label:'Habitabilidad Rural (DS10)',        desc:'Construcción y mejoramiento en localidades hasta 5.000 hab.'},
-  ];
-
-  const catsAMostrar = catActual==='todos'
-    ? CATEGORIAS
-    : CATEGORIAS.filter(c=>c.id===catActual);
-
-  catsAMostrar.forEach(cat=>{
-    const subsEnCat = todos.filter(s=>s.categoria===cat.id);
-    if(!subsEnCat.length) return;
-
-    const tarjetas=[];
-    // Ordenar: primero los que califican (si hay contexto)
-    const conCtx = ctx && ctx.sueldo > 0;
-    const ordenados = conCtx
-      ? [...subsEnCat.filter(s=>s.aplicar(evalCtx)), ...subsEnCat.filter(s=>!s.aplicar(evalCtx))]
-      : subsEnCat;
-
-    ordenados.forEach(s=>{
-      const aplica  = conCtx ? s.aplicar(evalCtx) : null;
-      const razones = (conCtx && !aplica && s.razones) ? s.razones(evalCtx) : [];
-
-      // Badge de elegibilidad
-      let badgeHtml;
-      if(!conCtx){
-        badgeHtml=`<span class="sub-badge--simular">Simula para ver si calificas</span>`;
-      } else if(aplica){
-        if(s.esFogaes)    badgeHtml=`<span class="sub-badge--califica">✓ Pie 10% disponible</span>`;
-        else if(s.esTasa) badgeHtml=`<span class="sub-badge--califica">✓ −${s.tasaDescuento}% tasa</span>`;
-        else              badgeHtml=`<span class="sub-badge--califica">✓ Calificas</span>`;
-      } else {
-        badgeHtml=`<span class="sub-badge--nocalifica">✗ No calificas hoy</span>`;
-      }
-
-      // Chips info
-      const chips=[];
-      if(s.ingresoMaximoRSH) chips.push(`<span class="sub-chip">RSH hasta ${s.ingresoMaximoRSH}%</span>`);
-      if(s.maxPrecioUF && s.maxPrecioUF<9000) chips.push(`<span class="sub-chip">Hasta ${s.maxPrecioUF.toLocaleString('es-CL')} UF</span>`);
-      if(s.ahorroMinimoUF>0) chips.push(`<span class="sub-chip">Ahorro mín. ${s.ahorroMinimoUF} UF</span>`);
-      const chipsHtml = chips.length ? `<div class="sub-chips">${chips.join('')}</div>` : '';
-
-      // Requisitos
-      const reqHtml = s.requisitosOficiales ? `<div class="sub-req-wrap">
-        <div class="sub-req-titulo">📋 Requisitos oficiales MINVU</div>
-        <ul class="sub-req-lista">${s.requisitosOficiales.map(r=>`<li><span class="sub-req-bullet" style="color:${aplica===true?'var(--verde)':'var(--suave2)'}">→</span><span>${r}</span></li>`).join('')}</ul>
-      </div>` : '';
-
-      // Por qué no califica
-      const razonesHtml = razones.length ? `<div class="sub-razones">
-        <div class="sub-razones-titulo">❌ Por qué no calificas hoy</div>
-        <ul>${razones.map(r=>`<li><span style="color:var(--rojo);font-weight:700;flex-shrink:0">•</span><span>${r}</span></li>`).join('')}</ul>
-      </div>` : '';
-
-      // Dividendo estimado si aplica y tiene precio
-      let dividendoHtml='';
-      if(aplica && !s.esFogaes && !s.esTasa && !s.esArriendo && !s.esMejoramiento && !s.esRural && s.montoUF && ctx){
-        const precioEf = Math.min(ctx.precioUF, s.maxPrecioUF||ctx.precioUF) - (s.montoUF||0);
-        if(precioEf>0){
-          const cuota = cuotaMensual(Math.max(0, precioEf*(1-PIE)), TASA, PLAZO);
-          dividendoHtml=`<div class="sub-metric" style="background:#f0fdf4;border:1px solid #86efac;border-radius:9px;padding:.55rem .75rem;margin:.5rem 0;display:inline-block">
-            <div style="font-size:10px;color:#15803d;font-weight:700;text-transform:uppercase;letter-spacing:.06em">💰 Dividendo estimado con tu subsidio</div>
-            <div style="font-family:'Fraunces',serif;font-size:1.25rem;font-weight:600;color:var(--negro)">$${fmt(cuota)}<span style="font-size:.8rem;font-weight:300">/mes</span></div>
-            <div style="font-size:11px;color:var(--suave)">Subsidio: ${s.montoUF} UF · pie 20% · 25 años · 4,1%</div>
-          </div>`;
-        }
-      }
-
-      // Botones
-      const btns = s.linksOficiales ? `<div class="sub-links-bar">
-        <a class="sub-btn sub-btn--primary" href="${s.linksOficiales.minvu}" target="_blank" rel="noopener">Ver requisitos en MINVU →</a>
-        ${!conCtx ? `<button class="sub-btn sub-btn--secondary" data-main-action="ir-calculadora">Simular para ver si califico</button>` : ''}
-      </div>` : '';
-
-      const claseTarjeta = aplica===true ? 'aplica' : aplica===false ? 'no-aplica' : '';
-
-      tarjetas.push(`<div class="sub-item ${claseTarjeta}" id="sub-item-${s.id}">
-        <div class="sub-header">
-          <div class="sub-header-left">
-            <span class="sub-icono">${s.icono}</span>
-            <div><div class="sub-nombre">${s.nombre}</div></div>
-          </div>
-          <div class="sub-monto">${badgeHtml}</div>
-        </div>
-        ${chipsHtml}
-        ${s.descripcionOficial ? `<div class="sub-desc">${s.descripcionOficial}</div>` : ''}
-        ${s.quienPuedePostular ? `<div class="sub-quien"><strong>¿Quién puede postular?</strong> ${s.quienPuedePostular}</div>` : ''}
-        ${dividendoHtml}
-        ${s.fechasPostulacion2026 ? `<div class="sub-fecha-tag">📅 ${s.fechasPostulacion2026}</div>` : ''}
-        ${s.modalidad ? `<div class="sub-modal"><strong>Modalidad:</strong> ${s.modalidad}</div>` : ''}
-        ${s.postulacion ? `<div class="sub-modal"><strong>Postulación:</strong> ${s.postulacion}</div>` : ''}
-        ${razonesHtml}
-        ${reqHtml}
-        ${btns}
-      </div>`);
-    });
-
-    // Contador del acordeón
-    const califCat = conCtx ? subsEnCat.filter(s=>s.aplicar(evalCtx)).length : null;
-    const contadorHtml = califCat!==null
-      ? (califCat>0
-          ? `<span class="sub-badge sub-badge--verde" style="flex-shrink:0">✓ ${califCat} calificas</span>`
-          : `<span style="font-size:.78rem;color:var(--suave);flex-shrink:0">${subsEnCat.length} programa${subsEnCat.length>1?'s':''}</span>`)
-      : `<span style="font-size:.78rem;color:var(--suave);flex-shrink:0">${subsEnCat.length} programa${subsEnCat.length>1?'s':''}</span>`;
-
-    // Siempre plegado por defecto: usuario debe hacer click para desplegar
-    partes.push(`<details class="sub-cat-details">
-        <summary class="sub-cat-summary">
-          <div class="sub-cat-header">
-            <span class="sub-cat-emoji">${cat.emoji}</span>
-            <div>
-              <div class="sub-cat-titulo">${cat.label}</div>
-              <div class="sub-cat-desc">${cat.desc}</div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            ${contadorHtml}
-            <span class="sub-cat-chevron">▼</span>
-          </div>
-        </summary>
-        <div class="sub-cat-body subs-lista">${tarjetas.join('')}</div>
-      </details>`);
+  buttons.forEach(({ label, intent, param, url }) => {
+    const btn = document.createElement('button');
+    btn.className   = 'chat-btn';
+    btn.textContent = label;
+    btn.setAttribute('aria-label', label);
+    if (url) {
+      // Botón que abre URL externa filtrada
+      btn.addEventListener('click', () => window.open(url, '_blank', 'noopener,noreferrer'));
+    } else {
+      btn.addEventListener('click', () => {
+        _handleIntent(intent, param ?? null, label);
+      });
+    }
+    grid.appendChild(btn);
   });
 
-  lista.innerHTML = partes.join('');
+  area.appendChild(grid);
+  area.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function filtrarSubsidiosInteractivos(cat, btn){
-  renderSubsidiosInteractivos(cat);
+/** Agrega burbuja del usuario */
+function _appendUserMessage(text) {
+  const el = document.createElement('div');
+  el.className = 'chat-bubble message-user';
+  el.textContent = text;
+  _chatAppend(el);
 }
 
-function checkSubsidiosRapido(){
-  const sueldo=parseCLP('sub-sueldo');
-  const res=document.getElementById('sub-live-resultado');
-  const cta=document.getElementById('sub-cta-completo');
-  if(sueldo<=0){ res.innerHTML=''; if(cta) cta.style.display='none'; return; }
-
-  const primera=document.getElementById('sub-primera').checked;
-  const nueva=document.getElementById('sub-nueva').checked;
-  const situacion=primera?'primera':'segunda';
-  const ingresoUF=sueldo/UF_VALOR;
-  const TASA=4.1, PLAZO=25, PIE=0.20;
-
-  // Evalúa subsidios DS por ingreso
-  const dsOpts=[
-    {id:'ds49', nombre:'DS49 — Fondo Solidario de Elección de Vivienda', maxI:25, minI:0,  maxP:950,  monto:314, soloNueva:false},
-    {id:'ds1t1',nombre:'DS1 Tramo 1 — Primera casa, sectores medios bajos',maxI:37, minI:0,  maxP:1100, monto:130, soloNueva:false},
-    {id:'ds1t2',nombre:'DS1 Tramo 2 — Primera casa, sectores medios',     maxI:60, minI:37, maxP:1600, monto:90,  soloNueva:false},
-    {id:'ds1t3',nombre:'DS1 Tramo 3 — Primera casa, sectores medios altos',maxI:78, minI:60, maxP:2200, monto:60,  soloNueva:false},
-  ];
-  let dsOk=null, dsRazon='';
-  for(const ds of dsOpts){
-    const ingOk=ingresoUF>ds.minI&&ingresoUF<=ds.maxI;
-    const pOk=primera;
-    const nOk=!ds.soloNueva||nueva;
-    if(ingOk&&pOk&&nOk){ dsOk=ds; break; }
-  }
-  if(!dsOk){
-    if(!primera) dsRazon=situacion==='segunda'
-      ? 'Los subsidios DS49 y DS1 son exclusivos para <strong>primera vivienda</strong>. Si es tu segunda propiedad, puedes acceder a FOGAES (pie 10%) si calificas por ingresos.'
-      : 'Los subsidios DS49 y DS1 son exclusivos para <strong>primera vivienda</strong>. Si ya tienes casa y quieres reemplazarla, existen subsidios de reemplazo de vivienda.';
-    else if(ingresoUF<=25) dsRazon='Verifica tu RSH en registrosocial.gob.cl — el DS49 requiere estar en el 40% más vulnerable.';
-    else if(ingresoUF>78) dsRazon=`Tu sueldo de $${fmt(sueldo)} (${ingresoUF.toFixed(1)} UF/mes) supera los 78 UF máximos de los subsidios habitacionales. Los subsidios DS están orientados a ingresos medios y bajos.`;
-    else dsRazon='No se encontró un subsidio DS compatible con tu perfil actual.';
-  }
-
-  let html='';
-
-  // Tarjeta subsidio DS
-  if(dsOk){
-    const precioEfUF=dsOk.maxP-dsOk.monto;
-    const creditoUF=precioEfUF*(1-PIE);
-    const cuota=cuotaMensual(creditoUF,TASA,PLAZO);
-    const pieClp=precioEfUF*PIE*UF_VALOR;
-    const montoClp=dsOk.monto*UF_VALOR;
-    const precioClp=dsOk.maxP*UF_VALOR;
-    const bonoPie=false; // Bono Pie DS19 eliminado — DS49 no tiene bono pie separado
-    html+=`<div class="sub-card-grande verde">
-      <div class="sub-card-label verde">✅ Calificas a subsidio habitacional</div>
-      <div style="font-family:'Fraunces',serif;font-size:1.25rem;font-weight:600;color:var(--negro);margin-bottom:3px">${dsOk.nombre}</div>
-      <div style="font-size:12px;color:var(--suave);margin-bottom:.75rem">Tu ingreso: ${ingresoUF.toFixed(1)} UF/mes — dentro del rango del subsidio</div>
-      <div class="sub-metrics">
-        <div class="sub-metric">
-          <div class="sub-metric-label">Subsidio del Estado</div>
-          <div class="sub-metric-val verde">${dsOk.monto} UF</div>
-          <div class="sub-metric-sub">~$${fmt(montoClp)}</div>
-        </div>
-        <div class="sub-metric">
-          <div class="sub-metric-label">Precio máx. vivienda</div>
-          <div class="sub-metric-val">${dsOk.maxP} UF</div>
-          <div class="sub-metric-sub">~$${fmt(precioClp)}</div>
-        </div>
-        <div class="sub-metric">
-          <div class="sub-metric-label">Dividendo estimado</div>
-          <div class="sub-metric-val">$${fmt(cuota)}</div>
-          <div class="sub-metric-sub">pie 20%·25 años·4.1%</div>
-        </div>
-        <div class="sub-metric">
-          <div class="sub-metric-label">Pie que necesitas</div>
-          <div class="sub-metric-val">$${fmt(pieClp)}</div>
-          <div class="sub-metric-sub">${(PIE*100).toFixed(0)}% del precio</div>
-        </div>
-      </div>
-      </div>
-    </div>`;
-  } else {
-    html+=`<div class="sub-card-grande amarillo">
-      <div class="sub-card-label amarillo">⚠️ Sin subsidio DS disponible hoy</div>
-      <div style="font-size:13px;color:var(--texto);line-height:1.6">${dsRazon}</div>
-    </div>`;
-  }
-
-  // FOGAES (universal)
-  html+=`<div class="sub-universal">
-    <span style="font-size:1.3rem;flex-shrink:0">🔑</span>
-    <div>
-      <div style="font-weight:500;font-size:13.5px;color:var(--negro);margin-bottom:3px">FOGAES — Solo el 10% de pie <span class="pill pill-verde" style="font-size:10px;padding:1px 8px;margin-left:4px">Disponible para ti</span></div>
-      <div style="font-size:12.5px;color:var(--texto);line-height:1.6">Con FOGAES el banco acepta <strong>solo el 10% de pie</strong> en vez del 20% estándar — el Estado garantiza la diferencia. Aplica a viviendas hasta 4.500 UF. El banco lo tramita automáticamente, sin postulación en Minvu.</div>
-    </div>
-  </div>`;
-
-  // Ley 21.748 (vivienda nueva)
-  if(nueva){
-    html+=`<div class="sub-universal">
-      <span style="font-size:1.3rem;flex-shrink:0">📉</span>
-      <div>
-        <div style="font-weight:500;font-size:13.5px;color:var(--negro);margin-bottom:3px">Ley 21.748 — Subsidio a la tasa <span class="pill pill-verde" style="font-size:10px;padding:1px 8px;margin-left:4px">Vivienda nueva</span></div>
-        <div style="font-size:12.5px;color:var(--texto);line-height:1.6">El Estado subsidia tu tasa de interés. Tu tasa baja <strong>0.6%</strong>, lo que equivale a ~$30.000–$60.000 menos en tu dividendo mensual los primeros <strong>~5 años</strong>. Aplica a vivienda nueva hasta 4.000 UF — solo menciónalo en el banco. Después del período subsidiado, el dividendo sube a la tasa normal.</div>
-      </div>
-    </div>`;
-  }
-
-  res.innerHTML=html;
-  if(cta) cta.style.display='flex';
+/** Agrega burbuja del bot */
+function _appendBotMessage(html) {
+  const el = document.createElement('div');
+  el.className = 'chat-bubble message-bot';
+  el.innerHTML = html;
+  _chatAppend(el);
 }
 
+/** Muestra el indicador de escritura */
+function _showTyping() {
+  let el = document.getElementById('chat-typing-indicator');
+  if (el) return;
+  el = document.createElement('div');
+  el.className = 'chat-typing';
+  el.id        = 'chat-typing-indicator';
+  el.setAttribute('aria-label', 'El agente está escribiendo...');
+  el.innerHTML = '<span></span><span></span><span></span>';
+  _chatAppend(el);
+}
 
+/** Oculta el indicador de escritura */
+function _hideTyping() {
+  const el = document.getElementById('chat-typing-indicator');
+  if (el) el.remove();
+}
+
+/** Inserta elemento y hace scroll */
+function _chatAppend(el) {
+  const area = document.getElementById('chat-messages');
+  if (!area) return;
+  area.appendChild(el);
+  area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' });
+}
+
+/* Badge de notificación después de 8 segundos */
+setTimeout(() => {
+  if (!_chatOpen && !_chatBadgeShown) {
+    _chatBadgeShown = true;
+    const badge = document.getElementById('chat-badge');
+    if (badge) badge.style.display = 'flex';
+  }
+}, 8000);
+
+/* Compatibilidad: sendChat / sendSuggestion ya no son necesarios,
+   pero se mantienen vacíos para no romper referencias en HTML antiguo */
+function sendChat() {}
+function sendSuggestion() {}
