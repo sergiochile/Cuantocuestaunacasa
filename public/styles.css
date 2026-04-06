@@ -65,6 +65,13 @@ body  {
   font-size: 12px;
   color: var(--suave);
 }
+.nav-link {
+  font-size: 13px;
+  color: var(--suave);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.nav-link:hover { color: var(--negro); }
 .dot-live {
   width: 6px;
   height: 6px;
