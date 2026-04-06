@@ -1811,3 +1811,149 @@ button.bypass-card {
   font-size       : 32px;
   border-radius   : 8px 8px 0 0;
 }
+
+
+/* ══════════════════════════════════════════════════════════════
+   TAB EMPLEOS 2026–2030
+   ══════════════════════════════════════════════════════════════ */
+
+.emp-kicker {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--suave2);
+  margin-bottom: .4rem;
+}
+
+.emp-acordeon {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 1.75rem;
+}
+
+.emp-item {
+  border: 1.5px solid var(--borde);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.emp-item[open] { border-color: var(--negro); }
+
+.emp-resumen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  background: var(--blanco);
+  transition: background .15s;
+}
+.emp-resumen::-webkit-details-marker { display: none; }
+.emp-resumen::marker { display: none; }
+.emp-resumen:hover { background: var(--fondo); }
+.emp-item[open] > .emp-resumen { background: var(--fondo); border-bottom: 1px solid var(--borde); }
+
+.emp-ico { font-size: 1.4rem; flex-shrink: 0; line-height: 1; }
+
+.emp-info { flex: 1; min-width: 0; }
+
+.emp-nombre {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--negro);
+  line-height: 1.2;
+  display: block;
+}
+
+.emp-sueldo-rango { font-size: 12px; color: var(--suave); margin-top: 3px; display: block; }
+
+.emp-chevron {
+  font-size: 11px;
+  color: var(--suave2);
+  flex-shrink: 0;
+  transition: transform .2s;
+}
+.emp-item[open] .emp-chevron { transform: rotate(180deg); }
+
+.emp-contenido { padding: 1rem 1.25rem 1.25rem; }
+
+.emp-roles-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--suave);
+  margin-bottom: .5rem;
+}
+
+.emp-roles {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.emp-roles li {
+  font-size: 13.5px;
+  color: var(--texto);
+  padding-left: .9rem;
+  position: relative;
+  line-height: 1.5;
+}
+.emp-roles li::before { content: '–'; position: absolute; left: 0; color: var(--suave2); }
+
+.emp-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: .75rem;
+  border-top: 1px dashed var(--borde);
+}
+
+.emp-regiones-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--suave2);
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.emp-vivienda {
+  width: 100%;
+  margin-top: .4rem;
+  padding: 8px 12px;
+  background: var(--fondo);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--suave);
+  line-height: 1.6;
+}
+.emp-vivienda strong { color: var(--verde); }
+
+.emp-cierre {
+  border: 1.5px solid var(--negro);
+  border-radius: 14px;
+  padding: 1.2rem 1.4rem;
+}
+.emp-cierre-titulo {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--negro);
+  margin-bottom: .5rem;
+}
+.emp-cierre-texto { font-size: 13.5px; color: var(--suave); line-height: 1.8; }
+.emp-cierre-texto strong { color: var(--negro); }
+
+@media (max-width: 620px) {
+  .emp-nombre { font-size: .92rem; }
+  .emp-sueldo-rango { font-size: 11px; }
+}

@@ -1,0 +1,423 @@
+<!-- ══════════════════════════════════════════════════════════════
+     SECCIÓN EDITORIAL: Empleos con mayor futuro en Chile 2026–2030
+     Integración: pegar dentro de <main> o como nueva pantalla.
+     Requiere: styles.css del sitio (variables CSS ya definidas).
+     ══════════════════════════════════════════════════════════════ -->
+
+<style>
+/* ── SECCIÓN EMPLEOS ──────────────────────────────────────── */
+
+.emp-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 4rem;
+}
+
+/* Encabezado editorial */
+.emp-kicker {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--suave2);
+  margin-bottom: .5rem;
+}
+
+.emp-intro {
+  font-size: 15px;
+  color: var(--suave);
+  line-height: 1.75;
+  margin-bottom: 2rem;
+}
+
+/* ── Acordeón ─────────────────────────────────────────────── */
+
+.emp-acordeon {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 2rem;
+}
+
+.emp-item {
+  border: 1.5px solid var(--borde);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.emp-item[open] {
+  border-color: var(--negro);
+}
+
+.emp-resumen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  background: var(--blanco);
+  transition: background .15s;
+}
+
+/* Ocultar flecha nativa del navegador */
+.emp-resumen::-webkit-details-marker { display: none; }
+.emp-resumen::marker                 { display: none; }
+
+.emp-resumen:hover {
+  background: var(--fondo);
+}
+
+.emp-item[open] > .emp-resumen {
+  background: var(--fondo);
+  border-bottom: 1px solid var(--borde);
+}
+
+.emp-ico {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.emp-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.emp-nombre {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  font-weight: 300;
+  color: var(--negro);
+  line-height: 1.2;
+  display: block;
+}
+
+.emp-sueldo-rango {
+  font-size: 12px;
+  color: var(--suave);
+  margin-top: 3px;
+  display: block;
+}
+
+.emp-chevron {
+  font-size: 11px;
+  color: var(--suave2);
+  flex-shrink: 0;
+  transition: transform .2s;
+  line-height: 1;
+}
+
+.emp-item[open] .emp-chevron {
+  transform: rotate(180deg);
+}
+
+/* ── Contenido del ítem ───────────────────────────────────── */
+
+.emp-contenido {
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.emp-roles-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--suave);
+  margin-bottom: .6rem;
+}
+
+.emp-roles {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.emp-roles li {
+  font-size: 13.5px;
+  color: var(--texto);
+  padding-left: .9rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.emp-roles li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: var(--suave2);
+}
+
+/* Pie del ítem: regiones + nota de vivienda */
+
+.emp-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: .85rem;
+  border-top: 1px dashed var(--borde);
+}
+
+.emp-regiones-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--suave2);
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.emp-vivienda {
+  width: 100%;
+  margin-top: .5rem;
+  padding: 9px 12px;
+  background: var(--fondo);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--suave);
+  line-height: 1.6;
+}
+
+.emp-vivienda strong {
+  color: var(--verde);
+}
+
+/* ── Cierre editorial ─────────────────────────────────────── */
+
+.emp-cierre {
+  border: 1.5px solid var(--negro);
+  border-radius: 14px;
+  padding: 1.3rem 1.5rem;
+}
+
+.emp-cierre-titulo {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--negro);
+  margin-bottom: .6rem;
+}
+
+.emp-cierre-texto {
+  font-size: 13.5px;
+  color: var(--suave);
+  line-height: 1.8;
+}
+
+.emp-cierre-texto strong {
+  color: var(--negro);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+
+@media (max-width: 620px) {
+  .emp-wrap    { padding: 1.75rem 1.25rem 3rem; }
+  .emp-nombre  { font-size: .95rem; }
+  .emp-sueldo-rango { font-size: 11px; }
+}
+</style>
+
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SECCIÓN: Empleos con mayor futuro en Chile (2026–2030)  -->
+<!-- ════════════════════════════════════════════════════════ -->
+
+<section class="emp-wrap" aria-labelledby="emp-titulo">
+
+  <!-- Encabezado -->
+  <p class="emp-kicker">Editorial · Mercado laboral</p>
+  <h2 class="titulo-grande titulo-grande--sm" id="emp-titulo">
+    Empleos con mayor <em>futuro en Chile</em><br>2026–2030
+  </h2>
+  <p class="emp-intro">
+    Algunos sectores concentran la mayor demanda de trabajadores calificados para esta
+    década — y con ello, los sueldos más competitivos. Conocer ese panorama sirve para
+    planificar la carrera y, en paralelo, entender qué tipo de vivienda es alcanzable
+    con lo que ganas hoy o con lo que podrías ganar mañana.
+  </p>
+
+  <!-- ── Acordeón ── -->
+  <div class="emp-acordeon">
+
+    <!-- 1. Tecnología y Datos -->
+    <details class="emp-item">
+      <summary class="emp-resumen">
+        <span class="emp-ico">💻</span>
+        <div class="emp-info">
+          <span class="emp-nombre">Tecnología y Datos</span>
+          <span class="emp-sueldo-rango">$1.200.000 – $3.000.000 / mes</span>
+        </div>
+        <span class="emp-chevron">▾</span>
+      </summary>
+      <div class="emp-contenido">
+        <p class="emp-roles-label">Roles con mayor demanda</p>
+        <ul class="emp-roles">
+          <li>Desarrollador/a de software (frontend, backend, fullstack)</li>
+          <li>Analista e ingeniero/a de datos</li>
+          <li>Especialista en ciberseguridad</li>
+          <li>Soporte TI avanzado y administración de sistemas</li>
+        </ul>
+        <div class="emp-footer">
+          <span class="emp-regiones-label">Regiones</span>
+          <span class="pill pill-azul">RM</span>
+          <span class="pill pill-azul">Valparaíso</span>
+          <span class="pill pill-azul">Biobío</span>
+          <span class="emp-vivienda">
+            <strong>Vivienda alcanzable:</strong> Con $1.800.000/mes puedes pagar un dividendo de hasta ~$540.000
+            (30% del sueldo). Eso alcanza para financiar viviendas de 3.000–4.500 UF en regiones,
+            o un departamento usado en Santiago combinando ahorro y subsidio.
+          </span>
+        </div>
+      </div>
+    </details>
+
+    <!-- 2. Salud y Cuidados -->
+    <details class="emp-item">
+      <summary class="emp-resumen">
+        <span class="emp-ico">🏥</span>
+        <div class="emp-info">
+          <span class="emp-nombre">Salud y Cuidados</span>
+          <span class="emp-sueldo-rango">$700.000 – $2.500.000 / mes</span>
+        </div>
+        <span class="emp-chevron">▾</span>
+      </summary>
+      <div class="emp-contenido">
+        <p class="emp-roles-label">Roles con mayor demanda</p>
+        <ul class="emp-roles">
+          <li>Enfermero/a (hospitalario, clínico, atención primaria)</li>
+          <li>TENS — Técnico en Enfermería de Nivel Superior</li>
+          <li>Kinesiólogo/a</li>
+          <li>Psicólogo/a</li>
+          <li>Cuidador/a de adultos mayores</li>
+        </ul>
+        <div class="emp-footer">
+          <span class="emp-regiones-label">Regiones</span>
+          <span class="pill pill-verde">Todo Chile</span>
+          <span class="emp-vivienda">
+            <strong>Vivienda alcanzable:</strong> Los sueldos de entrada ($700.000–$900.000/mes) califican para
+            subsidios DS49 o DS1 Tramo 1 del MINVU. Con ingresos sobre $1.200.000 se abren opciones
+            en ciudades medianas sin depender del subsidio.
+          </span>
+        </div>
+      </div>
+    </details>
+
+    <!-- 3. Minería, Energía y Transición Verde -->
+    <details class="emp-item">
+      <summary class="emp-resumen">
+        <span class="emp-ico">⚡</span>
+        <div class="emp-info">
+          <span class="emp-nombre">Minería, Energía y Transición Verde</span>
+          <span class="emp-sueldo-rango">$1.000.000 – $3.500.000 / mes</span>
+        </div>
+        <span class="emp-chevron">▾</span>
+      </summary>
+      <div class="emp-contenido">
+        <p class="emp-roles-label">Roles con mayor demanda</p>
+        <ul class="emp-roles">
+          <li>Técnico/a industrial y de procesos</li>
+          <li>Operador/a minero</li>
+          <li>Ingeniero/a eléctrico y mecánico</li>
+          <li>Prevencionista de riesgos</li>
+          <li>Técnico/a en energías renovables (solar, eólica, hidrógeno verde)</li>
+        </ul>
+        <div class="emp-footer">
+          <span class="emp-regiones-label">Regiones</span>
+          <span class="pill pill-amarillo">Antofagasta</span>
+          <span class="pill pill-amarillo">Atacama</span>
+          <span class="pill pill-amarillo">Tarapacá</span>
+          <span class="pill pill-amarillo">Magallanes</span>
+          <span class="emp-vivienda">
+            <strong>Vivienda alcanzable:</strong> El costo de vivienda en estas regiones es notoriamente
+            más bajo que en Santiago. Con $1.500.000/mes es posible financiar viviendas de hasta
+            2.500–3.000 UF sin subsidio adicional.
+          </span>
+        </div>
+      </div>
+    </details>
+
+    <!-- 4. Logística, Transporte y Comercio -->
+    <details class="emp-item">
+      <summary class="emp-resumen">
+        <span class="emp-ico">🚚</span>
+        <div class="emp-info">
+          <span class="emp-nombre">Logística, Transporte y Comercio</span>
+          <span class="emp-sueldo-rango">$650.000 – $1.800.000 / mes</span>
+        </div>
+        <span class="emp-chevron">▾</span>
+      </summary>
+      <div class="emp-contenido">
+        <p class="emp-roles-label">Roles con mayor demanda</p>
+        <ul class="emp-roles">
+          <li>Controlador/a de inventarios y bodega</li>
+          <li>Especialista en logística y supply chain</li>
+          <li>Conductor/a profesional (carga, transporte de pasajeros)</li>
+          <li>Supervisor/a de operaciones</li>
+        </ul>
+        <div class="emp-footer">
+          <span class="emp-regiones-label">Regiones</span>
+          <span class="pill pill-azul">RM</span>
+          <span class="pill pill-azul">Valparaíso</span>
+          <span class="pill pill-azul">Biobío</span>
+          <span class="emp-vivienda">
+            <strong>Vivienda alcanzable:</strong> Los sueldos de entrada ($650.000–$800.000/mes) requieren
+            codeudor o subsidio para acceder a crédito hipotecario. A partir de $1.200.000 la
+            ecuación mejora, especialmente en ciudades fuera de Santiago.
+          </span>
+        </div>
+      </div>
+    </details>
+
+    <!-- 5. Construcción e Infraestructura -->
+    <details class="emp-item">
+      <summary class="emp-resumen">
+        <span class="emp-ico">🏗️</span>
+        <div class="emp-info">
+          <span class="emp-nombre">Construcción e Infraestructura</span>
+          <span class="emp-sueldo-rango">$700.000 – $2.200.000 / mes</span>
+        </div>
+        <span class="emp-chevron">▾</span>
+      </summary>
+      <div class="emp-contenido">
+        <p class="emp-roles-label">Roles con mayor demanda</p>
+        <ul class="emp-roles">
+          <li>Técnico/a en construcción</li>
+          <li>Maestro/a especializado (gasfíter, electricista, pintor)</li>
+          <li>Instalador/a eléctrico y sanitario</li>
+          <li>Ingeniero/a y constructor/a civil</li>
+        </ul>
+        <div class="emp-footer">
+          <span class="emp-regiones-label">Regiones</span>
+          <span class="pill pill-verde">Todo Chile</span>
+          <span class="emp-vivienda">
+            <strong>Vivienda alcanzable:</strong> Un maestro especializado con $1.000.000/mes puede optar
+            al DS1 Tramo 1 o usar FOGAES para reducir el pie al 10% en viviendas bajo 4.500 UF.
+            El sector también permite acceder a proyectos SERVIU con condiciones especiales.
+          </span>
+        </div>
+      </div>
+    </details>
+
+  </div><!-- /emp-acordeon -->
+
+
+  <!-- ── Cierre editorial ── -->
+  <div class="emp-cierre">
+    <p class="emp-cierre-titulo">Ingreso y vivienda: la ecuación real</p>
+    <p class="emp-cierre-texto">
+      La regla que usan los bancos es simple: <strong>el dividendo mensual no debe superar el 30% del sueldo líquido.</strong>
+      Con el sueldo mediano chileno de $611.162 (INE ESI 2024), el dividendo máximo es ~$183.000 al mes —
+      insuficiente para financiar cualquier vivienda sin subsidio estatal.
+      Si tu sueldo está en los rangos medios o altos de los sectores listados, la ecuación cambia
+      sustancialmente. <strong>Ingresa tus datos en la calculadora y ve cuánto puedes comprar hoy.</strong>
+    </p>
+  </div>
+
+</section>
+<!-- /SECCIÓN EMPLEOS -->
