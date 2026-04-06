@@ -142,11 +142,16 @@ Agregar entrada:
 
 ## Criterios de éxito
 
-- Google Search Console muestra `/faq` indexada en < 2 semanas tras deploy
-- FAQ rich results visibles en Google para al menos 3 queries de la lista de preguntas
-- HowTo snippet aparece para "cómo comprar casa Chile" o variantes
-- Sin errores de schema en Google Rich Results Test
-- El link "Preguntas frecuentes" aparece en el nav en todas las pantallas
+| Criterio | Probabilidad | Nota |
+|---|---|---|
+| `/faq` indexada en < 2 semanas | Alta | Depende de crawl budget y sitemap |
+| Sin errores en Rich Results Test | Alta | Validable antes de deploy |
+| Breadcrumbs visibles en SERP | Alta | Schema bien formado es suficiente |
+| Link FAQ visible en nav | Garantizado | Cambio de código directo |
+| FAQ rich results visibles | Parcial / intermitente | Google es selectivo; no garantizado |
+| HowTo snippet visible | Depende | Requiere visibilidad HTML de los pasos; Google no siempre activa |
+
+Los dos últimos están fuera de nuestro control directo — el código los habilita, pero Google decide si los muestra.
 
 ---
 
