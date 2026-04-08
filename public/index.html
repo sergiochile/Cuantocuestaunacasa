@@ -3501,16 +3501,69 @@ function irAEmpleos(){
       if(typeof irAEmpleos==='function') irAEmpleos(); else location.href='/empleos';
     }
   }
-  window.addEventListener('DOMContentLoaded',function(){
+  function ensureBypassCard(){
+    const grids=[...document.querySelectorAll('.bypass-grid')];
+    const cardsHtml=`
+      <div class="bypass-card" data-main-action="ir-bencinazo" role="button" tabindex="0" aria-label="Calcular impacto del bencinazo">
+        <div class="bypass-card-ico">⛽</div>
+        <div class="bypass-card-titulo">Bencinazo</div>
+        <div class="bypass-card-sub">Impacto en tu sueldo</div>
+      </div>
+      <div class="bypass-card" data-main-action="ir-empleos" role="button" tabindex="0" aria-label="Explorar proyeccion de empleos">
+        <div class="bypass-card-ico">💼</div>
+        <div class="bypass-card-titulo">Empleos 2026</div>
+        <div class="bypass-card-sub">Sueldo y demanda por rubro</div>
+      </div>`;
+    grids.forEach(grid=>{
+      if(!grid) return;
+      if(!grid.querySelector('[data-main-action="ir-bencinazo"]')) grid.insertAdjacentHTML('beforeend',cardsHtml);
+      else if(!grid.querySelector('[data-main-action="ir-empleos"]')) {
+        grid.insertAdjacentHTML('beforeend',`
+          <div class="bypass-card" data-main-action="ir-empleos" role="button" tabindex="0" aria-label="Explorar proyeccion de empleos">
+            <div class="bypass-card-ico">💼</div>
+            <div class="bypass-card-titulo">Empleos 2026</div>
+            <div class="bypass-card-sub">Sueldo y demanda por rubro</div>
+          </div>
+        `);
+      }
+    });
+    const side=document.querySelector('.side-explore');
+    if(side&&!side.querySelector('[data-main-action="ir-bencinazo"]')){
+      side.insertAdjacentHTML('beforeend',`
+        <div class="bypass-card" data-main-action="ir-bencinazo" role="button" tabindex="0" aria-label="Calcular impacto del bencinazo">
+          <div class="bypass-card-ico">⛽</div>
+          <div><div class="bypass-card-titulo">Bencinazo</div><div class="bypass-card-sub">Impacto en tu sueldo</div></div>
+        </div>
+      `);
+    }
+    if(side&&!side.querySelector('[data-main-action="ir-empleos"]')){
+      side.insertAdjacentHTML('beforeend',`
+        <div class="bypass-card" data-main-action="ir-empleos" role="button" tabindex="0" aria-label="Explorar proyeccion de empleos">
+          <div class="bypass-card-ico">💼</div>
+          <div><div class="bypass-card-titulo">Empleos 2026</div><div class="bypass-card-sub">Sueldo y demanda por rubro</div></div>
+        </div>
+      `);
+    }
+  }
+  function initExplorerEnhancements(){
     const sel=findExplorerSelect();
     ensureOption(sel,'/bencinazo','⛽ Bencinazo');
     ensureOption(sel,'/empleos','💼 Empleos');
+    ensureBypassCard();
     if(sel){
       sel.addEventListener('change',function(){
         route(sel.value);
       });
     }
-  });
+    document.addEventListener('click',function(e){
+      const card=e.target.closest('[data-main-action="ir-empleos"]');
+      if(!card) return;
+      if(typeof irAEmpleos==='function') irAEmpleos();
+      else route('/empleos');
+    });
+  }
+  if(document.readyState==='loading') window.addEventListener('DOMContentLoaded',initExplorerEnhancements);
+  else initExplorerEnhancements();
 })();
 </script>
 <footer style="border-top:1px solid #E5E5E5;padding:1.75rem 2rem;text-align:center;font-size:12px;color:#888;font-family:'DM Sans',sans-serif;margin-top:2rem">
