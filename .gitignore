@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Backups y archivos temporales
+*.original.html
+*predeploy-backup*
+_fix.py
+
+# Python
+__pycache__/
+*.pyc

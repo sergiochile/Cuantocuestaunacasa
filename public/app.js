@@ -338,32 +338,158 @@ function _mostrarUF(valor) {
     valor.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+/* ── ROUTER (path + hash) ────────────────────────────────────
+   Las 4 pantallas laterales usan rutas limpias (/region, etc.)
+   Las pantallas del wizard siguen usando hashes (#paso-2, etc.)
+   Uso:
+     Router.navigate('/bancos')        → cambia URL + activa screen
+     Router.navigate('#resultados')    → ídem para wizard
+     Router.replace('/region')         → reemplaza entrada history
+     Router.init()                     → lee URL inicial y navega
+   ─────────────────────────────────────────────────────────── */
+const Router = (() => {
+  /** Tabla de rutas: clave → { screen, wizard, tab } */
+  const ROUTES = {
+    // ── Wizard (hash-based) ──────────────────────────────────
+    '':               { screen: 'screen-1',         wizard: true,  tab: null },
+    '#inicio':        { screen: 'screen-1',         wizard: true,  tab: null },
+    '#paso-2':        { screen: 'screen-2',         wizard: true,  tab: null },
+    '#resultados':    { screen: 'screen-3',         wizard: true,  tab: 'tab-analisis' },
+    '#tab-analisis':  { screen: 'screen-3',         wizard: true,  tab: 'tab-analisis' },
+    '#tab-subsidios': { screen: 'screen-3',         wizard: true,  tab: 'tab-subsidios' },
+    '#tab-arrendar':  { screen: 'screen-3',         wizard: true,  tab: 'tab-arrendar' },
+    '#tab-regiones':  { screen: 'screen-3',         wizard: true,  tab: 'tab-regiones' },
+    '#tab-bancos':    { screen: 'screen-3',         wizard: true,  tab: 'tab-bancos' },
+    // ── Pantallas laterales (path-based) ─────────────────────
+    '/region':             { screen: 'screen-regiones',  wizard: false, tab: null },
+    '/arrendar-vs-comprar':{ screen: 'screen-arrendar',  wizard: false, tab: null },
+    '/bancos':             { screen: 'screen-bancos',     wizard: false, tab: null },
+    '/bencinazo':          { screen: 'screen-bencinazo',  wizard: false, tab: null },
+    // ── Aliases legacy (hashes anteriores) ───────────────────
+    '#regiones':      { screen: 'screen-regiones',  wizard: false, tab: null },
+    '#arrendar':      { screen: 'screen-arrendar',  wizard: false, tab: null },
+    '#subsidios':     { screen: 'screen-subsidios', wizard: false, tab: null },
+  };
+
+  /** Activa la pantalla y tab indicados en la ruta, SIN tocar history */
+  function _applyRoute(route) {
+    // Ocultar todas las screens
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('activa'));
+    const target = document.getElementById(route.screen);
+    if (!target) return;
+    target.classList.add('activa');
+
+    // Wizard steps
+    const wz = document.querySelector('.wizard-steps');
+    if (wz) wz.style.display = route.wizard ? '' : 'none';
+
+    if (route.wizard) {
+      const n = route.screen === 'screen-1' ? 1
+              : route.screen === 'screen-2' ? 2
+              : route.screen === 'screen-3' ? 3 : 1;
+      [1, 2, 3].forEach(i => {
+        const it = document.getElementById('ws' + i);
+        if (!it) return;
+        it.classList.remove('activo', 'done');
+        it.removeAttribute('aria-current');
+        if (i < n)        { it.classList.add('done'); }
+        else if (i === n) { it.classList.add('activo'); it.setAttribute('aria-current', 'step'); }
+      });
+      [1, 2].forEach(i => {
+        const ln = document.getElementById('ws-l' + i);
+        if (ln) ln.classList.toggle('done', i < n);
+      });
+    }
+
+    // Tab opcional (solo en screen-3)
+    if (route.tab) {
+      const screen3 = document.getElementById('screen-3');
+      if (screen3) {
+        screen3.querySelectorAll('[data-tab]').forEach(b => {
+          const active = b.dataset.tab === route.tab;
+          b.classList.toggle('activo', active);
+          b.setAttribute('aria-selected', active ? 'true' : 'false');
+          b.setAttribute('tabindex', active ? '0' : '-1');
+        });
+        screen3.querySelectorAll('[data-tab-panel]').forEach(p => {
+          p.classList.toggle('activo', p.dataset.tabPanel === route.tab || p.id === route.tab);
+        });
+      }
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    requestAnimationFrame(() => {
+      const h = target.querySelector('h1, h2, .sub-hero-title');
+      if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+    });
+  }
+
+  /** Devuelve la clave de ROUTES desde la URL actual (path o hash) */
+  function _keyFromLocation() {
+    const path = window.location.pathname;
+    const hash = window.location.hash;
+    // Path-based tiene prioridad (pantallas laterales)
+    if (ROUTES[path]) return path;
+    // Fallback hash (wizard)
+    if (ROUTES[hash]) return hash;
+    return '';
+  }
+
+  /** Navega a una clave (path '/bancos' o hash '#paso-2') actualizando history */
+  function navigate(key) {
+    const route = ROUTES[key] || ROUTES[''];
+    // Si la clave empieza con '/' es path, sino hash
+    history.pushState({ key }, '', key || '/');
+    _applyRoute(route);
+  }
+
+  /** Reemplaza la entrada actual de history (sin agregar una nueva) */
+  function replace(key) {
+    const route = ROUTES[key] || ROUTES[''];
+    history.replaceState({ key }, '', key || '/');
+    _applyRoute(route);
+  }
+
+  /** Lee la URL actual y aplica la ruta correspondiente */
+  function init() {
+    const key = _keyFromLocation();
+    const route = ROUTES[key] || ROUTES[''];
+    // Normalizar: si el path no existe en tabla y no es '/', volver a raíz
+    if (!ROUTES[key] && window.location.pathname !== '/') {
+      history.replaceState({}, '', '/');
+    }
+    _applyRoute(route);
+  }
+
+  // Manejar botón atrás/adelante del navegador
+  window.addEventListener('popstate', () => {
+    const key = _keyFromLocation();
+    const route = ROUTES[key] || ROUTES[''];
+    _applyRoute(route);
+    // Pantallas que necesitan re-render al volver
+    if (route.screen === 'screen-3') {
+      if (typeof calcular === 'function') calcular();
+      if (typeof renderDesigualdad === 'function') renderDesigualdad();
+    }
+    if (route.screen === 'screen-regiones') {
+      if (typeof renderPublicRegiones === 'function') renderPublicRegiones();
+    }
+    if (route.screen === 'screen-subsidios') {
+      if (typeof checkSubsidiosRapido === 'function') checkSubsidiosRapido();
+    }
+  });
+
+  return { navigate, replace, init, ROUTES };
+})();
+
 /* ── WIZARD ─────────────────────────────────────────────────── */
 
 function showScreen(n) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('activa'));
-  const target = document.getElementById('screen-' + n);
-  target.classList.add('activa');
-
-  [1, 2, 3].forEach(i => {
-    const it = document.getElementById('ws' + i);
-    it.classList.remove('activo', 'done');
-    it.removeAttribute('aria-current');
-    if (i < n)       { it.classList.add('done'); }
-    else if (i === n) { it.classList.add('activo'); it.setAttribute('aria-current', 'step'); }
-  });
-  [1, 2].forEach(i =>
-    document.getElementById('ws-l' + i).classList.toggle('done', i < n)
-  );
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  requestAnimationFrame(() => {
-    const h = target.querySelector('h1, h2');
-    if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
-  });
+  const hashMap = { 1: '', 2: '#paso-2', 3: '#resultados' };
+  Router.navigate(hashMap[n] ?? '');
 }
 
-function irAPaso1() { showScreen(1); }
+function irAPaso1() { Router.navigate(''); }
 
 function irAPaso2() {
   const sueldo = parseCLP('sueldo');
@@ -386,11 +512,11 @@ function irAPaso2() {
   const r2 = document.getElementById('region');
   if (r1 && r2) r2.value = r1.value;
 
-  showScreen(2);
+  Router.navigate('#paso-2');
 }
 
 function irAResultados() {
-  showScreen(3);
+  Router.navigate('#resultados');
   calcular();
   renderDesigualdad();
   const sl = document.getElementById('arriendo-slider');
@@ -1277,14 +1403,42 @@ function renderFraseImpacto(sueldo, pct, pieClp, aniosPie, precioClp, regionNomb
 
   textoEl.innerHTML = frase;
 
-  const url      = encodeURIComponent(window.location.href);
-  const tweetTxt = pct <= 30
-    ? `Con mi sueldo puedo comprar un departamento en ${regionNombre} y el dividendo sería el ${pct.toFixed(0)}% de mis ingresos. Calculé en:`
+  const aniosPieTxt = Math.max(1, Math.ceil(aniosPie || 0));
+  const shareMsg = pct <= 30
+    ? `Mi resultado: si puedo comprar vivienda en ${regionNombre}. El dividendo seria ${pct.toFixed(0)}% de mi sueldo.`
     : pct <= 50
-      ? `Necesito ${Math.ceil(aniosPie)} años para juntar el pie de un departamento en ${regionNombre} 🏠 Calculé mi realidad en:`
-      : `El dividendo de un depto en ${regionNombre} sería el ${pct.toFixed(0)}% de mi sueldo. La crisis habitacional es real. Calculé en:`;
-  document.getElementById('btn-tw').href =
-    `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetTxt)}&url=${url}`;
+      ? `Mi resultado: necesito ${aniosPieTxt} anos para juntar el pie en ${regionNombre}.`
+      : `Mi resultado: hoy no me alcanza para comprar en ${regionNombre}. El dividendo seria ${pct.toFixed(0)}% de mi sueldo.`;
+  actualizarLinksShare(shareMsg);
+}
+
+function actualizarLinksShare(mensajeBase) {
+  const shareArea = document.querySelector('.share-area');
+  if (!shareArea) return;
+  const ensureBtn = (id, label) => {
+    let el = document.getElementById(id);
+    if (el) return el;
+    el = document.createElement('a');
+    el.id = id;
+    el.className = 'btn-share';
+    el.target = '_blank';
+    el.rel = 'noopener noreferrer';
+    el.textContent = label;
+    const copyBtn = shareArea.querySelector('.btn-share-copy');
+    if (copyBtn) shareArea.insertBefore(el, copyBtn);
+    else shareArea.appendChild(el);
+    return el;
+  };
+  const baseUrl = window.location.href;
+  const txt = `${mensajeBase} Calculalo en cuantocuestaunacasa.cl`;
+  const btnTw = ensureBtn('btn-tw', 'X / Twitter');
+  const btnWa = ensureBtn('btn-wa', 'WhatsApp');
+  const btnRd = ensureBtn('btn-rd', 'Reddit');
+  const btnLi = ensureBtn('btn-li', 'LinkedIn');
+  btnTw.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(txt)}&url=${encodeURIComponent(baseUrl)}`;
+  btnWa.href = `https://wa.me/?text=${encodeURIComponent(`${txt} ${baseUrl}`)}`;
+  btnRd.href = `https://www.reddit.com/submit?url=${encodeURIComponent(baseUrl)}&title=${encodeURIComponent(txt)}`;
+  btnLi.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(baseUrl)}`;
 }
 
 /* ── PROYECCIÓN DE INGRESOS ──────────────────────────────────── */
@@ -1442,6 +1596,71 @@ function copiarLink() {
   });
 }
 
+function inyectarBloqueConfianzaHome() {
+  if (document.getElementById('trust-home-bloque')) return;
+  const screen = document.getElementById('screen-1');
+  if (!screen) return;
+  const style = document.createElement('style');
+  style.id = 'trust-home-style';
+  style.textContent = `.trust-home{border:1.5px solid var(--borde);border-radius:14px;padding:1rem 1.1rem;background:var(--blanco);margin:1rem 0 1.2rem}.trust-home-tag{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--suave);margin-bottom:.45rem}.trust-home-title{font-family:'Fraunces',serif;font-size:1.1rem;line-height:1.2;color:var(--negro);margin-bottom:.45rem}.trust-home-copy{font-size:12.5px;line-height:1.65;color:var(--texto);margin-bottom:.55rem}.trust-home-list{display:flex;flex-wrap:wrap;gap:8px;margin:.2rem 0 .65rem;padding:0;list-style:none}.trust-home-list li{font-size:11px;color:var(--suave);background:var(--fondo);border:1px solid var(--borde);border-radius:999px;padding:4px 8px}.trust-home-links{display:flex;flex-wrap:wrap;gap:10px}.trust-home-links a{font-size:11px;color:var(--azul);text-decoration:none;border-bottom:1px dashed rgba(0,0,0,.2)}`;
+  document.head.appendChild(style);
+  const bloque = document.createElement('section');
+  bloque.id = 'trust-home-bloque';
+  bloque.className = 'trust-home';
+  bloque.innerHTML = `<div class="trust-home-tag">Como calculamos</div><h2 class="trust-home-title">Metodologia basada en fuentes oficiales de Chile</h2><p class="trust-home-copy">Las estimaciones usan regla bancaria de esfuerzo (25-30%), tasa referencial en UF y datos publicos para precios, ingresos y subsidios. Es una herramienta educativa y no reemplaza una evaluacion comercial del banco.</p><ul class="trust-home-list"><li>Actualizado: Abril 2026</li><li>Tasa referencial: 4.1% UF</li><li>Plazo base: 25 anos</li></ul><div class="trust-home-links"><a href="https://www.cmfchile.cl" target="_blank" rel="noopener noreferrer">CMF</a><a href="https://www.bcentral.cl" target="_blank" rel="noopener noreferrer">Banco Central</a><a href="https://www.ine.gob.cl" target="_blank" rel="noopener noreferrer">INE</a><a href="https://www.minvu.gob.cl" target="_blank" rel="noopener noreferrer">MINVU</a><a href="https://cchc.cl" target="_blank" rel="noopener noreferrer">CChC</a></div>`;
+  const intro = screen.querySelector('.sub');
+  if (intro && intro.parentNode) intro.insertAdjacentElement('afterend', bloque);
+}
+
+function inyectarNarrativaHome() {
+  const screen = document.getElementById('screen-1');
+  if (!screen || document.getElementById('narrativa-home-bloque')) return;
+  const titulo = screen.querySelector('.titulo-grande');
+  if (titulo) titulo.innerHTML = '¿<em>Puedes comprar una casa en Chile</em>?';
+  const sub = screen.querySelector('.sub');
+  if (sub) sub.textContent = 'Descubre en 30 segundos si tu sueldo y ahorro alcanzan para comprar vivienda en tu region.';
+  const style = document.createElement('style');
+  style.id = 'narrativa-home-style';
+  style.textContent = `.narrativa-home{background:linear-gradient(135deg,var(--azul) 0%,#0f172a 100%);border-radius:16px;padding:1rem 1.1rem;color:#fff;margin:0 0 1rem}.narrativa-home-kicker{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#93c5fd;margin-bottom:.35rem}.narrativa-home-copy{font-size:13px;line-height:1.6;opacity:.95}.narrativa-home-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:.85rem}.narrativa-home-stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:.55rem .6rem}.narrativa-home-stat strong{display:block;font-size:1rem;font-weight:700;color:#fff}.narrativa-home-stat span{font-size:10.5px;color:#cbd5e1;line-height:1.35}`;
+  document.head.appendChild(style);
+  const narrativa = document.createElement('section');
+  narrativa.id = 'narrativa-home-bloque';
+  narrativa.className = 'narrativa-home';
+  narrativa.innerHTML = `<div class="narrativa-home-kicker">Realidad inmobiliaria Chile 2026</div><div class="narrativa-home-copy">Ingresa tu sueldo real, ahorro y region. Te mostramos un resultado claro: si puedes comprar hoy, cuanto seria tu dividendo y cuanto tiempo te falta para el pie.</div><div class="narrativa-home-stats"><div class="narrativa-home-stat"><strong>76%</strong><span>No logra comprar vivienda con su ingreso actual</span></div><div class="narrativa-home-stat"><strong>+120%</strong><span>Subida acumulada en precios de vivienda</span></div><div class="narrativa-home-stat"><strong>23 anos</strong><span>Tiempo promedio para juntar un pie sin apoyo</span></div></div>`;
+  const wizard = screen.querySelector('.wizard-contexto, .tooltip, form, .form-card');
+  if (wizard && wizard.parentNode) wizard.insertAdjacentElement('beforebegin', narrativa);
+}
+
+function inyectarMenuAccesoRapido() {
+  if (document.getElementById('menu-acceso-rapido')) return;
+  const nav = document.querySelector('nav');
+  if (!nav || !nav.parentNode) return;
+  const style = document.createElement('style');
+  style.id = 'menu-acceso-style';
+  style.textContent = `.menu-acceso{max-width:960px;margin:0 auto;padding:.55rem 1rem .25rem;display:flex;gap:8px;flex-wrap:wrap}.menu-acceso-btn{border:1px solid var(--borde);background:var(--blanco);color:var(--texto);border-radius:999px;padding:7px 12px;font-size:12px;line-height:1;font-family:'DM Sans',sans-serif;cursor:pointer}`;
+  document.head.appendChild(style);
+  const items = [
+    { label: 'Calculadora', action: () => (typeof irAPaso1 === 'function' ? irAPaso1() : null) },
+    { label: 'Regiones', action: () => (typeof irARegiones === 'function' ? irARegiones() : null) },
+    { label: 'Bancos', action: () => (typeof irABancos === 'function' ? irABancos() : null) },
+    { label: 'Subsidios', action: () => (typeof irASubsidios === 'function' ? irASubsidios() : null) },
+    { label: 'Arrendar vs Comprar', action: () => (typeof irAArrendar === 'function' ? irAArrendar() : null) },
+    { label: 'Guia vivienda', action: () => { window.location.href = '/guia-vivienda-chile'; } },
+  ];
+  const menu = document.createElement('div');
+  menu.id = 'menu-acceso-rapido';
+  menu.className = 'menu-acceso';
+  items.forEach(it => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'menu-acceso-btn';
+    btn.textContent = it.label;
+    btn.addEventListener('click', it.action);
+    menu.appendChild(btn);
+  });
+  nav.insertAdjacentElement('afterend', menu);
+}
+
 /* ── NAVEGACIÓN: EXPLORAR ────────────────────────────────────── */
 function _ocultarWizard() {
   document.querySelector('.wizard-steps').style.display = 'none';
@@ -1450,34 +1669,27 @@ function _mostrarWizard() {
   document.querySelector('.wizard-steps').style.display = '';
 }
 function _irAScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('activa'));
-  const target = document.getElementById(id);
-  target.classList.add('activa');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  const h = target.querySelector('h1, .sub-hero-title');
-  if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+  // Mapear id de elemento a su clave de ruta (path o hash)
+  const idToKey = {
+    'screen-1':         '',
+    'screen-2':         '#paso-2',
+    'screen-3':         '#resultados',
+    'screen-regiones':  '/region',
+    'screen-arrendar':  '/arrendar-vs-comprar',
+    'screen-subsidios': '#subsidios',
+    'screen-bancos':    '/bancos',
+    'screen-bencinazo': '/bencinazo',
+  };
+  const key = idToKey[id] ?? '';
+  Router.navigate(key);
 }
 
 function volverDesdeScreen() {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('activa'));
-  const target = document.getElementById('screen-1');
-  target.classList.add('activa');
-  _mostrarWizard();
-  [1, 2, 3].forEach(i => {
-    const it = document.getElementById('ws' + i);
-    it.classList.remove('activo', 'done');
-    it.removeAttribute('aria-current');
-    if (i === 1) { it.classList.add('activo'); it.setAttribute('aria-current', 'step'); }
-  });
-  [1, 2].forEach(i => document.getElementById('ws-l' + i).classList.remove('done'));
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  const h = target.querySelector('h1');
-  if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+  Router.navigate('');
 }
 
 function irARegiones() {
-  _irAScreen('screen-regiones');
-  _ocultarWizard();
+  Router.navigate('/region');
   renderPublicRegiones();
 }
 
@@ -1563,8 +1775,7 @@ function renderPublicRegiones() {
 }
 
 function irAArrendar() {
-  _irAScreen('screen-arrendar');
-  _ocultarWizard();
+  Router.navigate('/arrendar-vs-comprar');
 }
 
 function calcPublicAVC() {
@@ -1653,12 +1864,21 @@ function calcPublicAVC() {
 function irASubsidios() {
   const v = document.getElementById('sueldo').value;
   if (v) document.getElementById('sub-sueldo').value = v;
-  _irAScreen('screen-subsidios');
-  _ocultarWizard();
+  Router.navigate('#subsidios');
   checkSubsidiosRapido();
 }
 
 function volverDesdeSubsidios() { volverDesdeScreen(); }
+
+/* ── BANCOS (pantalla pública) ───────────────────────────────── */
+function irABancos() {
+  Router.navigate('/bancos');
+}
+
+/* ── BENCINAZO (pantalla pública) ───────────────────────────── */
+function irABencinazo() {
+  Router.navigate('/bencinazo');
+}
 
 function irACalculadoraCompleta() {
   const v = parseCLP('sub-sueldo');
@@ -1667,8 +1887,7 @@ function irACalculadoraCompleta() {
   // Sincronizar al input hidden (value 'si'/'no', no .checked)
   const primeraHidden = document.getElementById('primera');
   if (primeraHidden) primeraHidden.value = p ? 'si' : 'no';
-  const btnPrimeraSync = document.getElementById('sit-btn-primera');
-  if (btnPrimeraSync) btnPrimeraSync.classList.toggle('activo', p);
+  document.getElementById('sit-btn-primera').classList.toggle('activo', p);
   volverDesdeScreen();
 }
 
@@ -1693,6 +1912,12 @@ function checkSubsidiosRapido() {
 
 /* ── INICIALIZACIÓN ──────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
+  inyectarMenuAccesoRapido();
+  inyectarNarrativaHome();
+  inyectarBloqueConfianzaHome();
+  // ── Inicializar router: leer hash URL y activar la pantalla correcta
+  Router.init();
+
   actualizarSliderArriendo();
 
   // Marcar slider de arriendo como "tocado" cuando el usuario interactúa
@@ -1750,7 +1975,8 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'ir-resultados':    irAResultados();              break;
       case 'ir-regiones':      irARegiones();                break;
       case 'ir-arrendar':      irAArrendar();                break;
-      case 'ir-bancos':        irASubsidios();               break; // placeholder → subsidios por ahora
+      case 'ir-bancos':        irABancos();                  break;
+      case 'ir-bencinazo':     irABencinazo();               break;
       case 'ir-calculadora':   irACalculadoraCompleta();     break;
       case 'volver-screen':    volverDesdeScreen();          break;
       case 'volver-subsidios': volverDesdeSubsidios();       break;
@@ -1781,6 +2007,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const panel = container.querySelector(`[data-tab-panel="${targetId}"]`)
                || document.getElementById(targetId);
     if (panel) panel.classList.add('activo');
+    // Sincronizar hash si el tab pertenece a screen-3 (resultados)
+    const screen3 = document.getElementById('screen-3');
+    if (screen3 && screen3.classList.contains('activa') && Router.ROUTES['#' + targetId]) {
+      history.replaceState({ hash: '#' + targetId }, '', '#' + targetId);
+    }
   });
 
   // ── clicks: data-sit (situación vivienda) ────────────────

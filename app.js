@@ -263,8 +263,6 @@ function formatCLP(id) {
 
 /** Formateo rápido de número entero */
 const fmt = n => Math.round(n).toLocaleString('es-CL');
-/** Formateo de UF (entero) */
-const fmtUF = n => Math.round(n).toLocaleString('es-CL');
 
 /* ── CÁLCULOS FINANCIEROS ───────────────────────────────────── */
 
@@ -424,13 +422,10 @@ function calcular() {
   const sueldo         = parseCLP('sueldo');
   const ahorroHoy      = parseCLP('ahorro');
   const codeudor       = parseCLP('codeudor');
-  const edad           = 0; // campo eliminado
   const primera        = document.getElementById('primera').checked;
   const m2             = parseFloat(document.getElementById('m2').value) || 55;
   const tasa           = parseFloat(document.getElementById('tasa').value) || 4.1;
-  const plazoIngresado = parseFloat(document.getElementById('plazo').value) || 25;
-  const plazoMaxEdad   = edad > 0 ? Math.max(75 - edad, 5) : 40;
-  const plazo          = edad > 0 ? Math.min(plazoIngresado, plazoMaxEdad) : plazoIngresado;
+  const plazo          = parseFloat(document.getElementById('plazo').value) || 25;
   const piePct         = parseFloat(document.getElementById('pie').value) || 20;
 
   const sueldoTotal = sueldo + codeudor;
@@ -506,9 +501,9 @@ function calcular() {
   document.getElementById('m-cuota').textContent      = '$' + fmt(cuota);
   document.getElementById('m-cuota-sub').textContent  = `${plazo} años · ${tasa}% tasa`;
   document.getElementById('m-precio').textContent     = '$' + fmt(precioClp);
-  document.getElementById('m-precio-uf').textContent  = fmtUF(precioUF) + ' UF total';
+  document.getElementById('m-precio-uf').textContent  = fmt(precioUF) + ' UF total';
   document.getElementById('m-pie').textContent        = '$' + fmt(pieClp);
-  document.getElementById('m-pie-sub').textContent    = `${fmtUF(pieUF)} UF · ${piePct}% del precio`;
+  document.getElementById('m-pie-sub').textContent    = `${fmt(pieUF)} UF · ${piePct}% del precio`;
   document.getElementById('m-maxcredito').textContent = '$' + fmt(maxCredClp);
   document.getElementById('m-maxcredito-sub').textContent = 'max vivienda $' + fmt(maxPrecioClp);
 
@@ -517,42 +512,34 @@ function calcular() {
   if (sueldoTotal > 0) {
     avisoAhorro.style.display = 'block';
     const falta     = pieClp - ahorroHoy;
-    const avisoEdad = (edad > 0 && plazo < plazoIngresado)
-      ? `<br>⏳ <strong>Plazo ajustado:</strong> con ${edad} años el banco te presta máximo ${plazo} años (no ${plazoIngresado}).`
-      : '';
     if (ahorroHoy >= pieClp) {
       avisoAhorro.className = 'aviso aviso-verde';
-      avisoAhorro.innerHTML = `✅ <strong>Tu ahorro cubre el pie completo</strong> y te sobran $${fmt(ahorroHoy - pieClp)}. Puedes comprar si el banco aprueba el crédito.${avisoEdad}`;
+      avisoAhorro.innerHTML = `✅ <strong>Tu ahorro cubre el pie completo</strong> y te sobran $${fmt(ahorroHoy - pieClp)}. Puedes comprar si el banco aprueba el crédito.`;
     } else if (falta > 0) {
       const mesesFalta = sueldoTotal * 0.20 > 0 ? Math.ceil(falta / (sueldoTotal * 0.20)) : 0;
       avisoAhorro.className = 'aviso aviso-neutro';
-      avisoAhorro.innerHTML = `📊 Te faltan <strong>$${fmt(falta)}</strong> para el pie. Ahorrando el 20% de tu sueldo, los juntas en aprox. <strong>${mesesFalta} meses</strong>.${avisoEdad}`;
-    } else if (avisoEdad) {
-      avisoAhorro.className = 'aviso aviso-neutro';
-      avisoAhorro.innerHTML = avisoEdad.replace('<br>', '');
+      avisoAhorro.innerHTML = `📊 Te faltan <strong>$${fmt(falta)}</strong> para el pie. Ahorrando el 20% de tu sueldo, los juntas en aprox. <strong>${mesesFalta} meses</strong>.`;
     }
   } else {
     avisoAhorro.style.display = 'none';
   }
 
   /* — Resto de bloques — */
-  const cuotaSinLimiteEdad = cuotaMensual(credito, tasa, plazoIngresado);
-  renderBloqueEdad(edad, plazoIngresado, plazo, cuota, cuotaSinLimiteEdad, sueldoTotal, precioClp, pieClp, ahorroHoy);
-
   const aniosPieCalc = (pieClp - ahorroHoy > 0 && sueldoTotal * 0.20 > 0)
     ? (pieClp - ahorroHoy) / (sueldoTotal * 0.20) / 12
     : 0;
 
-  renderFraseImpacto(sueldoTotal, pct, pieClp, aniosPieCalc, precioClp, datos.nombre, edad, plazo);
+  renderFraseImpacto(sueldoTotal, pct, pieClp, aniosPieCalc, precioClp, datos.nombre, plazo);
   renderEscenarios(precioUF, piePct, tasa, plazo, subsAplican, sueldoTotal, ahorroHoy);
   renderSubsidios(subsAplican, precioUF, tasa, plazo, ctx);
   renderArrVsCompra(precioClp, precioUF, piePct, tasa, plazo, cuota);
   renderTabla(sueldoTotal, piePct, tasa, plazo);
+  renderProyeccionIngresos(sueldoTotal, cuota);
 
   const histSubEl = document.getElementById('hist-sub');
   if (histSubEl) {
     const sfx = reg !== 'RM'
-      ? ` — En ${datos.nombre.split('/')[0].trim()}, un depto de 55 m² cuesta hoy <strong>${fmtUF(datos.depto * 55)} UF</strong> (~$${fmt(datos.depto * 55 * UF_VALOR)}).`
+      ? ` — En ${datos.nombre.split('/')[0].trim()}, un depto de 55 m² cuesta hoy <strong>${fmt(datos.depto * 55)} UF</strong> (~$${fmt(datos.depto * 55 * UF_VALOR)}).`
       : '';
     histSubEl.innerHTML = 'Referencia RM · Depto 55 m² en Santiago · Sueldos en ese período subieron ~40%' + sfx;
   }
@@ -566,64 +553,9 @@ function calcular() {
   _resultadoCalculado = true;
 }
 
-/* ── BLOQUE EDAD ─────────────────────────────────────────────── */
-function renderBloqueEdad(edad, plazoIngresado, plazo, cuota, cuotaSinLimite, sueldoTotal, precioClp, pieClp, ahorroHoy) {
-  const bloque = document.getElementById('bloque-edad');
-  if (!bloque) return;
-  if (edad <= 0) { bloque.style.display = 'none'; return; }
-  bloque.style.display = 'block';
-
-  const edadFin        = edad + plazo;
-  const aniosPagoFin   = new Date().getFullYear() + plazo;
-  const plazoLimitado  = plazo < plazoIngresado;
-  const pct            = sueldoTotal > 0 ? cuota / sueldoTotal * 100 : 0;
-  const colorPct       = pct <= 30 ? 'verde' : pct <= 50 ? 'amarillo' : 'rojo';
-
-  document.getElementById('edad-subtitulo').textContent =
-    `Tienes ${edad} años · plazo máximo del banco: ${plazo} años (hasta ~75, varía por banco)`;
-
-  document.getElementById('edad-metricas').innerHTML = `
-    <div class="edad-metrica">
-      <div class="edad-metrica-label">Terminas de pagar</div>
-      <div class="edad-metrica-valor ${edadFin >= 65 ? 'rojo' : edadFin >= 55 ? 'amarillo' : 'verde'}">${edadFin} años</div>
-      <div class="edad-metrica-sub">Año ${aniosPagoFin}</div>
-    </div>
-    <div class="edad-metrica">
-      <div class="edad-metrica-label">Plazo disponible</div>
-      <div class="edad-metrica-valor ${plazoLimitado ? 'amarillo' : 'verde'}">${plazo} años</div>
-      <div class="edad-metrica-sub">${plazoLimitado ? `Reducido desde ${plazoIngresado}` : 'Sin restricción'}</div>
-    </div>
-    <div class="edad-metrica">
-      <div class="edad-metrica-label">Cuota mensual</div>
-      <div class="edad-metrica-valor ${colorPct}">$${fmt(cuota)}</div>
-      <div class="edad-metrica-sub">${pct.toFixed(1)}% de tu sueldo</div>
-    </div>`;
-
-  let txt = '';
-  if (plazoLimitado) {
-    const dif = cuota - cuotaSinLimite;
-    txt += `⚠️ <strong>Tu edad acorta el plazo de ${plazoIngresado} a ${plazo} años.</strong> Tu cuota sube <em>$${fmt(dif)} más</em> que si pudieras pagar en ${plazoIngresado} años. `;
-  }
-  if (edadFin > 75)
-    txt += `🔴 <strong>El banco no aprobará el plazo de ${plazoIngresado} años</strong> porque tendrías ${edad + plazoIngresado} años al terminar. El plazo real queda en <em>${plazo} años</em>. `;
-  else if (edadFin >= 65)
-    txt += `🟡 Terminarías de pagar a los <strong>${edadFin} años</strong>, cerca del retiro. Considera que a esa edad tu ingreso puede bajar. `;
-  else if (edadFin <= 50)
-    txt += `✅ Terminarías de pagar a los <strong>${edadFin} años</strong>, con mucho margen financiero por delante. `;
-  else
-    txt += `Terminarías de pagar a los <strong>${edadFin} años</strong>. `;
-
-  if (ahorroHoy < pieClp && sueldoTotal > 0) {
-    const mesesParaPie   = Math.ceil((pieClp - ahorroHoy) / (sueldoTotal * 0.20));
-    const edadConPie     = edad + mesesParaPie / 12;
-    const plazoRestante  = 75 - Math.ceil(edadConPie);
-    if (plazoRestante < 15 && plazoRestante > 0)
-      txt += `📌 Si tardas <em>${Math.ceil(mesesParaPie / 12)} años</em> en juntar el pie, tendrías <strong>${plazoRestante} años</strong> para pagar — lo que subiría aún más la cuota.`;
-    else if (plazoRestante <= 0)
-      txt += `🔴 <strong>Atención:</strong> al ritmo de ahorro actual juntarías el pie a los <em>${Math.round(edadConPie)} años</em> — ya no calificarías para crédito.`;
-  }
-  if (!txt) txt = `Con ${edad} años y plazo de ${plazo} años tienes una ventana normal para este crédito.`;
-  document.getElementById('edad-veredicto').innerHTML = txt;
+/* ── BLOQUE EDAD (campo eliminado — se oculta siempre) ────────── */
+function renderBloqueEdad() {
+  document.getElementById('bloque-edad')?.style.setProperty('display', 'none');
 }
 
 /* ── ESCENARIOS ──────────────────────────────────────────────── */
@@ -1219,7 +1151,7 @@ function renderTabla(sueldoTotal, piePct, tasa, plazo) {
     return `<tr class="${k === regionActual ? 'fila-activa' : ''}">
       <td>${v.nombre}</td>
       <td style="font-size:12px">$${fmt(v[ufKey] * UF_VALOR)}<br><span style="color:var(--suave2)">${v[ufKey]} UF</span></td>
-      <td>$${fmt(clp)}<br><span style="font-size:11px;color:var(--suave)">${fmtUF(uf)} UF</span></td>
+      <td>$${fmt(clp)}<br><span style="font-size:11px;color:var(--suave)">${fmt(uf)} UF</span></td>
       <td><strong>$${fmt(div)}</strong>/mes</td>
       <td>$${fmt(pieClp)}<br><span style="font-size:11px;color:var(--suave)">${piePct}%</span></td>
       <td><span class="${pc}">${lbl}</span></td>
@@ -1320,25 +1252,21 @@ function renderArrVsCompra(precioClp, precioUF, piePct, tasa, plazo, cuota) {
 }
 
 /* ── FRASE IMPACTO ───────────────────────────────────────────── */
-function renderFraseImpacto(sueldo, pct, pieClp, aniosPie, precioClp, regionNombre, edad, plazo) {
+function renderFraseImpacto(sueldo, pct, pieClp, aniosPie, precioClp, regionNombre, plazo) {
   const fraseEl = document.getElementById('frase-impacto');
   const textoEl = document.getElementById('frase-texto');
   if (!sueldo || sueldo <= 0) { fraseEl.style.display = 'none'; return; }
   fraseEl.style.display = 'block';
 
   const sueldoFmt = '$' + fmt(sueldo);
-  const edadFin   = (edad > 0 && plazo > 0) ? edad + plazo : null;
   let frase = '';
 
   if (pct <= 30) {
     frase = `Con <em>${sueldoFmt}/mes</em>, el dividendo representa solo el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. Eres de los pocos chilenos con acceso real a vivienda propia en ${regionNombre}.`;
-    if (edadFin) frase += ` <strong>Terminarías de pagar a los ${edadFin} años.</strong>`;
   } else if (pct <= 50) {
     frase = `Con <em>${sueldoFmt}/mes</em>, destinarías el <strong>${pct.toFixed(1)}% de tu sueldo</strong> al dividendo. Quedarás con poco margen. Y para el pie aún necesitas <strong>${Math.ceil(aniosPie * 12)} meses de ahorro disciplinado</strong>.`;
-    if (edadFin) frase += ` Terminarías de pagar a los <strong>${edadFin} años</strong>.`;
   } else if (pct <= 80) {
     frase = `Con <em>${sueldoFmt}/mes</em>, el dividendo se llevaría el <strong>${pct.toFixed(1)}% de tu sueldo</strong>. El banco probablemente no lo aprobará. Necesitarías ganar <strong>el doble</strong> para calificar solo, o conseguir un codeudor.`;
-    if (edadFin) frase += ` Y terminarías pagando a los <strong>${edadFin} años</strong>.`;
   } else {
     frase = `<strong>Esta vivienda no es accesible para tu sueldo actual.</strong> El dividendo sería el <em>${pct.toFixed(1)}% de tus ingresos</em>. No es un problema tuyo: es la realidad de millones de chilenos hoy.`;
   }
@@ -1347,14 +1275,130 @@ function renderFraseImpacto(sueldo, pct, pieClp, aniosPie, precioClp, regionNomb
 
   textoEl.innerHTML = frase;
 
-  const url      = encodeURIComponent(window.location.href);
-  const tweetTxt = pct <= 30
-    ? `Con mi sueldo puedo comprar un departamento en ${regionNombre} y el dividendo sería el ${pct.toFixed(0)}% de mis ingresos. Calculé en:`
+  const aniosPieTxt = Math.max(1, Math.ceil(aniosPie || 0));
+  const shareMsg = pct <= 30
+    ? `Mi resultado: si puedo comprar vivienda en ${regionNombre}. El dividendo seria ${pct.toFixed(0)}% de mi sueldo.`
     : pct <= 50
-      ? `Necesito ${Math.ceil(aniosPie)} años para juntar el pie de un departamento en ${regionNombre} 🏠 Calculé mi realidad en:`
-      : `El dividendo de un depto en ${regionNombre} sería el ${pct.toFixed(0)}% de mi sueldo. La crisis habitacional es real. Calculé en:`;
-  document.getElementById('btn-tw').href =
-    `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetTxt)}&url=${url}`;
+      ? `Mi resultado: necesito ${aniosPieTxt} anos para juntar el pie en ${regionNombre}.`
+      : `Mi resultado: hoy no me alcanza para comprar en ${regionNombre}. El dividendo seria ${pct.toFixed(0)}% de mi sueldo.`;
+  actualizarLinksShare(shareMsg);
+}
+
+function actualizarLinksShare(mensajeBase) {
+  const shareArea = document.querySelector('.share-area');
+  if (!shareArea) return;
+
+  const ensureBtn = (id, label) => {
+    let el = document.getElementById(id);
+    if (el) return el;
+    el = document.createElement('a');
+    el.id = id;
+    el.className = 'btn-share';
+    el.target = '_blank';
+    el.rel = 'noopener noreferrer';
+    el.textContent = label;
+    const copyBtn = shareArea.querySelector('.btn-share-copy');
+    if (copyBtn) shareArea.insertBefore(el, copyBtn);
+    else shareArea.appendChild(el);
+    return el;
+  };
+
+  const baseUrl = window.location.href;
+  const txt = `${mensajeBase} Calculalo en cuantocuestaunacasa.cl`;
+
+  const btnTw = ensureBtn('btn-tw', 'X / Twitter');
+  const btnWa = ensureBtn('btn-wa', 'WhatsApp');
+  const btnRd = ensureBtn('btn-rd', 'Reddit');
+  const btnLi = ensureBtn('btn-li', 'LinkedIn');
+
+  btnTw.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(txt)}&url=${encodeURIComponent(baseUrl)}`;
+  btnWa.href = `https://wa.me/?text=${encodeURIComponent(`${txt} ${baseUrl}`)}`;
+  btnRd.href = `https://www.reddit.com/submit?url=${encodeURIComponent(baseUrl)}&title=${encodeURIComponent(txt)}`;
+  btnLi.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(baseUrl)}`;
+  btnLi.setAttribute('aria-label', 'Compartir resultado en LinkedIn');
+}
+
+/* ── PROYECCIÓN DE INGRESOS ──────────────────────────────────── */
+
+/**
+ * Renderiza la proyección de ingresos para el tab "Si crezco".
+ * Muestra cómo evoluciona la relación cuota/sueldo si el ingreso crece.
+ * @param {number} sueldoTotal - Ingreso mensual actual en CLP
+ * @param {number} cuota       - Dividendo mensual en CLP
+ */
+function renderProyeccionIngresos(sueldoTotal, cuota) {
+  const cont = document.getElementById('proyeccion-cont');
+  if (!cont || sueldoTotal <= 0) return;
+
+  // Persistir valores para cuando el usuario cambie la tasa
+  cont.dataset.sueldo = sueldoTotal;
+  cont.dataset.cuota  = cuota;
+
+  const tasas        = [3, 5, 8, 10, 15];
+  const selectedRate = parseInt(cont.dataset.tasa || '5');
+  const pctActual    = cuota / sueldoTotal * 100;
+
+  // Proyección a 10 años
+  const filas   = [];
+  let añoAcceso = null;
+  for (let año = 1; año <= 10; año++) {
+    const sueldoProy = sueldoTotal * Math.pow(1 + selectedRate / 100, año);
+    const pct        = cuota / sueldoProy * 100;
+    if (añoAcceso === null && pct <= 30) añoAcceso = año;
+    filas.push({ año, sueldo: sueldoProy, pct });
+  }
+
+  // Mensaje clave
+  let insight;
+  if (pctActual <= 30) {
+    const pct10 = filas[filas.length - 1].pct;
+    insight = `Hoy el dividendo ya está en el <strong>${pctActual.toFixed(1)}%</strong> de tu sueldo — accesible. Con <em>${selectedRate}% anual</em> de crecimiento, en 10 años bajaría al <strong>${pct10.toFixed(1)}%</strong>. Más holgura cada año.`;
+  } else if (añoAcceso !== null) {
+    const sueldoAcc = filas[añoAcceso - 1].sueldo;
+    insight = `Con <em>${selectedRate}% anual</em> de crecimiento, en <strong>${añoAcceso} año${añoAcceso > 1 ? 's' : ''}</strong> el dividendo quedaría bajo el 30% de tu sueldo. Estarías ganando <strong>$${fmt(sueldoAcc)}/mes</strong>.`;
+  } else {
+    insight = `Con <em>${selectedRate}% anual</em>, el dividendo aún supera el 30% después de 10 años. Considera codeudor, subsidio o viviendas de menor precio.`;
+  }
+
+  const pillFor = pct => {
+    if (pct <= 30) return '<span class="pill pill-verde" style="font-size:10px;padding:2px 8px">✓ Accesible</span>';
+    if (pct <= 50) return '<span class="pill pill-amarillo" style="font-size:10px;padding:2px 8px">Esfuerzo alto</span>';
+    return '<span class="pill pill-rojo" style="font-size:10px;padding:2px 8px">Difícil acceso</span>';
+  };
+
+  const selector = tasas
+    .map(t => `<button class="proy-btn${t === selectedRate ? ' activo' : ''}" onclick="cambiarTasaProyeccion(${t})">${t}% año</button>`)
+    .join('');
+
+  const hoyRow = `<tr class="proy-hoy"><td><strong>Hoy</strong></td><td>$${fmt(sueldoTotal)}</td><td>${pctActual.toFixed(1)}%</td><td>${pillFor(pctActual)}</td></tr>`;
+  const proyRows = filas.map(f =>
+    `<tr class="${f.pct <= 30 ? 'proy-ok' : ''}"><td>Año ${f.año}</td><td>$${fmt(f.sueldo)}</td><td>${f.pct.toFixed(1)}%</td><td>${pillFor(f.pct)}</td></tr>`
+  ).join('');
+
+  cont.innerHTML = `
+    <div class="proy-selector">${selector}</div>
+    <div class="proy-insight">${insight}</div>
+    <div class="proy-tabla">
+      <table>
+        <thead><tr><th>Período</th><th>Sueldo estimado</th><th>Dividendo / sueldo</th><th>Estado</th></tr></thead>
+        <tbody>${hoyRow}${proyRows}</tbody>
+      </table>
+    </div>
+    <p class="proy-nota">La proyección asume dividendo fijo y sueldo que crece a la tasa elegida de forma compuesta. No considera inflación, variación de la UF ni cambios de tasa hipotecaria.</p>`;
+}
+
+/**
+ * Cambia la tasa de crecimiento anual y re-renderiza la proyección.
+ * @param {number} tasa - Porcentaje anual de crecimiento elegido
+ */
+function cambiarTasaProyeccion(tasa) {
+  const cont = document.getElementById('proyeccion-cont');
+  if (!cont) return;
+  cont.dataset.tasa = tasa;
+  renderProyeccionIngresos(
+    parseFloat(cont.dataset.sueldo || '0'),
+    parseFloat(cont.dataset.cuota  || '0')
+  );
 }
 
 /* ── DESIGUALDAD REGIONAL ────────────────────────────────────── */
@@ -1373,7 +1417,7 @@ function renderDesigualdad() {
       return `<div class="desig-row">
         <span class="desig-nombre">${it.nombre}</span>
         <div class="desig-barra-wrap"><div class="desig-barra" style="width:${pct}%;background:${color}"></div></div>
-        <span class="desig-uf">${fmtUF(it.uf)} UF</span>
+        <span class="desig-uf">${fmt(it.uf)} UF</span>
       </div>`;
     }).join('');
 }
@@ -1427,6 +1471,138 @@ function copiarLink() {
     btn.textContent = '✅ ¡Copiado!';
     setTimeout(() => { btn.textContent = orig; }, 2200);
   });
+}
+
+/* ── BLOQUE DE CONFIANZA (HOME) ──────────────────────────────── */
+function inyectarBloqueConfianzaHome() {
+  if (document.getElementById('trust-home-bloque')) return;
+  const screen = document.getElementById('screen-1');
+  if (!screen) return;
+
+  const style = document.createElement('style');
+  style.id = 'trust-home-style';
+  style.textContent = `
+    .trust-home{border:1.5px solid var(--borde);border-radius:14px;padding:1rem 1.1rem;background:var(--blanco);margin:1rem 0 1.2rem}
+    .trust-home-tag{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--suave);margin-bottom:.45rem}
+    .trust-home-title{font-family:'Fraunces',serif;font-size:1.1rem;line-height:1.2;color:var(--negro);margin-bottom:.45rem}
+    .trust-home-copy{font-size:12.5px;line-height:1.65;color:var(--texto);margin-bottom:.55rem}
+    .trust-home-list{display:flex;flex-wrap:wrap;gap:8px;margin:.2rem 0 .65rem;padding:0;list-style:none}
+    .trust-home-list li{font-size:11px;color:var(--suave);background:var(--fondo);border:1px solid var(--borde);border-radius:999px;padding:4px 8px}
+    .trust-home-links{display:flex;flex-wrap:wrap;gap:10px}
+    .trust-home-links a{font-size:11px;color:var(--azul);text-decoration:none;border-bottom:1px dashed rgba(0,0,0,.2)}
+    .trust-home-links a:hover{color:var(--negro);border-bottom-color:var(--negro)}
+  `;
+  document.head.appendChild(style);
+
+  const bloque = document.createElement('section');
+  bloque.id = 'trust-home-bloque';
+  bloque.className = 'trust-home';
+  bloque.setAttribute('aria-label', 'Metodologia y fuentes');
+  bloque.innerHTML = `
+    <div class="trust-home-tag">Como calculamos</div>
+    <h2 class="trust-home-title">Metodologia basada en fuentes oficiales de Chile</h2>
+    <p class="trust-home-copy">Las estimaciones usan regla bancaria de esfuerzo (25-30%), tasa referencial en UF y datos publicos para precios, ingresos y subsidios. Es una herramienta educativa y no reemplaza una evaluacion comercial del banco.</p>
+    <ul class="trust-home-list">
+      <li>Actualizado: Abril 2026</li>
+      <li>Tasa referencial: 4.1% UF</li>
+      <li>Plazo base: 25 anos</li>
+    </ul>
+    <div class="trust-home-links">
+      <a href="https://www.cmfchile.cl" target="_blank" rel="noopener noreferrer">CMF</a>
+      <a href="https://www.bcentral.cl" target="_blank" rel="noopener noreferrer">Banco Central</a>
+      <a href="https://www.ine.gob.cl" target="_blank" rel="noopener noreferrer">INE</a>
+      <a href="https://www.minvu.gob.cl" target="_blank" rel="noopener noreferrer">MINVU</a>
+      <a href="https://cchc.cl" target="_blank" rel="noopener noreferrer">CChC</a>
+    </div>
+  `;
+
+  const intro = screen.querySelector('.sub');
+  if (intro && intro.parentNode) intro.insertAdjacentElement('afterend', bloque);
+  else screen.insertBefore(bloque, screen.firstChild.nextSibling || null);
+}
+
+/* ── NARRATIVA LANDING (HOME) ─────────────────────────────────── */
+function inyectarNarrativaHome() {
+  const screen = document.getElementById('screen-1');
+  if (!screen) return;
+
+  const titulo = screen.querySelector('.titulo-grande');
+  if (titulo) titulo.innerHTML = '¿<em>Puedes comprar una casa en Chile</em>?';
+
+  const sub = screen.querySelector('.sub');
+  if (sub) sub.textContent = 'Descubre en 30 segundos si tu sueldo y ahorro alcanzan para comprar vivienda en tu region.';
+  if (document.getElementById('narrativa-home-bloque')) return;
+
+  const style = document.createElement('style');
+  style.id = 'narrativa-home-style';
+  style.textContent = `
+    .narrativa-home{background:linear-gradient(135deg,var(--azul) 0%,#0f172a 100%);border-radius:16px;padding:1rem 1.1rem;color:#fff;margin:0 0 1rem}
+    .narrativa-home-kicker{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#93c5fd;margin-bottom:.35rem}
+    .narrativa-home-copy{font-size:13px;line-height:1.6;opacity:.95}
+    .narrativa-home-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:.85rem}
+    .narrativa-home-stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:.55rem .6rem}
+    .narrativa-home-stat strong{display:block;font-size:1rem;font-weight:700;color:#fff}
+    .narrativa-home-stat span{font-size:10.5px;color:#cbd5e1;line-height:1.35}
+    @media(max-width:620px){.narrativa-home-stats{grid-template-columns:1fr}}
+  `;
+  document.head.appendChild(style);
+
+  const narrativa = document.createElement('section');
+  narrativa.id = 'narrativa-home-bloque';
+  narrativa.className = 'narrativa-home';
+  narrativa.setAttribute('aria-label', 'Contexto del mercado inmobiliario en Chile');
+  narrativa.innerHTML = `
+    <div class="narrativa-home-kicker">Realidad inmobiliaria Chile 2026</div>
+    <div class="narrativa-home-copy">Ingresa tu sueldo real, ahorro y region. Te mostramos un resultado claro: si puedes comprar hoy, cuanto seria tu dividendo y cuanto tiempo te falta para el pie.</div>
+    <div class="narrativa-home-stats">
+      <div class="narrativa-home-stat"><strong>76%</strong><span>No logra comprar vivienda con su ingreso actual</span></div>
+      <div class="narrativa-home-stat"><strong>+120%</strong><span>Subida acumulada en precios de vivienda</span></div>
+      <div class="narrativa-home-stat"><strong>23 anos</strong><span>Tiempo promedio para juntar un pie sin apoyo</span></div>
+    </div>
+  `;
+
+  const wizard = screen.querySelector('.wizard-contexto, .tooltip, form, .form-card');
+  if (wizard && wizard.parentNode) wizard.insertAdjacentElement('beforebegin', narrativa);
+  else if (sub && sub.parentNode) sub.insertAdjacentElement('afterend', narrativa);
+  else screen.appendChild(narrativa);
+}
+
+/* ── MENU DE ACCESO RAPIDO ────────────────────────────────────── */
+function inyectarMenuAccesoRapido() {
+  if (document.getElementById('menu-acceso-rapido')) return;
+  const nav = document.querySelector('nav');
+  if (!nav || !nav.parentNode) return;
+
+  const style = document.createElement('style');
+  style.id = 'menu-acceso-style';
+  style.textContent = `
+    .menu-acceso{max-width:960px;margin:0 auto;padding:.55rem 1rem .25rem;display:flex;gap:8px;flex-wrap:wrap}
+    .menu-acceso-btn{border:1px solid var(--borde);background:var(--blanco);color:var(--texto);border-radius:999px;padding:7px 12px;font-size:12px;line-height:1;font-family:'DM Sans',sans-serif;cursor:pointer}
+    .menu-acceso-btn:hover{background:var(--fondo)}
+  `;
+  document.head.appendChild(style);
+
+  const items = [
+    { label: 'Calculadora', action: () => (typeof irAPaso1 === 'function' ? irAPaso1() : window.scrollTo({ top: 0, behavior: 'smooth' })) },
+    { label: 'Regiones', action: () => (typeof irARegiones === 'function' ? irARegiones() : null) },
+    { label: 'Subsidios', action: () => (typeof irASubsidios === 'function' ? irASubsidios() : null) },
+    { label: 'Arrendar vs Comprar', action: () => (typeof irAArrendar === 'function' ? irAArrendar() : null) },
+    { label: 'Mi resultado', action: () => (typeof irAResultados === 'function' ? irAResultados() : null) },
+    { label: 'Guia vivienda', action: () => { window.location.href = '/guia-vivienda-chile'; } },
+  ];
+
+  const menu = document.createElement('div');
+  menu.id = 'menu-acceso-rapido';
+  menu.className = 'menu-acceso';
+  items.forEach(it => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'menu-acceso-btn';
+    btn.textContent = it.label;
+    btn.addEventListener('click', it.action);
+    menu.appendChild(btn);
+  });
+  nav.insertAdjacentElement('afterend', menu);
 }
 
 /* ── NAVEGACIÓN: EXPLORAR ────────────────────────────────────── */
@@ -1677,6 +1853,9 @@ function checkSubsidiosRapido() {
 
 /* ── INICIALIZACIÓN ──────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
+  inyectarMenuAccesoRapido();
+  inyectarNarrativaHome();
+  inyectarBloqueConfianzaHome();
   actualizarSliderArriendo();
 
   // Marcar slider de arriendo como "tocado" cuando el usuario interactúa
