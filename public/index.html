@@ -3476,10 +3476,16 @@ function irAEmpleos(){
 (function(){
   function findExplorerSelect(){
     const sels=[...document.querySelectorAll('select')];
+    const routeHints=['/region','/arrendar-vs-comprar','/bancos','#subsidios','/bencinazo','/empleos'];
+    const byRoute=sels.find(s=>{
+      const vals=[...s.options].map(o=>String(o.value||'').trim().toLowerCase());
+      return vals.some(v=>routeHints.includes(v));
+    });
+    if(byRoute) return byRoute;
     return sels.find(s=>{
       const txt=[...s.options].map(o=>(o.textContent||'').toLowerCase()).join(' | ');
-      return /banco|tasas/.test(txt);
-    });
+      return /explorar|menu|regiones|subsidios|bancos|tasas/.test(txt);
+    }) || null;
   }
   function ensureOption(sel,value,label){
     if(!sel||[...sel.options].some(o=>o.value===value)) return;
