@@ -1,0 +1,10 @@
+# Netlify _redirects
+# Páginas legales — deben ir ANTES del fallback SPA
+/privacidad    /privacidad.html    200
+/terminos      /terminos.html      200
+
+# SPA fallback — todas las rutas apuntan a index.html (status 200)
+/*    /index.html    200
+
+# Forzar HTTPS (Netlify lo hace automáticamente, pero explícito por claridad)
+# http://cuantocuestauncasa.cl/*   https://cuantocuestauncasa.cl/:splat   301!

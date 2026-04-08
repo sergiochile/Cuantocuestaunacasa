@@ -1,0 +1,208 @@
+{
+  "fuente": "CMF Chile / calc.cl — datos al 28-03-2026",
+  "tasaPromedio": 4.35,
+  "tasaMinima": 3.39,
+  "tasaMaxima": 5.20,
+  "bancos": [
+    {
+      "id": "itau",
+      "nombre": "Banco Itaú",
+      "logo": "🟠",
+      "tasaFija": 3.39,
+      "cae": 3.65,
+      "dividendoCLP": 943200,
+      "dividendoUF": 24.50,
+      "plazoAnios": 20,
+      "montoUF": 2000,
+      "piePct": 20,
+      "badge": "mejor-tasa",
+      "comentario": "Tasa fija más baja del mercado marzo 2026. Ideal para créditos competitivos.",
+      "colorTasa": "verde"
+    },
+    {
+      "id": "falabella",
+      "nombre": "Banco Falabella",
+      "logo": "🟢",
+      "tasaFija": 3.70,
+      "cae": 3.98,
+      "dividendoCLP": 965000,
+      "dividendoUF": 25.06,
+      "plazoAnios": 20,
+      "montoUF": 2000,
+      "piePct": 20,
+      "badge": "muy-competitivo",
+      "comentario": "Segunda tasa más baja del mercado. Muy competitivo para viviendas nuevas.",
+      "colorTasa": "verde"
+    },
+    {
+      "id": "bancoestado",
+      "nombre": "BancoEstado",
+      "logo": "🔵",
+      "tasaFija": 4.19,
+      "cae": 4.48,
+      "dividendoCLP": 995000,
+      "dividendoUF": 25.84,
+      "plazoAnios": 20,
+      "montoUF": 2000,
+      "piePct": 20,
+      "badge": "mejor-subsidios",
+      "comentario": "Especializado en operaciones con subsidios MINVU. Convenios DS49 y DS1.",
+      "colorTasa": "amarillo"
+    },
+    {
+      "id": "coopeuch",
+      "nombre": "Coopeuch",
+      "logo": "🟡",
+      "tasaFija": 4.50,
+      "cae": 4.79,
+      "dividendoCLP": 1018000,
+      "dividendoUF": 26.44,
+      "plazoAnios": 20,
+      "montoUF": 2000,
+      "piePct": 20,
+      "badge": "buenas-condiciones-socios",
+      "comentario": "Buenas condiciones para socios activos. Ventajas adicionales para cooperados.",
+      "colorTasa": "amarillo"
+    },
+    {
+      "id": "santander",
+      "nombre": "Banco Santander",
+      "logo": "🔴",
+      "tasaFija": 4.58,
+      "cae": 4.89,
+      "dividendoCLP": 1025000,
+      "dividendoUF": 26.62,
+      "plazoAnios": 20,
+      "montoUF": 2000,
+      "piePct": 20,
+      "badge": "fuerte-mixta",
+      "comentario": "Fuerte en tasas mixtas. Ofrece período inicial fijo ventajoso antes de pasar a variable.",
+      "colorTasa": "amarillo"
+    },
+    {
+      "id": "internacional",
+      "nombre": "Banco Internacional",
+      "logo": "⚫",
+      "tasaFija": 4.85,
+      "cae": 5.10,
+      "dividendoCLP": 892377,
+      "dividendoUF": 22.40,
+      "plazoAnios": 20,
+      "montoUF": 2000,
+      "piePct": 20,
+      "badge": "mejor-dividendo-cmf",
+      "comentario": "Mejor dividendo registrado por CMF al 28-03-2026: $892.377 / 22,40 UF mensuales.",
+      "colorTasa": "amarillo"
+    },
+    {
+      "id": "chile",
+      "nombre": "Banco de Chile",
+      "logo": "🔷",
+      "tasaFija": 4.60,
+      "cae": 4.90,
+      "dividendoCLP": 1027000,
+      "dividendoUF": 26.67,
+      "plazoAnios": 20,
+      "montoUF": 2000,
+      "piePct": 20,
+      "badge": null,
+      "comentario": "Banco universal con amplia cobertura. Tasas dentro del promedio de mercado.",
+      "colorTasa": "amarillo"
+    },
+    {
+      "id": "bci",
+      "nombre": "BCI",
+      "logo": "🔶",
+      "tasaFija": 4.65,
+      "cae": 4.95,
+      "dividendoCLP": 1031000,
+      "dividendoUF": 26.78,
+      "plazoAnios": 20,
+      "montoUF": 2000,
+      "piePct": 20,
+      "badge": null,
+      "comentario": "Sólido para clientes con historial crediticio establecido. Diversas modalidades.",
+      "colorTasa": "amarillo"
+    },
+    {
+      "id": "scotiabank",
+      "nombre": "Scotiabank",
+      "logo": "🟥",
+      "tasaFija": 4.80,
+      "cae": 5.12,
+      "dividendoCLP": 1048000,
+      "dividendoUF": 27.21,
+      "plazoAnios": 20,
+      "montoUF": 2000,
+      "piePct": 20,
+      "badge": null,
+      "comentario": "Enfoque en clientes con ingresos demostrables. Tasa levemente sobre el promedio.",
+      "colorTasa": "amarillo"
+    },
+    {
+      "id": "security",
+      "nombre": "Banco Security",
+      "logo": "🟤",
+      "tasaFija": 4.90,
+      "cae": 5.22,
+      "dividendoCLP": 1055000,
+      "dividendoUF": 27.40,
+      "plazoAnios": 20,
+      "montoUF": 2000,
+      "piePct": 20,
+      "badge": null,
+      "comentario": "Orientado a segmento ABC1. Tasas sobre el promedio pero con servicios premium.",
+      "colorTasa": "rojo"
+    },
+    {
+      "id": "consorcio",
+      "nombre": "Banco Consorcio",
+      "logo": "🟣",
+      "tasaFija": 5.10,
+      "cae": 5.40,
+      "dividendoCLP": 1070000,
+      "dividendoUF": 27.79,
+      "plazoAnios": 20,
+      "montoUF": 2000,
+      "piePct": 20,
+      "badge": null,
+      "comentario": "Mayor tasa en el comparador CMF. Útil como referencia de techo de mercado.",
+      "colorTasa": "rojo"
+    }
+  ],
+  "requisitos2026": {
+    "dependientes": "6 a 12 meses de antigüedad laboral mínima",
+    "independientes": "2 años de actividad con declaraciones de renta comprobables",
+    "cargaFinanciera": "Máximo 25%–30% del ingreso líquido mensual en deudas totales",
+    "pieMinimoLegal": "20% del precio de la vivienda (obligatorio por ley desde 2015)",
+    "documentos": [
+      "Liquidaciones de sueldo últimos 3 meses",
+      "Declaración de renta (Form. 22) últimos 2 años si eres independiente",
+      "Certificado de cotizaciones AFP (últimos 12 meses)",
+      "Carpeta tributaria Servicio de Impuestos Internos (SII)",
+      "Promesa de compraventa o tasación del inmueble"
+    ]
+  },
+  "tendencias2026": [
+    {
+      "emoji": "📉",
+      "titulo": "TPM a la baja",
+      "desc": "El Banco Central mantiene tendencia bajista en la Tasa de Política Monetaria, lo que presiona hacia abajo las tasas hipotecarias."
+    },
+    {
+      "emoji": "📊",
+      "titulo": "Tasas descendiendo",
+      "desc": "El promedio del mercado bajó de ~5% en 2024 a 4.3%–4.4% en marzo 2026. La tasa mínima llega a 3.39% (Itaú)."
+    },
+    {
+      "emoji": "🏛",
+      "titulo": "Ley 21.748 FOGAES activos",
+      "desc": "La Ley de Integración (21.748) y el FOGAES permiten pie reducido al 10% y descuento en tasa para viviendas nuevas bajo 2.200 UF."
+    },
+    {
+      "emoji": "🏦",
+      "titulo": "Mayor competencia bancaria",
+      "desc": "La entrada de Banco Falabella y la agresividad de Itaú generaron una guerra de tasas que beneficia a los compradores en 2026."
+    }
+  ]
+}

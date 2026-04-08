@@ -1,0 +1,6 @@
+# Netlify _redirects
+# HTTPS lo maneja Netlify automáticamente.
+# SPA fallback: cualquier ruta desconocida devuelve index.html (status 200)
+# Rutas de pantallas laterales: /region, /arrendar-vs-comprar, /bancos, /bencinazo
+# El JS inline de index.html aplica la pantalla correcta según window.location.pathname
+/*  /index.html  200
