@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:www.learninggroup.cl)",
+      "WebFetch(domain:www.postedin.com)",
+      "WebFetch(domain:www.semrush.com)",
+      "WebFetch(domain:digitalgrowth.io)",
+      "WebFetch(domain:www.tupuedesvendermas.com)",
+      "WebFetch(domain:blog.toctoc.com)",
+      "WebFetch(domain:www.pauta.cl)",
+      "WebFetch(domain:centrocompetencia.com)",
+      "WebFetch(domain:www.emol.com)",
+      "WebFetch(domain:bienisimo.com)",
+      "WebFetch(domain:urbani.cl)",
+      "Bash(convert --version)",
+      "Bash(python3)",
+      "Bash(pkill -f \"python3 -m http.server\")",
+      "Bash(python3 -m http.server 3000)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/index.html)",
+      "Bash(git stash:*)",
+      "Bash(curl -s http://localhost:3000/index.html)",
+      "Bash(node --check /Users/sergecchile./Desktop/cuantocuestauncasa/public/app.js)"
+    ]
+  }
+}
