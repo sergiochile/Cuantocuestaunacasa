@@ -3471,6 +3471,42 @@ function irAEmpleos(){
   var h=t.querySelector('h1,h2'); if(h){ h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
 }
 </script>
+<script>
+// Fix mobile explorer dropdown: ensure extra routes are visible.
+(function(){
+  function findExplorerSelect(){
+    const sels=[...document.querySelectorAll('select')];
+    return sels.find(s=>{
+      const txt=[...s.options].map(o=>(o.textContent||'').toLowerCase()).join(' | ');
+      return /banco|tasas/.test(txt);
+    });
+  }
+  function ensureOption(sel,value,label){
+    if(!sel||[...sel.options].some(o=>o.value===value)) return;
+    const opt=document.createElement('option');
+    opt.value=value;
+    opt.textContent=label;
+    sel.appendChild(opt);
+  }
+  function route(value){
+    if(value==='/bencinazo'){
+      if(typeof irABencinazo==='function') irABencinazo(); else location.href='/bencinazo';
+    } else if(value==='/empleos'){
+      if(typeof irAEmpleos==='function') irAEmpleos(); else location.href='/empleos';
+    }
+  }
+  window.addEventListener('DOMContentLoaded',function(){
+    const sel=findExplorerSelect();
+    ensureOption(sel,'/bencinazo','⛽ Bencinazo');
+    ensureOption(sel,'/empleos','💼 Empleos');
+    if(sel){
+      sel.addEventListener('change',function(){
+        route(sel.value);
+      });
+    }
+  });
+})();
+</script>
 <footer style="border-top:1px solid #E5E5E5;padding:1.75rem 2rem;text-align:center;font-size:12px;color:#888;font-family:'DM Sans',sans-serif;margin-top:2rem">
   <p>© 2026 CuantoCuestaUnaCasa.cl — Información orientativa, no asesoría financiera.</p>
   <p style="margin-top:8px">

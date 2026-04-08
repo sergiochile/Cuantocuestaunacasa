@@ -549,6 +549,7 @@ function calcular() {
 
   // Mostrar portales de búsqueda
   mostrarBuscadoresPropiedades(reg, Math.round(maxPrecioUF));
+  renderConversionResultados();
 
   _resultadoCalculado = true;
 }
@@ -1470,6 +1471,62 @@ function copiarLink() {
     const orig = btn.textContent;
     btn.textContent = '✅ ¡Copiado!';
     setTimeout(() => { btn.textContent = orig; }, 2200);
+  });
+}
+
+/* ── CONVERSION: SIGUIENTE PASO ──────────────────────────────── */
+function renderConversionResultados() {
+  const screen = document.getElementById('screen-3');
+  if (!screen || document.getElementById('conv-next-steps')) return;
+
+  const style = document.createElement('style');
+  style.id = 'conv-next-style';
+  style.textContent = `
+    .conv-next{margin:1rem 0 1.2rem;padding:1rem;border:1.5px solid var(--borde);border-radius:14px;background:var(--fondo)}
+    .conv-next-k{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);margin-bottom:.35rem}
+    .conv-next-t{font-family:'Fraunces',serif;font-size:1.1rem;line-height:1.2;color:var(--negro);margin-bottom:.4rem}
+    .conv-next-p{font-size:13px;color:var(--texto);line-height:1.6;margin-bottom:.7rem}
+    .conv-next-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .conv-next-btn{border:1px solid var(--borde);background:var(--blanco);color:var(--texto);border-radius:999px;padding:8px 12px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .conv-next-btn--pri{background:var(--negro);color:#fff;border-color:var(--negro)}
+  `;
+  document.head.appendChild(style);
+
+  const box = document.createElement('section');
+  box.id = 'conv-next-steps';
+  box.className = 'conv-next';
+  box.innerHTML = `
+    <div class="conv-next-k">Siguiente paso recomendado</div>
+    <div class="conv-next-t">Pasa de simulacion a decision real</div>
+    <p class="conv-next-p">Compara bancos, revisa subsidios y mira propiedades dentro de tu rango para avanzar hoy.</p>
+    <div class="conv-next-actions">
+      <button type="button" class="conv-next-btn conv-next-btn--pri" data-conv-action="bancos">Comparar bancos</button>
+      <button type="button" class="conv-next-btn" data-conv-action="subsidios">Ver subsidios</button>
+      <button type="button" class="conv-next-btn" data-conv-action="propiedades">Ver propiedades</button>
+    </div>
+  `;
+
+  const tabs = screen.querySelector('[role="tablist"], .tabs-wrap');
+  if (tabs && tabs.parentNode) tabs.insertAdjacentElement('beforebegin', box);
+  else screen.insertBefore(box, screen.firstChild.nextSibling || null);
+
+  box.addEventListener('click', e => {
+    const btn = e.target.closest('[data-conv-action]');
+    if (!btn) return;
+    const action = btn.dataset.convAction;
+    if (action === 'bancos') {
+      if (typeof irABancos === 'function') irABancos();
+      else document.querySelector('[data-tab="tab-bancos"]')?.click();
+      return;
+    }
+    if (action === 'subsidios') {
+      if (typeof irASubsidios === 'function') irASubsidios();
+      else document.querySelector('[data-tab="tab-subsidios"]')?.click();
+      return;
+    }
+    if (action === 'propiedades') {
+      document.getElementById('buscadores-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   });
 }
 
