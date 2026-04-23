@@ -1,6 +1,9 @@
-# Netlify _redirects
-/privacidad    /privacidad.html    200
-/terminos      /terminos.html      200
+# Netlify _redirects — rutas estáticas ANTES del fallback SPA
+/acerca      /acerca.html      200
+/guia        /guia.html        200
+/confianza   /confianza.html   200
+/privacidad  /privacidad.html  200
+/terminos    /terminos.html    200
 /guia-vivienda-chile                         /guia-vivienda-chile.html                         200
 /cuanto-cuesta-una-casa-en-chile-2026      /cuanto-cuesta-una-casa-en-chile-2026.html      200
 /cuanto-sueldo-necesitas-para-comprar-casa /cuanto-sueldo-necesitas-para-comprar-casa.html 200
@@ -8,4 +11,5 @@
 /arrendar-vs-comprar-en-chile              /arrendar-vs-comprar-en-chile.html              200
 /subsidios-vivienda-chile-explicados       /subsidios-vivienda-chile-explicados.html       200
 /cuanto-te-presta-un-banco-en-chile        /cuanto-te-presta-un-banco-en-chile.html        200
+
 /*  /index.html  200

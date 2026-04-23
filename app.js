@@ -1402,6 +1402,89 @@ function cambiarTasaProyeccion(tasa) {
   );
 }
 
+/* ── PROYECCIÓN DE INGRESOS ──────────────────────────────────── */
+
+/**
+ * Renderiza la proyección de ingresos para el tab "Si crezco".
+ * Muestra cómo evoluciona la relación cuota/sueldo si el ingreso crece.
+ * @param {number} sueldoTotal - Ingreso mensual actual en CLP
+ * @param {number} cuota       - Dividendo mensual en CLP
+ */
+function renderProyeccionIngresos(sueldoTotal, cuota) {
+  const cont = document.getElementById('proyeccion-cont');
+  if (!cont || sueldoTotal <= 0) return;
+
+  // Persistir valores para cuando el usuario cambie la tasa
+  cont.dataset.sueldo = sueldoTotal;
+  cont.dataset.cuota  = cuota;
+
+  const tasas        = [3, 5, 8, 10, 15];
+  const selectedRate = parseInt(cont.dataset.tasa || '5');
+  const pctActual    = cuota / sueldoTotal * 100;
+
+  // Proyección a 10 años
+  const filas   = [];
+  let añoAcceso = null;
+  for (let año = 1; año <= 10; año++) {
+    const sueldoProy = sueldoTotal * Math.pow(1 + selectedRate / 100, año);
+    const pct        = cuota / sueldoProy * 100;
+    if (añoAcceso === null && pct <= 30) añoAcceso = año;
+    filas.push({ año, sueldo: sueldoProy, pct });
+  }
+
+  // Mensaje clave
+  let insight;
+  if (pctActual <= 30) {
+    const pct10 = filas[filas.length - 1].pct;
+    insight = `Hoy el dividendo ya está en el <strong>${pctActual.toFixed(1)}%</strong> de tu sueldo — accesible. Con <em>${selectedRate}% anual</em> de crecimiento, en 10 años bajaría al <strong>${pct10.toFixed(1)}%</strong>. Más holgura cada año.`;
+  } else if (añoAcceso !== null) {
+    const sueldoAcc = filas[añoAcceso - 1].sueldo;
+    insight = `Con <em>${selectedRate}% anual</em> de crecimiento, en <strong>${añoAcceso} año${añoAcceso > 1 ? 's' : ''}</strong> el dividendo quedaría bajo el 30% de tu sueldo. Estarías ganando <strong>$${fmt(sueldoAcc)}/mes</strong>.`;
+  } else {
+    insight = `Con <em>${selectedRate}% anual</em>, el dividendo aún supera el 30% después de 10 años. Considera codeudor, subsidio o viviendas de menor precio.`;
+  }
+
+  const pillFor = pct => {
+    if (pct <= 30) return '<span class="pill pill-verde" style="font-size:10px;padding:2px 8px">✓ Accesible</span>';
+    if (pct <= 50) return '<span class="pill pill-amarillo" style="font-size:10px;padding:2px 8px">Esfuerzo alto</span>';
+    return '<span class="pill pill-rojo" style="font-size:10px;padding:2px 8px">Difícil acceso</span>';
+  };
+
+  const selector = tasas
+    .map(t => `<button class="proy-btn${t === selectedRate ? ' activo' : ''}" onclick="cambiarTasaProyeccion(${t})">${t}% año</button>`)
+    .join('');
+
+  const hoyRow = `<tr class="proy-hoy"><td><strong>Hoy</strong></td><td>$${fmt(sueldoTotal)}</td><td>${pctActual.toFixed(1)}%</td><td>${pillFor(pctActual)}</td></tr>`;
+  const proyRows = filas.map(f =>
+    `<tr class="${f.pct <= 30 ? 'proy-ok' : ''}"><td>Año ${f.año}</td><td>$${fmt(f.sueldo)}</td><td>${f.pct.toFixed(1)}%</td><td>${pillFor(f.pct)}</td></tr>`
+  ).join('');
+
+  cont.innerHTML = `
+    <div class="proy-selector">${selector}</div>
+    <div class="proy-insight">${insight}</div>
+    <div class="proy-tabla">
+      <table>
+        <thead><tr><th>Período</th><th>Sueldo estimado</th><th>Dividendo / sueldo</th><th>Estado</th></tr></thead>
+        <tbody>${hoyRow}${proyRows}</tbody>
+      </table>
+    </div>
+    <p class="proy-nota">La proyección asume dividendo fijo y sueldo que crece a la tasa elegida de forma compuesta. No considera inflación, variación de la UF ni cambios de tasa hipotecaria.</p>`;
+}
+
+/**
+ * Cambia la tasa de crecimiento anual y re-renderiza la proyección.
+ * @param {number} tasa - Porcentaje anual de crecimiento elegido
+ */
+function cambiarTasaProyeccion(tasa) {
+  const cont = document.getElementById('proyeccion-cont');
+  if (!cont) return;
+  cont.dataset.tasa = tasa;
+  renderProyeccionIngresos(
+    parseFloat(cont.dataset.sueldo || '0'),
+    parseFloat(cont.dataset.cuota  || '0')
+  );
+}
+
 /* ── DESIGUALDAD REGIONAL ────────────────────────────────────── */
 function renderDesigualdad() {
   const cont = document.getElementById('desigualdad-visual');

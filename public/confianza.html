@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confianza y limitaciones — CuantoCuestaUnaCasa.cl</title>
+  <meta name="description" content="Transparencia sobre qué es y qué no es CuantoCuestaUnaCasa.cl, limitaciones del simulador, uso de fuentes oficiales (CMF, MINVU) y cómo interpretar los resultados.">
+  <link rel="canonical" href="https://cuantocuestaunacasa.cl/confianza">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8151493924438623" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --negro: #111111;
+      --texto: #1C1C1C;
+      --suave: #666666;
+      --suave2: #888888;
+      --borde: #E5E5E5;
+      --fondo: #F8F6F3;
+      --blanco: #FFFFFF;
+      --verde: #1A7A4A;
+      --rojo: #C0392B;
+      --azul: #1A5FA8;
+      --azul-l: #EBF2FC;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--blanco); color: var(--texto); font-size: 16px; line-height: 1.6; }
+
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 2rem; border-bottom: 1px solid var(--borde); position: sticky; top: 0; background: var(--blanco); z-index: 100; }
+    .nav-logo { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; color: var(--negro); text-decoration: none; }
+    .nav-logo em { color: var(--rojo); font-style: italic; }
+    .nav-volver { font-size: 13px; color: var(--suave); text-decoration: none; border: 1.5px solid var(--borde); padding: 6px 14px; border-radius: 10px; transition: color .15s, border-color .15s; }
+    .nav-volver:hover { color: var(--negro); border-color: var(--negro); }
+
+    .wrap { max-width: 720px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+
+    .page-kicker { font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--suave2); margin-bottom: .6rem; }
+    .page-titulo { font-family: 'Fraunces', serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 300; line-height: 1.1; color: var(--negro); margin-bottom: .75rem; }
+    .page-titulo em { font-style: italic; color: var(--rojo); }
+    .page-fecha { font-size: 13px; color: var(--suave2); margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid var(--borde); }
+
+    .section { margin-bottom: 2.5rem; }
+    .section h2 { font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 600; color: var(--negro); margin-bottom: .75rem; padding-bottom: .4rem; border-bottom: 1.5px solid var(--borde); }
+    .section p { font-size: 15px; color: var(--texto); line-height: 1.8; margin-bottom: .9rem; }
+    .section ul { list-style: none; padding: 0; margin-bottom: .9rem; display: flex; flex-direction: column; gap: 8px; }
+    .section ul li { font-size: 15px; color: var(--texto); padding-left: 1.1rem; position: relative; line-height: 1.75; }
+    .section ul li::before { content: '–'; position: absolute; left: 0; color: var(--suave2); }
+    .section a { color: var(--azul); text-decoration: underline; }
+    .section a:hover { color: var(--negro); }
+
+    .aviso-azul { background: var(--azul-l); border-left: 3px solid var(--azul); border-radius: 0 8px 8px 0; padding: 12px 16px; font-size: 14px; color: #1a3a6e; line-height: 1.6; margin-bottom: 2rem; }
+
+    .fuente-box { background: var(--fondo); border: 1px solid var(--borde); border-radius: 12px; padding: 1rem 1.2rem; font-size: 14px; line-height: 1.75; margin-bottom: 1rem; }
+    .fuente-box strong { color: var(--negro); }
+
+    footer { border-top: 1px solid var(--borde); padding: 2rem; text-align: center; font-size: 12px; color: var(--suave2); }
+    footer a { color: var(--suave); text-decoration: none; margin: 0 6px; }
+    footer a:hover { color: var(--negro); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="/">Cuánto cuesta una <em>casa</em></a>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+      <a class="nav-volver" href="/acerca.html" style="border:none;padding:6px 0;text-decoration:underline">Acerca</a>
+      <a class="nav-volver" href="/guia.html" style="border:none;padding:6px 0;text-decoration:underline">Guía</a>
+      <a class="nav-volver" href="/privacidad.html" style="border:none;padding:6px 0;text-decoration:underline">Privacidad</a>
+      <a class="nav-volver" href="/">← Calculadora</a>
+    </div>
+  </nav>
+
+  <div class="wrap">
+
+    <p class="page-kicker">Transparencia</p>
+    <h1 class="page-titulo">Confianza y <em>alcance</em> del sitio</h1>
+    <p class="page-fecha">Última actualización: 23 de abril de 2026</p>
+
+    <div class="aviso-azul">
+      CuantoCuestaUnaCasa.cl existe para <strong>educar y ordenar cifras</strong> sobre vivienda y crédito en Chile. No somos banco, corredor de crédito, notaría ni asesoría personalizada. Los números que ves son <strong>orientativos</strong>.
+    </div>
+
+    <div class="section" id="que-es">
+      <h2>1. Qué puedes esperar — y qué no</h2>
+      <p><strong>Sí:</strong> simulaciones con tus datos, comparaciones con referencias públicas (por ejemplo tasas CMF), resúmenes de programas habitacionales según información oficial MINVU, y contenido editorial para entender conceptos.</p>
+      <p><strong>No:</strong> aprobación de crédito, promesa de tasa final, asesoría legal o tributaria, ni recomendación de producto concreto. Cada institución evalúa tu caso con sus propias reglas.</p>
+    </div>
+
+    <div class="section" id="limitaciones">
+      <h2>2. Limitaciones del simulador</h2>
+      <p>La calculadora y las pantallas de exploración usan <strong>supuestos simplificados</strong>. En la práctica pueden diferir tus resultados por:</p>
+      <ul>
+        <li><strong>Política del banco</strong> — cargas financieras, requisitos de antigüedad, producto elegido (fija, mixta, etc.).</li>
+        <li><strong>Tasación</strong> — el crédito se apoya en el valor tasado, que puede ser distinto al precio de compra.</li>
+        <li><strong>Historial crediticio y garantías</strong> — no modelamos DICOM, avales ni excepciones.</li>
+        <li><strong>Gastos de operación</strong> — tasación, notaría, inscripción, seguros: no siempre están desglosados en cada vista; cuando damos rangos, son referenciales.</li>
+        <li><strong>UF y precios</strong> — la UF cambia a diario; los precios por región son referencias agregadas, no cotización de un departamento puntual.</li>
+        <li><strong>Subsidios</strong> — cupos, llamados y requisitos exactos los define MINVU/SERVIU; el sitio resume para orientar, no sustituye la postulación oficial.</li>
+      </ul>
+      <p>Si un resultado parece “demasiado bueno” o “imposible”, vuelve a revisar los datos ingresados y confirma con el banco o con las fuentes enlazadas.</p>
+    </div>
+
+    <div class="section" id="fuentes">
+      <h2>3. Fuentes y cómo las usamos</h2>
+      <p>Indicamos fechas en las pantallas cuando corresponde (por ejemplo, tablas de bancos con base en informes CMF). Los datos envejecen: vuelve a la fuente antes de decidir.</p>
+
+      <div class="fuente-box">
+        <strong>CMF (Comisión para el Mercado Financiero)</strong> — tasas, CAE y dividendos de referencia de instituciones. Sitio: <a href="https://www.cmfchile.cl" target="_blank" rel="noopener">cmfchile.cl</a>
+      </div>
+      <div class="fuente-box">
+        <strong>MINVU</strong> — subsidios, requisitos y postulación. Sitio: <a href="https://www.minvu.gob.cl" target="_blank" rel="noopener">minvu.gob.cl</a>
+      </div>
+      <div class="fuente-box">
+        <strong>Banco Central de Chile</strong> — contexto de tasas de política monetaria e inflación. Sitio: <a href="https://www.bcentral.cl" target="_blank" rel="noopener">bcentral.cl</a>
+      </div>
+      <div class="fuente-box">
+        <strong>UF y otros indicadores</strong> — consulta pública (por ejemplo <a href="https://mindicador.cl" target="_blank" rel="noopener">mindicador.cl</a>).
+      </div>
+      <div class="fuente-box">
+        <strong>Precios y mercado inmobiliario</strong> — cuando citamos series sectoriales (por ejemplo CChC), lo indicamos en la pantalla correspondiente; son agregados, no el precio de un proyecto específico.
+      </div>
+    </div>
+
+    <div class="section" id="contacto">
+      <h2>4. Correcciones y contacto</h2>
+      <p>
+        Si detectas un error de datos, un enlace roto o una explicación confusa, escríbenos a
+        <a href="mailto:sergecchile@gmail.com">sergecchile@gmail.com</a>.
+        Revisamos los mensajes cuando podemos; no garantizamos respuesta inmediata.
+      </p>
+      <p>
+        Más detalle sobre el proyecto: <a href="/acerca.html">Acerca del sitio</a>.
+        Pasos y glosario: <a href="/guia.html">Guía editorial</a>.
+        Datos personales y cookies: <a href="/privacidad.html">Privacidad</a>.
+      </p>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2026 CuantoCuestaUnaCasa.cl</p>
+    <p style="margin-top: 8px;">
+      <a href="/">Calculadora</a> ·
+      <a href="/confianza.html">Confianza</a> ·
+      <a href="/guia.html">Guía</a> ·
+      <a href="/acerca.html">Acerca</a> ·
+      <a href="/privacidad.html">Privacidad</a> ·
+      <a href="/terminos.html">Términos</a>
+    </p>
+  </footer>
+
+</body>
+</html>

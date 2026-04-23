@@ -1,7 +1,9 @@
-# Netlify _redirects
-# Páginas legales — deben ir ANTES del fallback SPA
-/privacidad    /privacidad.html    200
-/terminos      /terminos.html      200
+# Alineado con public/_redirects (publish = public en netlify.toml)
+/acerca      /acerca.html      200
+/guia        /guia.html        200
+/confianza   /confianza.html   200
+/privacidad  /privacidad.html  200
+/terminos    /terminos.html    200
 /guia-vivienda-chile                         /guia-vivienda-chile.html                         200
 /cuanto-cuesta-una-casa-en-chile-2026      /cuanto-cuesta-una-casa-en-chile-2026.html      200
 /cuanto-sueldo-necesitas-para-comprar-casa /cuanto-sueldo-necesitas-para-comprar-casa.html 200
@@ -10,8 +12,4 @@
 /subsidios-vivienda-chile-explicados       /subsidios-vivienda-chile-explicados.html       200
 /cuanto-te-presta-un-banco-en-chile        /cuanto-te-presta-un-banco-en-chile.html        200
 
-# SPA fallback — todas las rutas apuntan a index.html (status 200)
 /*    /index.html    200
-
-# Forzar HTTPS (Netlify lo hace automáticamente, pero explícito por claridad)
-# http://cuantocuestauncasa.cl/*   https://cuantocuestauncasa.cl/:splat   301!
