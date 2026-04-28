@@ -1,64 +1,406 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-CL">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cuánto cuesta una casa en Chile 2026: precios por región</title>
-  <meta name="description" content="Guía 2026 con precios de casas y departamentos en Chile por región, cuánto cuesta el pie y qué sueldo se necesita para comprar.">
+  <title>Cuánto cuesta una casa en Chile 2026: precios por región, pie y sueldo</title>
+  <meta name="description" content="Precios de casas y departamentos en Chile 2026 por región (UF/m², CLP), dividendo estimado y sueldo mínimo para comprar. Datos CMF, CChC, INE y MINVU.">
   <link rel="canonical" href="https://cuantocuestaunacasa.cl/cuanto-cuesta-una-casa-en-chile-2026">
+
+  <meta property="og:title" content="Cuánto cuesta una casa en Chile 2026: precios por región">
+  <meta property="og:description" content="Precios reales por región, dividendo estimado y sueldo mínimo para comprar. Tabla con las 16 regiones, ejemplos numéricos y subsidios MINVU 2026.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://cuantocuestaunacasa.cl/cuanto-cuesta-una-casa-en-chile-2026">
+  <meta property="og:image" content="https://cuantocuestaunacasa.cl/og.png">
+  <meta property="og:locale" content="es_CL">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cuánto cuesta una casa en Chile 2026">
+  <meta name="twitter:description" content="Precios por región, dividendo estimado y sueldo mínimo. Datos CMF, CChC, INE, MINVU.">
+  <meta name="twitter:image" content="https://cuantocuestaunacasa.cl/og.png">
+
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Cuánto cuesta una casa en Chile en 2026?","acceptedAnswer":{"@type":"Answer","text":"Depende de la región y comuna. Una vivienda media puede ir desde $55 millones a más de $190 millones según zona y tipo."}},{"@type":"Question","name":"¿Qué importa más, pie o sueldo?","acceptedAnswer":{"@type":"Answer","text":"Ambos: el pie reduce crédito y el sueldo determina si el dividendo pasa la evaluación bancaria."}}]}
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"¿Cuánto cuesta una casa en Chile en 2026?","acceptedAnswer":{"@type":"Answer","text":"En 2026 una vivienda media de 55 m² va desde ~1.925 UF (~$75 millones) en regiones del sur como Aysén o La Araucanía hasta ~4.235 UF (~$165 millones) en la Región Metropolitana. El precio depende de la región, comuna, tipo (departamento, casa, usada) y superficie."}},
+    {"@type":"Question","name":"¿Cuánto cuesta el metro cuadrado en Chile en 2026?","acceptedAnswer":{"@type":"Answer","text":"Según CChC Q3 2025, el precio promedio por m² para departamentos nuevos es: Región Metropolitana 77 UF, Antofagasta 68 UF, Valparaíso 58 UF, Biobío 55 UF, Coquimbo 56 UF, Maule 40 UF, La Araucanía 36 UF y Aysén 35 UF. Las casas suelen costar 10-20% menos por m² que los departamentos nuevos."}},
+    {"@type":"Question","name":"¿Cuál es la región más barata para comprar casa en Chile?","acceptedAnswer":{"@type":"Answer","text":"Las regiones con menor precio por m² son Aysén (35 UF/m²), La Araucanía (36 UF/m²), Los Ríos (37 UF/m²), Ñuble (38 UF/m²) y Los Lagos (38 UF/m²). Un departamento de 55 m² en La Araucanía cuesta aproximadamente 1.980 UF (~$77 millones), un 53% menos que en Santiago."}},
+    {"@type":"Question","name":"¿Cuánto cuesta un departamento en Santiago en 2026?","acceptedAnswer":{"@type":"Answer","text":"Un departamento nuevo de 55 m² en la Región Metropolitana cuesta aproximadamente 4.235 UF (~$165 millones) según CChC Q3 2025. Comunas como Providencia y Las Condes superan los 100 UF/m², mientras que comunas periféricas pueden bajar a 60 UF/m²."}},
+    {"@type":"Question","name":"¿Qué importa más al comprar, el pie o el sueldo?","acceptedAnswer":{"@type":"Answer","text":"Ambos. El pie reduce el monto del crédito (y por tanto el dividendo), mientras que el sueldo determina si el dividendo pasa la regla de esfuerzo bancaria (25%-30% del ingreso líquido). Sin pie suficiente no firmas; sin sueldo suficiente no te aprueban."}},
+    {"@type":"Question","name":"¿Cuánto sueldo necesito para comprar una casa de $100 millones en Chile?","acceptedAnswer":{"@type":"Answer","text":"Con pie 20% ($20 millones), crédito de $80 millones a 25 años y tasa 4,1% en UF, el dividendo es ~$427.000/mes. Aplicando la regla del 30% de esfuerzo, necesitas un sueldo líquido de hogar de al menos $1.420.000/mes. Con codeudor los ingresos se suman."}},
+    {"@type":"Question","name":"¿Cuánto cuesta el pie de una casa en Chile?","acceptedAnswer":{"@type":"Answer","text":"El pie estándar es 20% del precio. Para una casa de $100 millones son $20 millones; para una de $80 millones son $16 millones. Con FOGAES (Fondo de Garantía Especial del Estado) el pie mínimo baja al 10% en viviendas hasta 4.500 UF, y con DS19 el bono pie agrega hasta 30 UF adicionales."}},
+    {"@type":"Question","name":"¿Cuánto cuesta una casa usada vs una nueva en Chile?","acceptedAnswer":{"@type":"Answer","text":"Las viviendas usadas tienen un descuento promedio del 10-20% sobre las nuevas. En la RM, una casa usada está en torno a 62 UF/m² versus 77 UF/m² de un departamento nuevo. Importante: los subsidios DS19 y DS1 en algunos tramos no aplican a vivienda usada."}},
+    {"@type":"Question","name":"¿Cómo se calcula el precio de una vivienda en UF y en pesos?","acceptedAnswer":{"@type":"Answer","text":"Precio total (UF) = precio por m² × superficie. Por ejemplo, un departamento de 55 m² a 77 UF/m² cuesta 4.235 UF. Para convertir a pesos se multiplica por el valor UF del día (~$39.000 en abril 2026), entregando ~$165 millones."}},
+    {"@type":"Question","name":"¿Cuánto es el dividendo mensual de una casa en Chile?","acceptedAnswer":{"@type":"Answer","text":"Para un crédito a 25 años con tasa 4,1% anual en UF, cada $10 millones de crédito se traducen en ~$53.000 de dividendo mensual. Una casa de $100 millones con pie 20% (crédito $80 millones) genera un dividendo de aproximadamente $427.000/mes."}},
+    {"@type":"Question","name":"¿Qué subsidios MINVU existen para comprar casa en 2026?","acceptedAnswer":{"@type":"Answer","text":"Los principales son: DS19 (hasta 180 UF de subsidio para hogares con ingreso ≤ 25 UF/mes y vivienda nueva ≤ 950 UF); DS1 con 3 tramos según ingreso (hasta 78 UF/mes); FOGAES (reduce el pie al 10%); y la Ley 21.748 de subsidio a la tasa, que rebaja ~0,6% para viviendas nuevas hasta 4.000 UF."}},
+    {"@type":"Question","name":"¿Cuáles son los gastos adicionales al comprar una casa en Chile?","acceptedAnswer":{"@type":"Answer","text":"Suman aproximadamente 1,5-2,5% del precio: tasación bancaria ($150.000-$250.000), gastos notariales ($200.000-$400.000), inscripción en el Conservador de Bienes Raíces ($100.000-$300.000) y seguros obligatorios (desgravamen e incendio). Para una casa de $100 millones, considera $1,5-$2,5 millones extra."}}
+  ]}
   </script>
+
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"Article","headline":"Cuánto cuesta una casa en Chile en 2026","description":"Guía de precios de vivienda en Chile por región y variables de pie y sueldo.","dateModified":"2026-04-08","author":{"@type":"Organization","name":"CuantoCuestaUnaCasa.cl"},"publisher":{"@type":"Organization","name":"CuantoCuestaUnaCasa.cl"},"mainEntityOfPage":"https://cuantocuestaunacasa.cl/cuanto-cuesta-una-casa-en-chile-2026"}
+  {"@context":"https://schema.org","@type":"Article","headline":"Cuánto cuesta una casa en Chile en 2026","description":"Precios de vivienda en Chile por región, dividendo estimado y sueldo mínimo para comprar en 2026.","datePublished":"2026-04-08","dateModified":"2026-04-28","inLanguage":"es-CL","author":{"@type":"Organization","name":"CuantoCuestaUnaCasa.cl","url":"https://cuantocuestaunacasa.cl/"},"publisher":{"@type":"Organization","name":"CuantoCuestaUnaCasa.cl","url":"https://cuantocuestaunacasa.cl/","logo":{"@type":"ImageObject","url":"https://cuantocuestaunacasa.cl/og.png"}},"image":"https://cuantocuestaunacasa.cl/og.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://cuantocuestaunacasa.cl/cuanto-cuesta-una-casa-en-chile-2026"}}
   </script>
+
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://cuantocuestaunacasa.cl/"},{"@type":"ListItem","position":2,"name":"Cuánto cuesta una casa en Chile 2026","item":"https://cuantocuestaunacasa.cl/cuanto-cuesta-una-casa-en-chile-2026"}]}
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+    {"@type":"ListItem","position":1,"name":"Inicio","item":"https://cuantocuestaunacasa.cl/"},
+    {"@type":"ListItem","position":2,"name":"Guía vivienda Chile","item":"https://cuantocuestaunacasa.cl/guia-vivienda-chile"},
+    {"@type":"ListItem","position":3,"name":"Cuánto cuesta una casa en Chile 2026","item":"https://cuantocuestaunacasa.cl/cuanto-cuesta-una-casa-en-chile-2026"}
+  ]}
   </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
-    :root { --negro:#111; --texto:#1c1c1c; --suave:#666; --borde:#e5e5e5; --fondo:#f8f6f3; --azul:#1a5fa8; --rojo:#c0392b; --blanco:#fff; }
+    :root { --negro:#111; --texto:#1c1c1c; --suave:#666; --suave2:#888; --borde:#e5e5e5; --fondo:#f8f6f3; --azul:#1a5fa8; --azul-l:#ebf2fc; --rojo:#c0392b; --verde:#1a7a4a; --verde-l:#e8f5ee; --amarillo-l:#fef6e4; --blanco:#fff; }
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'DM Sans',sans-serif; color:var(--texto); background:var(--blanco); line-height:1.65; }
-    nav { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.4rem; border-bottom:1px solid var(--borde); position:sticky; top:0; background:var(--blanco); }
+    nav { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.4rem; border-bottom:1px solid var(--borde); position:sticky; top:0; background:var(--blanco); z-index:10; }
     .logo { font-family:'Fraunces',serif; color:var(--negro); text-decoration:none; font-size:1rem; }
     .logo em { color:var(--rojo); }
     .volver { border:1px solid var(--borde); border-radius:10px; padding:6px 12px; font-size:13px; color:var(--suave); text-decoration:none; }
+    .volver:hover { color:var(--negro); border-color:var(--negro); }
     .wrap { max-width:860px; margin:0 auto; padding:2rem 1.2rem 3rem; }
-    .hero { background:linear-gradient(135deg,var(--azul),#0f172a); color:#fff; border-radius:16px; padding:1.25rem 1.2rem; margin-bottom:1rem; }
-    h1 { font-family:'Fraunces',serif; font-size:clamp(1.7rem,4vw,2.4rem); line-height:1.15; margin-bottom:.4rem; }
-    h2 { font-family:'Fraunces',serif; font-size:1.2rem; margin:1.2rem 0 .55rem; color:var(--negro); }
+    .breadcrumb { font-size:12px; color:var(--suave2); margin-bottom:1rem; }
+    .breadcrumb a { color:var(--suave); text-decoration:none; }
+    .breadcrumb a:hover { color:var(--negro); text-decoration:underline; }
+    .hero { background:linear-gradient(135deg,var(--azul),#0f172a); color:#fff; border-radius:16px; padding:1.5rem 1.4rem; margin-bottom:1.25rem; }
+    h1 { font-family:'Fraunces',serif; font-size:clamp(1.7rem,4vw,2.4rem); line-height:1.15; margin-bottom:.55rem; font-weight:300; }
+    h1 em { font-style:italic; }
+    h2 { font-family:'Fraunces',serif; font-size:clamp(1.2rem,2.6vw,1.5rem); font-weight:600; margin:2rem 0 .65rem; color:var(--negro); }
+    h3 { font-family:'Fraunces',serif; font-size:1.05rem; font-weight:600; margin:1.2rem 0 .4rem; color:var(--negro); }
     p { margin-bottom:.75rem; }
-    ul { padding-left:1.1rem; margin-bottom:.75rem; }
-    .meta { font-size:12px; color:#cbd5e1; }
-    .box { border:1px solid var(--borde); border-radius:12px; background:var(--fondo); padding:.9rem 1rem; margin-top:.9rem; }
+    ul, ol { padding-left:1.2rem; margin-bottom:.75rem; }
+    li { margin-bottom:.35rem; }
+    .meta { font-size:12px; color:#cbd5e1; margin-top:.4rem; }
+    .hero p.lead { opacity:.95; max-width:62ch; font-size:15px; }
     a { color:var(--azul); }
+    .tldr { border:1.5px solid var(--borde); border-left:3px solid var(--azul); border-radius:10px; background:var(--fondo); padding:1rem 1.1rem; margin:1.25rem 0 1.5rem; }
+    .tldr-label { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--azul); margin-bottom:.4rem; }
+    .tldr ul { margin:.4rem 0 0 0; padding-left:1.1rem; }
+    .tldr li { font-size:14px; }
+    .toc { border:1px solid var(--borde); border-radius:10px; padding:.85rem 1rem; background:var(--blanco); margin-bottom:1.5rem; font-size:14px; }
+    .toc-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--suave); margin-bottom:.5rem; }
+    .toc ol { padding-left:1.2rem; margin:0; }
+    .toc a { text-decoration:none; }
+    .toc a:hover { text-decoration:underline; }
+    .stats-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:1rem 0 1.25rem; }
+    .stat { border:1px solid var(--borde); border-radius:12px; background:var(--fondo); padding:.75rem .85rem; text-align:center; }
+    .stat-num { font-family:'Fraunces',serif; font-size:1.4rem; font-weight:600; color:var(--negro); line-height:1; }
+    .stat-lbl { font-size:11px; color:var(--suave); margin-top:4px; line-height:1.35; }
+    .tabla-wrap { overflow-x:auto; border:1px solid var(--borde); border-radius:12px; margin:1rem 0 1.25rem; }
+    table { width:100%; border-collapse:collapse; font-size:13.5px; min-width:600px; }
+    thead th { background:var(--fondo); text-align:left; padding:10px 12px; font-weight:600; color:var(--negro); border-bottom:1.5px solid var(--borde); font-size:12px; }
+    tbody td { padding:9px 12px; border-bottom:1px solid var(--borde); }
+    tbody tr:last-child td { border-bottom:none; }
+    tbody tr:hover { background:var(--fondo); }
+    .num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .ejemplo { border:1.5px solid var(--borde); border-radius:14px; padding:1.1rem 1.2rem; margin:1rem 0; background:var(--blanco); }
+    .ejemplo-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--azul); margin-bottom:.4rem; }
+    .ejemplo h3 { margin:.1rem 0 .55rem; }
+    .ejemplo-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px 14px; font-size:13.5px; margin:.6rem 0; }
+    .ejemplo-grid dt { color:var(--suave); }
+    .ejemplo-grid dd { color:var(--negro); font-weight:500; text-align:right; }
+    .ejemplo-veredicto { border-top:1px dashed var(--borde); padding-top:.65rem; margin-top:.5rem; font-size:14px; }
+    .ejemplo-veredicto.ok { color:#0e5b35; }
+    .ejemplo-veredicto.no { color:#8c1c12; }
+    .ejemplo-veredicto.medio { color:#7d540a; }
+    .faq { margin:.5rem 0 1rem; }
+    .faq details { border:1px solid var(--borde); border-radius:10px; margin-bottom:8px; overflow:hidden; }
+    .faq details[open] { border-color:var(--negro); }
+    .faq summary { cursor:pointer; padding:.85rem 1rem; font-weight:500; color:var(--negro); list-style:none; display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:14.5px; }
+    .faq summary::-webkit-details-marker { display:none; }
+    .faq summary::after { content:'+'; color:var(--suave); font-size:1.1rem; flex-shrink:0; transition:transform .15s; }
+    .faq details[open] summary::after { content:'–'; }
+    .faq summary:hover { background:var(--fondo); }
+    .faq .faq-resp { padding:0 1rem 1rem; font-size:14px; color:var(--texto); line-height:1.7; }
+    .cta { border:1.5px solid var(--negro); border-radius:14px; padding:1.1rem 1.2rem; margin:1.5rem 0; background:var(--negro); color:#fff; }
+    .cta-titulo { font-family:'Fraunces',serif; font-size:1.15rem; margin-bottom:.4rem; }
+    .cta-sub { font-size:14px; opacity:.85; margin-bottom:.85rem; }
+    .cta-btn { display:inline-block; background:#fff; color:var(--negro); padding:9px 18px; border-radius:9px; text-decoration:none; font-weight:500; font-size:14px; }
+    .cta-btn:hover { background:var(--fondo); }
+    .relacionados { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:1rem 0 1.5rem; }
+    .rel-card { border:1px solid var(--borde); border-radius:12px; padding:.9rem 1rem; text-decoration:none; color:inherit; transition:.15s; background:#fff; }
+    .rel-card:hover { transform:translateY(-1px); border-color:#cfd8e3; box-shadow:0 6px 14px rgba(0,0,0,.05); }
+    .rel-k { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--suave); margin-bottom:.3rem; }
+    .rel-card strong { font-family:'Fraunces',serif; font-weight:600; color:var(--negro); display:block; margin-bottom:.25rem; font-size:14.5px; }
+    .rel-card span { font-size:12.5px; color:var(--suave); }
+    .fuentes { background:var(--fondo); border:1px solid var(--borde); border-radius:10px; padding:.95rem 1.1rem; font-size:13px; line-height:1.75; margin:1.25rem 0 .5rem; color:var(--texto); }
+    .fuentes-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--suave); margin-bottom:.4rem; }
+    .fuentes a { color:var(--azul); }
+    .nota-mini { font-size:11.5px; color:var(--suave2); margin-top:.5rem; font-style:italic; }
+    footer { border-top:1px solid var(--borde); padding:1.5rem 1.2rem 2rem; text-align:center; font-size:12px; color:var(--suave2); margin-top:2rem; }
+    footer a { color:var(--suave); margin:0 6px; text-decoration:none; }
+    footer a:hover { color:var(--negro); }
+    @media (max-width:760px) {
+      .stats-3 { grid-template-columns:1fr; }
+      .relacionados { grid-template-columns:1fr; }
+      .ejemplo-grid { grid-template-columns:1fr 1fr; }
+    }
   </style>
 </head>
 <body>
   <nav>
     <a class="logo" href="/">Cuánto cuesta una <em>casa</em></a>
-    <a class="volver" href="/guia-vivienda-chile">Ver guía</a>
+    <a class="volver" href="/guia-vivienda-chile">← Ver guía completa</a>
   </nav>
+
   <main class="wrap">
-  <section class="hero">
-    <h1>Cuánto cuesta una casa en Chile en 2026</h1>
-    <p class="meta">Última actualización: 8 abril 2026</p>
-  </section>
-  <p>El valor de una vivienda cambia mucho por región, tipo de propiedad y superficie.</p>
-  <h2>Rangos referenciales</h2>
-  <p>RM: $110M-$190M · Valparaíso/Biobío: $80M-$150M · Regiones intermedias: $55M-$120M.</p>
-  <h2>Pie y sueldo</h2>
-  <p>El pie usual está entre 10% y 20%. Los bancos suelen exigir dividendo bajo 25%-30% del ingreso.</p>
-  <div class="box"><a href="/">Ir a la calculadora</a></div>
-  <h2>También te puede servir</h2>
-  <ul>
-    <li><a href="/cuanto-sueldo-necesitas-para-comprar-casa">Cuánto sueldo necesitas para comprar casa</a></li>
-    <li><a href="/cuanto-hay-que-ahorrar-para-el-pie">Cuánto hay que ahorrar para el pie</a></li>
-  </ul>
-  <p><small>Fuentes de referencia: CMF, Banco Central, INE, MINVU, CChC.</small></p>
+    <p class="breadcrumb">
+      <a href="/">Inicio</a> · <a href="/guia-vivienda-chile">Guía vivienda</a> · <span>Cuánto cuesta una casa en Chile 2026</span>
+    </p>
+
+    <section class="hero">
+      <h1>Cuánto cuesta una casa en Chile en <em>2026</em></h1>
+      <p class="lead">Precios reales por región, dividendo estimado y sueldo mínimo para comprar. Datos CChC Q3 2025, CMF marzo 2026, INE ESI 2024 y MINVU 2026.</p>
+      <p class="meta">Última actualización: 28 de abril de 2026 · Lectura ≈ 8 min</p>
+    </section>
+
+    <div class="tldr" aria-label="Resumen ejecutivo">
+      <div class="tldr-label">Resumen rápido</div>
+      <ul>
+        <li>Una vivienda media de 55 m² cuesta entre <strong>~$75 millones</strong> (Aysén, Araucanía) y <strong>~$165 millones</strong> (Santiago).</li>
+        <li>El dividendo va desde ~<strong>$321.000</strong> hasta ~<strong>$705.000</strong> mensuales con pie 20% y 25 años a 4,1%.</li>
+        <li>Para comprar en Santiago necesitas un sueldo de hogar de al menos <strong>~$2,35 millones</strong>; en Araucanía bastan <strong>~$1,1 millones</strong>.</li>
+        <li>Con subsidio <strong>DS19</strong> (hasta 25 UF/mes) y vivienda nueva ≤ 950 UF, el aporte propio puede bajar a $5-7 millones.</li>
+      </ul>
+    </div>
+
+    <nav class="toc" aria-label="Tabla de contenidos">
+      <div class="toc-label">En esta página</div>
+      <ol>
+        <li><a href="#precio-region">Precio promedio por región (tabla)</a></li>
+        <li><a href="#como-se-calcula">Cómo se calcula el precio</a></li>
+        <li><a href="#pie-sueldo">Pie y sueldo: la regla del 30%</a></li>
+        <li><a href="#ejemplos">3 ejemplos numéricos resueltos</a></li>
+        <li><a href="#subsidios">Subsidios MINVU 2026 que reducen el precio</a></li>
+        <li><a href="#gastos-extra">Gastos adicionales al comprar</a></li>
+        <li><a href="#faq">Preguntas frecuentes</a></li>
+        <li><a href="#metodologia">Metodología y fuentes</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="precio-region">Precio promedio por región en 2026</h2>
+    <p>La siguiente tabla muestra el precio por m² de departamento nuevo según CChC Q3 2025, el precio total estimado para una vivienda de 55 m², el dividendo mensual con pie 20% y 25 años a tasa 4,1% en UF, y el sueldo líquido mínimo del hogar para cumplir la regla bancaria del 30%.</p>
+
+    <div class="tabla-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Región</th>
+            <th class="num">UF/m²</th>
+            <th class="num">Precio 55 m²</th>
+            <th class="num">Precio (CLP)</th>
+            <th class="num">Dividendo</th>
+            <th class="num">Sueldo mín. 30%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Región Metropolitana</td><td class="num">77</td><td class="num">4.235 UF</td><td class="num">$165 M</td><td class="num">$705.000</td><td class="num">$2.350.000</td></tr>
+          <tr><td>Antofagasta</td><td class="num">68</td><td class="num">3.740 UF</td><td class="num">$146 M</td><td class="num">$623.000</td><td class="num">$2.080.000</td></tr>
+          <tr><td>Valparaíso</td><td class="num">58</td><td class="num">3.190 UF</td><td class="num">$124 M</td><td class="num">$531.000</td><td class="num">$1.770.000</td></tr>
+          <tr><td>Coquimbo / La Serena</td><td class="num">56</td><td class="num">3.080 UF</td><td class="num">$120 M</td><td class="num">$513.000</td><td class="num">$1.710.000</td></tr>
+          <tr><td>Biobío / Concepción</td><td class="num">55</td><td class="num">3.025 UF</td><td class="num">$118 M</td><td class="num">$504.000</td><td class="num">$1.680.000</td></tr>
+          <tr><td>Tarapacá</td><td class="num">52</td><td class="num">2.860 UF</td><td class="num">$112 M</td><td class="num">$477.000</td><td class="num">$1.590.000</td></tr>
+          <tr><td>Atacama</td><td class="num">48</td><td class="num">2.640 UF</td><td class="num">$103 M</td><td class="num">$440.000</td><td class="num">$1.470.000</td></tr>
+          <tr><td>Arica y Parinacota</td><td class="num">45</td><td class="num">2.475 UF</td><td class="num">$97 M</td><td class="num">$413.000</td><td class="num">$1.380.000</td></tr>
+          <tr><td>O'Higgins</td><td class="num">44</td><td class="num">2.420 UF</td><td class="num">$94 M</td><td class="num">$403.000</td><td class="num">$1.345.000</td></tr>
+          <tr><td>Maule</td><td class="num">40</td><td class="num">2.200 UF</td><td class="num">$86 M</td><td class="num">$367.000</td><td class="num">$1.220.000</td></tr>
+          <tr><td>Magallanes</td><td class="num">40</td><td class="num">2.200 UF</td><td class="num">$86 M</td><td class="num">$367.000</td><td class="num">$1.220.000</td></tr>
+          <tr><td>Ñuble</td><td class="num">38</td><td class="num">2.090 UF</td><td class="num">$82 M</td><td class="num">$349.000</td><td class="num">$1.160.000</td></tr>
+          <tr><td>Los Lagos</td><td class="num">38</td><td class="num">2.090 UF</td><td class="num">$82 M</td><td class="num">$349.000</td><td class="num">$1.160.000</td></tr>
+          <tr><td>Los Ríos</td><td class="num">37</td><td class="num">2.035 UF</td><td class="num">$79 M</td><td class="num">$339.000</td><td class="num">$1.130.000</td></tr>
+          <tr><td>La Araucanía</td><td class="num">36</td><td class="num">1.980 UF</td><td class="num">$77 M</td><td class="num">$330.000</td><td class="num">$1.100.000</td></tr>
+          <tr><td>Aysén</td><td class="num">35</td><td class="num">1.925 UF</td><td class="num">$75 M</td><td class="num">$321.000</td><td class="num">$1.070.000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota-mini">Conversión usada: UF ≈ $39.000 (referencia abril 2026). Las casas suelen costar 10-20% menos por m² que los departamentos nuevos. Los rangos por comuna pueden variar significativamente: Las Condes y Providencia superan los 100 UF/m².</p>
+
+    <h2 id="como-se-calcula">Cómo se calcula el precio de una vivienda</h2>
+    <p>La fórmula básica es simple:</p>
+    <ol>
+      <li><strong>Precio total en UF</strong> = precio por m² × superficie. Ejemplo: 77 UF/m² × 55 m² = 4.235 UF.</li>
+      <li><strong>Precio total en pesos</strong> = precio en UF × valor UF del día. Con UF a $39.000: 4.235 × $39.000 = $165.165.000.</li>
+      <li><strong>Pie</strong> (estándar 20%) = precio × 0,20. Para $165 M, pie = $33 M.</li>
+      <li><strong>Crédito hipotecario</strong> = precio − pie. En el ejemplo, $132 M.</li>
+      <li><strong>Dividendo mensual</strong> ≈ crédito × 0,005334 (factor para 25 años, 4,1% anual en UF). En el ejemplo, ~$704.000.</li>
+    </ol>
+    <p>Los bancos exigen además que el dividendo no supere el 25-30% del sueldo líquido del hogar (regla de esfuerzo financiero).</p>
+
+    <h2 id="pie-sueldo">Pie y sueldo: las dos restricciones bancarias</h2>
+    <p>Para comprar vivienda en Chile en 2026, se aplican dos cuellos de botella:</p>
+    <ul>
+      <li><strong>Pie suficiente:</strong> 20% del precio (10% con FOGAES). Sin él, el banco no firma el crédito.</li>
+      <li><strong>Sueldo suficiente:</strong> el dividendo no debe superar el 25-30% del ingreso líquido (la regla más común es 30%). Sin él, no se aprueba el crédito aunque tengas el pie.</li>
+    </ul>
+    <p>Por eso aumentar el pie no siempre resuelve el problema, y aumentar el ingreso (con codeudor, segundo empleo o cambio laboral) puede ser tan decisivo como ahorrar más.</p>
+
+    <h2 id="ejemplos">3 ejemplos numéricos resueltos</h2>
+
+    <div class="ejemplo">
+      <div class="ejemplo-label">Ejemplo 1 · Sueldo medio en Santiago</div>
+      <h3>Sueldo $1.000.000 con $15 millones de ahorro</h3>
+      <dl class="ejemplo-grid">
+        <dt>Dividendo máx. (30%)</dt><dd>$300.000</dd>
+        <dt>Crédito máx. aprobable</dt><dd>~$56 M</dd>
+        <dt>Precio máx. financiable</dt><dd>~$70 M</dd>
+        <dt>¿Alcanza para 55 m² en RM?</dt><dd>No ($165 M)</dd>
+      </dl>
+      <p class="ejemplo-veredicto medio">Alcanza para un departamento usado pequeño en comuna periférica de Santiago, o para una vivienda en Maule, Ñuble o Araucanía. Con codeudor o subsidio DS1 las opciones se amplían considerablemente.</p>
+    </div>
+
+    <div class="ejemplo">
+      <div class="ejemplo-label">Ejemplo 2 · Codeudores en Concepción</div>
+      <h3>Sueldo hogar $1.600.000 con $20 millones de ahorro</h3>
+      <dl class="ejemplo-grid">
+        <dt>Dividendo máx. (30%)</dt><dd>$480.000</dd>
+        <dt>Crédito máx. aprobable</dt><dd>~$90 M</dd>
+        <dt>Precio máx. con pie 20%</dt><dd>~$100 M</dd>
+        <dt>¿Alcanza para 55 m² en Biobío?</dt><dd>Casi ($118 M)</dd>
+      </dl>
+      <p class="ejemplo-veredicto ok">Alcanza para un departamento de 50 m² nuevo o casa usada de 55 m² en Concepción. Con FOGAES (pie 10%) y vivienda hasta $130 M, sí entran al departamento de 55 m² nuevo, aunque el dividendo se acerca al 35% del ingreso (ajustado).</p>
+    </div>
+
+    <div class="ejemplo">
+      <div class="ejemplo-label">Ejemplo 3 · Sueldo bajo con subsidio DS19</div>
+      <h3>Sueldo $700.000 con $5 millones de ahorro en Araucanía</h3>
+      <dl class="ejemplo-grid">
+        <dt>Calificación DS19 (≤ 25 UF/mes)</dt><dd>Sí</dd>
+        <dt>Subsidio MINVU</dt><dd>~180 UF (~$7 M)</dd>
+        <dt>Vivienda DS19 nueva ≤ 950 UF</dt><dd>~$37 M</dd>
+        <dt>Crédito tras subsidio</dt><dd>~$23 M</dd>
+        <dt>Dividendo (con FOGAES)</dt><dd>~$123.000</dd>
+      </dl>
+      <p class="ejemplo-veredicto ok">El esfuerzo es ~17,5% del sueldo. El DS19 abre acceso real a vivienda para familias con ingresos cercanos a la mediana chilena ($611.162/mes según INE ESI 2024), siempre que se combine con FOGAES y se busque vivienda nueva dentro del tope de 950 UF.</p>
+    </div>
+
+    <div class="cta">
+      <div class="cta-titulo">¿Quieres tu cálculo exacto?</div>
+      <div class="cta-sub">Simula con tu sueldo, ahorro y región. Compara 11 bancos y descubre a qué subsidios MINVU calificas.</div>
+      <a class="cta-btn" href="/">→ Ir a la calculadora</a>
+    </div>
+
+    <h2 id="subsidios">Subsidios MINVU 2026 que reducen el precio efectivo</h2>
+    <p>Los principales subsidios vigentes en 2026 que afectan directamente cuánto cuesta para ti una vivienda son:</p>
+    <ul>
+      <li><strong>DS19</strong> — hasta 180 UF de subsidio + bono pie hasta 30 UF. Para hogares con ingreso ≤ 25 UF/mes (~$975.000) y vivienda nueva hasta 950 UF (~$37 M).</li>
+      <li><strong>DS1 Tramo 1</strong> — hasta 130 UF. Ingreso ≤ 37 UF/mes (~$1,44 M) y vivienda hasta 1.600 UF (~$62 M).</li>
+      <li><strong>DS1 Tramo 2</strong> — hasta 90 UF. Ingreso ≤ 60 UF/mes (~$2,34 M) y vivienda hasta 2.200 UF (~$86 M).</li>
+      <li><strong>DS1 Tramo 3</strong> — hasta 60 UF. Ingreso ≤ 78 UF/mes (~$3,04 M) y vivienda hasta 2.600 UF (~$101 M).</li>
+      <li><strong>FOGAES</strong> — el Estado garantiza el 10% del precio, permitiendo pie mínimo de 10% (no 20%). Vivienda hasta 4.500 UF.</li>
+      <li><strong>Ley 21.748 (subsidio a la tasa)</strong> — rebaja ~0,6% en la tasa los primeros años. Vivienda nueva hasta 4.000 UF.</li>
+    </ul>
+    <p>El DS19 y DS1 reducen <em>el precio efectivo</em> que tú pagas; FOGAES y Ley 21.748 reducen el <em>esfuerzo financiero</em> al permitir menor pie y menor dividendo.</p>
+
+    <h2 id="gastos-extra">Gastos adicionales al comprar una casa en Chile</h2>
+    <p>Más allá del precio de venta y el pie, debes presupuestar entre 1,5% y 2,5% del precio en gastos operacionales:</p>
+    <ul>
+      <li>Tasación bancaria: $150.000 – $250.000</li>
+      <li>Gastos notariales: $200.000 – $400.000</li>
+      <li>Inscripción en el Conservador de Bienes Raíces (CBR): $100.000 – $300.000</li>
+      <li>Seguros obligatorios (desgravamen e incendio): variable según monto y plazo</li>
+    </ul>
+    <p>Para una casa de $100 millones, este ítem suma aproximadamente $1,5 a $2,5 millones, que <strong>no</strong> están incluidos en el crédito hipotecario y deben pagarse en efectivo.</p>
+
+    <h2 id="faq">Preguntas frecuentes</h2>
+    <div class="faq">
+      <details>
+        <summary>¿Cuánto cuesta una casa en Chile en 2026?</summary>
+        <div class="faq-resp">En 2026 una vivienda media de 55 m² va desde ~1.925 UF (~$75 millones) en regiones del sur como Aysén o La Araucanía hasta ~4.235 UF (~$165 millones) en la Región Metropolitana. El precio depende de la región, comuna, tipo (departamento, casa, usada) y superficie.</div>
+      </details>
+      <details>
+        <summary>¿Cuánto cuesta el metro cuadrado en Chile en 2026?</summary>
+        <div class="faq-resp">Según CChC Q3 2025, el precio promedio por m² para departamentos nuevos es: Región Metropolitana 77 UF, Antofagasta 68 UF, Valparaíso 58 UF, Biobío 55 UF, Coquimbo 56 UF, Maule 40 UF, La Araucanía 36 UF y Aysén 35 UF. Las casas suelen costar 10-20% menos por m² que los departamentos nuevos.</div>
+      </details>
+      <details>
+        <summary>¿Cuál es la región más barata para comprar casa en Chile?</summary>
+        <div class="faq-resp">Las regiones con menor precio por m² son Aysén (35 UF/m²), La Araucanía (36 UF/m²), Los Ríos (37 UF/m²), Ñuble (38 UF/m²) y Los Lagos (38 UF/m²). Un departamento de 55 m² en La Araucanía cuesta aproximadamente 1.980 UF (~$77 millones), un 53% menos que en Santiago.</div>
+      </details>
+      <details>
+        <summary>¿Cuánto cuesta un departamento en Santiago en 2026?</summary>
+        <div class="faq-resp">Un departamento nuevo de 55 m² en la Región Metropolitana cuesta aproximadamente 4.235 UF (~$165 millones) según CChC Q3 2025. Comunas como Providencia y Las Condes superan los 100 UF/m², mientras que comunas periféricas pueden bajar a 60 UF/m².</div>
+      </details>
+      <details>
+        <summary>¿Qué importa más al comprar, el pie o el sueldo?</summary>
+        <div class="faq-resp">Ambos. El pie reduce el monto del crédito (y por tanto el dividendo), mientras que el sueldo determina si el dividendo pasa la regla de esfuerzo bancaria (25%-30% del ingreso líquido). Sin pie suficiente no firmas; sin sueldo suficiente no te aprueban.</div>
+      </details>
+      <details>
+        <summary>¿Cuánto sueldo necesito para comprar una casa de $100 millones?</summary>
+        <div class="faq-resp">Con pie 20% ($20 millones), crédito de $80 millones a 25 años y tasa 4,1% en UF, el dividendo es ~$427.000/mes. Aplicando la regla del 30% de esfuerzo, necesitas un sueldo líquido de hogar de al menos $1.420.000/mes. Con codeudor los ingresos se suman.</div>
+      </details>
+      <details>
+        <summary>¿Cuánto cuesta el pie de una casa en Chile?</summary>
+        <div class="faq-resp">El pie estándar es 20% del precio. Para una casa de $100 millones son $20 millones; para una de $80 millones son $16 millones. Con FOGAES (Fondo de Garantía Especial del Estado) el pie mínimo baja al 10% en viviendas hasta 4.500 UF, y con DS19 el bono pie agrega hasta 30 UF adicionales.</div>
+      </details>
+      <details>
+        <summary>¿Cuánto cuesta una casa usada vs una nueva en Chile?</summary>
+        <div class="faq-resp">Las viviendas usadas tienen un descuento promedio del 10-20% sobre las nuevas. En la RM, una casa usada está en torno a 62 UF/m² versus 77 UF/m² de un departamento nuevo. Importante: los subsidios DS19 y DS1 en algunos tramos no aplican a vivienda usada.</div>
+      </details>
+      <details>
+        <summary>¿Cómo se calcula el precio de una vivienda en UF y en pesos?</summary>
+        <div class="faq-resp">Precio total (UF) = precio por m² × superficie. Por ejemplo, un departamento de 55 m² a 77 UF/m² cuesta 4.235 UF. Para convertir a pesos se multiplica por el valor UF del día (~$39.000 en abril 2026), entregando ~$165 millones.</div>
+      </details>
+      <details>
+        <summary>¿Cuánto es el dividendo mensual de una casa en Chile?</summary>
+        <div class="faq-resp">Para un crédito a 25 años con tasa 4,1% anual en UF, cada $10 millones de crédito se traducen en ~$53.000 de dividendo mensual. Una casa de $100 millones con pie 20% (crédito $80 millones) genera un dividendo de aproximadamente $427.000/mes.</div>
+      </details>
+      <details>
+        <summary>¿Qué subsidios MINVU existen para comprar casa en 2026?</summary>
+        <div class="faq-resp">Los principales son: DS19 (hasta 180 UF de subsidio para hogares con ingreso ≤ 25 UF/mes y vivienda nueva ≤ 950 UF); DS1 con 3 tramos según ingreso (hasta 78 UF/mes); FOGAES (reduce el pie al 10%); y la Ley 21.748 de subsidio a la tasa, que rebaja ~0,6% para viviendas nuevas hasta 4.000 UF.</div>
+      </details>
+      <details>
+        <summary>¿Cuáles son los gastos adicionales al comprar una casa en Chile?</summary>
+        <div class="faq-resp">Suman aproximadamente 1,5-2,5% del precio: tasación bancaria ($150.000-$250.000), gastos notariales ($200.000-$400.000), inscripción en el Conservador de Bienes Raíces ($100.000-$300.000) y seguros obligatorios (desgravamen e incendio). Para una casa de $100 millones, considera $1,5-$2,5 millones extra.</div>
+      </details>
+    </div>
+
+    <h2 id="metodologia">Metodología y fuentes</h2>
+    <p>Los precios por m² provienen del <a href="https://www.cchc.cl/" rel="external nofollow noopener" target="_blank">Informe MACh CChC Q3 2025</a> de la Cámara Chilena de la Construcción. La conversión a pesos usa una UF de referencia de $39.000 (abril 2026, valor publicado por el <a href="https://www.bcentral.cl/" rel="external nofollow noopener" target="_blank">Banco Central</a> y consultable en <a href="https://mindicador.cl/" rel="external nofollow noopener" target="_blank">mindicador.cl</a>).</p>
+    <p>El cálculo del dividendo asume tasa anual 4,1% en UF (referencia <a href="https://www.cmfchile.cl/" rel="external nofollow noopener" target="_blank">CMF marzo 2026</a>) y plazo 25 años, con factor mensual ≈ 0,005334. Los topes y montos de subsidios provienen de los reglamentos vigentes del <a href="https://www.minvu.gob.cl/" rel="external nofollow noopener" target="_blank">MINVU 2026</a>. El sueldo mediano de referencia ($611.162) corresponde a la <a href="https://www.ine.gob.cl/estadisticas/sociales/mercado-laboral/ingresos-de-hogares-y-personas" rel="external nofollow noopener" target="_blank">Encuesta Suplementaria de Ingresos del INE 2024</a>.</p>
+
+    <div class="fuentes">
+      <div class="fuentes-label">Fuentes</div>
+      <a href="https://www.cchc.cl/" rel="external nofollow noopener" target="_blank">CChC</a> ·
+      <a href="https://www.cmfchile.cl/" rel="external nofollow noopener" target="_blank">CMF Chile</a> ·
+      <a href="https://www.bcentral.cl/" rel="external nofollow noopener" target="_blank">Banco Central</a> ·
+      <a href="https://www.ine.gob.cl/" rel="external nofollow noopener" target="_blank">INE</a> ·
+      <a href="https://www.minvu.gob.cl/" rel="external nofollow noopener" target="_blank">MINVU</a> ·
+      <a href="https://mindicador.cl/" rel="external nofollow noopener" target="_blank">mindicador.cl</a>
+    </div>
+
+    <h2>Sigue leyendo</h2>
+    <div class="relacionados">
+      <a class="rel-card" href="/cuanto-sueldo-necesitas-para-comprar-casa">
+        <div class="rel-k">Guía 2</div>
+        <strong>Cuánto sueldo necesitas para comprar casa</strong>
+        <span>Regla del 30% y sueldo objetivo según el precio.</span>
+      </a>
+      <a class="rel-card" href="/cuanto-hay-que-ahorrar-para-el-pie">
+        <div class="rel-k">Guía 3</div>
+        <strong>Cuánto hay que ahorrar para el pie</strong>
+        <span>Pie 10% vs 20%, tiempo y estrategias para acelerar.</span>
+      </a>
+      <a class="rel-card" href="/subsidios-vivienda-chile-explicados">
+        <div class="rel-k">Guía 4</div>
+        <strong>Subsidios vivienda Chile explicados</strong>
+        <span>DS19, DS1 y FOGAES paso a paso.</span>
+      </a>
+      <a class="rel-card" href="/cuanto-te-presta-un-banco-en-chile">
+        <div class="rel-k">Guía 5</div>
+        <strong>Cuánto te presta un banco en Chile</strong>
+        <span>Tasas CMF 2026 y comparador de 11 bancos.</span>
+      </a>
+    </div>
+
+    <p class="nota-mini">Los valores son referenciales y cambian por comuna, banco y condiciones del solicitante. Subsidios sujetos a cupos y llamados MINVU. Esta guía no constituye asesoría financiera ni oferta de crédito.</p>
   </main>
+
+  <footer>
+    <a href="/">Inicio</a> ·
+    <a href="/guia-vivienda-chile">Guía vivienda</a> ·
+    <a href="/acerca">Acerca</a> ·
+    <a href="/privacidad">Privacidad</a> ·
+    <a href="/terminos">Términos</a>
+  </footer>
 </body>
 </html>

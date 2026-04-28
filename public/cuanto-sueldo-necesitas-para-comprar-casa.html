@@ -1,61 +1,421 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-CL">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cuánto sueldo necesitas para comprar casa en Chile</title>
-  <meta name="description" content="Descubre cuánto sueldo necesitas para comprar una casa en Chile según regla bancaria de 25%-30% de esfuerzo.">
+  <title>Cuánto sueldo necesitas para comprar casa en Chile 2026</title>
+  <meta name="description" content="Calcula el sueldo mínimo para comprar casa en Chile en 2026. Tabla precio→sueldo, regla del 30% bancaria, codeudor, honorarios y deudas. Datos CMF.">
   <link rel="canonical" href="https://cuantocuestaunacasa.cl/cuanto-sueldo-necesitas-para-comprar-casa">
+
+  <meta property="og:title" content="Cuánto sueldo necesitas para comprar casa en Chile 2026">
+  <meta property="og:description" content="Sueldo mínimo según el precio de la vivienda, con o sin codeudor. Tabla, ejemplos y simulador. Regla del 30% explicada.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://cuantocuestaunacasa.cl/cuanto-sueldo-necesitas-para-comprar-casa">
+  <meta property="og:image" content="https://cuantocuestaunacasa.cl/og.png">
+  <meta property="og:locale" content="es_CL">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cuánto sueldo necesitas para comprar casa en Chile 2026">
+  <meta name="twitter:description" content="Sueldo mínimo según el precio. Regla del 30%, codeudor, honorarios y deudas explicado con datos CMF 2026.">
+  <meta name="twitter:image" content="https://cuantocuestaunacasa.cl/og.png">
+
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Qué porcentaje del sueldo acepta un banco para dividendo?","acceptedAnswer":{"@type":"Answer","text":"Normalmente entre 25% y 30% del ingreso líquido del hogar."}},{"@type":"Question","name":"¿Un mayor pie reduce sueldo exigido?","acceptedAnswer":{"@type":"Answer","text":"Sí. Más pie implica menor crédito y menor dividendo mensual."}}]}
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"¿Qué porcentaje del sueldo acepta un banco para el dividendo?","acceptedAnswer":{"@type":"Answer","text":"Los bancos en Chile generalmente aceptan que el dividendo no supere entre el 25% y el 30% del sueldo líquido del hogar. Esta es la regla de esfuerzo financiero. Si tu sueldo líquido es $1.000.000, el dividendo máximo aprobable está en torno a $250.000-$300.000 mensuales."}},
+    {"@type":"Question","name":"¿Cuánto sueldo necesito para comprar una casa de $50 millones en Chile?","acceptedAnswer":{"@type":"Answer","text":"Con pie 20% ($10 millones), crédito de $40 millones a 25 años y tasa 4,1% en UF, el dividendo es ~$213.000/mes. Aplicando la regla del 30%, necesitas un sueldo líquido del hogar de al menos $711.000/mes."}},
+    {"@type":"Question","name":"¿Cuánto sueldo necesito para comprar una casa de $80 millones?","acceptedAnswer":{"@type":"Answer","text":"Con pie 20% ($16 millones), crédito de $64 millones a 25 años y tasa 4,1%, el dividendo es ~$341.000/mes. Necesitas un sueldo líquido del hogar de al menos $1.140.000/mes."}},
+    {"@type":"Question","name":"¿Cuánto sueldo necesito para comprar una casa de $100 millones?","acceptedAnswer":{"@type":"Answer","text":"Con pie 20% ($20 millones), crédito de $80 millones a 25 años y tasa 4,1%, el dividendo es ~$427.000/mes. Necesitas un sueldo líquido del hogar de al menos $1.420.000/mes."}},
+    {"@type":"Question","name":"¿Cuánto sueldo necesito para comprar en Santiago?","acceptedAnswer":{"@type":"Answer","text":"Un departamento nuevo de 55 m² en la Región Metropolitana cuesta aproximadamente $165 millones (4.235 UF a 77 UF/m²). Con pie 20% y 25 años a 4,1%, el dividendo es ~$705.000 y necesitas un sueldo líquido de hogar de al menos $2.350.000/mes. Con codeudor los ingresos se suman y bajan el umbral por persona."}},
+    {"@type":"Question","name":"¿Cuál es el sueldo mínimo para pedir un crédito hipotecario en Chile?","acceptedAnswer":{"@type":"Answer","text":"No existe un mínimo legal, pero los bancos exigen que el dividendo no supere el 30% del sueldo. Para un crédito de $30 millones a 25 años el dividendo es ~$160.000, lo que requiere un sueldo desde $533.000. En la práctica, los bancos suelen pedir sueldos desde $500.000-$700.000 líquidos."}},
+    {"@type":"Question","name":"¿Un mayor pie reduce el sueldo exigido?","acceptedAnswer":{"@type":"Answer","text":"Sí, directamente. Más pie reduce el crédito, que reduce el dividendo, que reduce el sueldo necesario. Para una casa de $100 millones: con pie 20% (crédito $80M) necesitas $1.420.000; con pie 30% (crédito $70M) bajas a $1.245.000; con pie 40% (crédito $60M) bajas a $1.067.000."}},
+    {"@type":"Question","name":"¿Puedo sumar el sueldo de un codeudor?","acceptedAnswer":{"@type":"Answer","text":"Sí. Con un codeudor (pareja, padres, hermanos), los ingresos líquidos se suman para calcular el dividendo máximo. Es la forma más común de calificar a viviendas de mayor valor cuando un sueldo individual no alcanza. Ambos quedan como titulares solidarios del crédito."}},
+    {"@type":"Question","name":"¿Sirve mi sueldo si soy independiente o trabajo a honorarios?","acceptedAnswer":{"@type":"Answer","text":"Sí, pero el banco pedirá acreditar ingresos con declaración anual de renta, cotizaciones previsionales, estados de cuenta y al menos 12-24 meses de historial. Algunos bancos usan el promedio de los últimos 12 meses como ingreso base. Lo recomendable es mostrar continuidad y boletas regulares."}},
+    {"@type":"Question","name":"¿Los bonos y comisiones cuentan como sueldo para el banco?","acceptedAnswer":{"@type":"Answer","text":"Parcialmente. Los bonos fijos contractuales suelen contar al 100%; los bonos variables (comisiones, gratificaciones extra) se promedian de los últimos 6-12 meses y muchos bancos solo computan el 50%-70%. Los aguinaldos y bonos puntuales no contractuales habitualmente no se incluyen."}},
+    {"@type":"Question","name":"¿Qué pasa con el sueldo necesario si tengo otras deudas?","acceptedAnswer":{"@type":"Answer","text":"Las deudas vigentes (créditos de consumo, tarjetas como CMR/Cencosud, automotriz, líneas de crédito) se restan de tu capacidad de pago. La carga financiera total (hipotecario + otras deudas) no debe superar 35-45% del sueldo. Pagar deudas pequeñas antes de postular puede aumentar significativamente el monto aprobable."}},
+    {"@type":"Question","name":"¿Cómo aumento mi capacidad de compra rápidamente?","acceptedAnswer":{"@type":"Answer","text":"Cuatro vías concretas: (1) sumar codeudor para combinar ingresos; (2) extender el plazo del crédito de 20 a 30 años (reduce el dividendo ~15%); (3) postular a un subsidio MINVU (DS19, DS1) para bajar el precio efectivo; (4) cancelar deudas de consumo previas. Combinar las cuatro puede duplicar el precio máximo accesible."}}
+  ]}
   </script>
+
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"Article","headline":"Cuánto sueldo necesitas para comprar casa en Chile","description":"Regla de esfuerzo bancaria y sueldo objetivo para crédito hipotecario.","dateModified":"2026-04-08","author":{"@type":"Organization","name":"CuantoCuestaUnaCasa.cl"},"publisher":{"@type":"Organization","name":"CuantoCuestaUnaCasa.cl"},"mainEntityOfPage":"https://cuantocuestaunacasa.cl/cuanto-sueldo-necesitas-para-comprar-casa"}
+  {"@context":"https://schema.org","@type":"Article","headline":"Cuánto sueldo necesitas para comprar casa en Chile en 2026","description":"Sueldo mínimo según el precio de la vivienda, regla bancaria del 30% de esfuerzo, codeudor, honorarios y deudas vigentes.","datePublished":"2026-04-08","dateModified":"2026-04-28","inLanguage":"es-CL","author":{"@type":"Organization","name":"CuantoCuestaUnaCasa.cl","url":"https://cuantocuestaunacasa.cl/"},"publisher":{"@type":"Organization","name":"CuantoCuestaUnaCasa.cl","url":"https://cuantocuestaunacasa.cl/","logo":{"@type":"ImageObject","url":"https://cuantocuestaunacasa.cl/og.png"}},"image":"https://cuantocuestaunacasa.cl/og.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://cuantocuestaunacasa.cl/cuanto-sueldo-necesitas-para-comprar-casa"}}
   </script>
+
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://cuantocuestaunacasa.cl/"},{"@type":"ListItem","position":2,"name":"Cuánto sueldo necesitas para comprar casa","item":"https://cuantocuestaunacasa.cl/cuanto-sueldo-necesitas-para-comprar-casa"}]}
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+    {"@type":"ListItem","position":1,"name":"Inicio","item":"https://cuantocuestaunacasa.cl/"},
+    {"@type":"ListItem","position":2,"name":"Guía vivienda Chile","item":"https://cuantocuestaunacasa.cl/guia-vivienda-chile"},
+    {"@type":"ListItem","position":3,"name":"Cuánto sueldo necesitas para comprar casa","item":"https://cuantocuestaunacasa.cl/cuanto-sueldo-necesitas-para-comprar-casa"}
+  ]}
   </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
-    :root { --negro:#111; --texto:#1c1c1c; --suave:#666; --borde:#e5e5e5; --fondo:#f8f6f3; --azul:#1a5fa8; --rojo:#c0392b; --blanco:#fff; }
+    :root { --negro:#111; --texto:#1c1c1c; --suave:#666; --suave2:#888; --borde:#e5e5e5; --fondo:#f8f6f3; --azul:#1a5fa8; --azul-l:#ebf2fc; --rojo:#c0392b; --verde:#1a7a4a; --verde-l:#e8f5ee; --amarillo-l:#fef6e4; --blanco:#fff; }
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:'DM Sans',sans-serif; color:var(--texto); background:var(--blanco); line-height:1.65; }
-    nav { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.4rem; border-bottom:1px solid var(--borde); position:sticky; top:0; background:var(--blanco); }
+    nav { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.4rem; border-bottom:1px solid var(--borde); position:sticky; top:0; background:var(--blanco); z-index:10; }
     .logo { font-family:'Fraunces',serif; color:var(--negro); text-decoration:none; font-size:1rem; }
     .logo em { color:var(--rojo); }
     .volver { border:1px solid var(--borde); border-radius:10px; padding:6px 12px; font-size:13px; color:var(--suave); text-decoration:none; }
+    .volver:hover { color:var(--negro); border-color:var(--negro); }
     .wrap { max-width:860px; margin:0 auto; padding:2rem 1.2rem 3rem; }
-    .hero { background:linear-gradient(135deg,var(--azul),#0f172a); color:#fff; border-radius:16px; padding:1.25rem 1.2rem; margin-bottom:1rem; }
-    h1 { font-family:'Fraunces',serif; font-size:clamp(1.7rem,4vw,2.4rem); line-height:1.15; margin-bottom:.4rem; }
-    h2 { font-family:'Fraunces',serif; font-size:1.2rem; margin:1.2rem 0 .55rem; color:var(--negro); }
+    .breadcrumb { font-size:12px; color:var(--suave2); margin-bottom:1rem; }
+    .breadcrumb a { color:var(--suave); text-decoration:none; }
+    .breadcrumb a:hover { color:var(--negro); text-decoration:underline; }
+    .hero { background:linear-gradient(135deg,var(--azul),#0f172a); color:#fff; border-radius:16px; padding:1.5rem 1.4rem; margin-bottom:1.25rem; }
+    h1 { font-family:'Fraunces',serif; font-size:clamp(1.7rem,4vw,2.4rem); line-height:1.15; margin-bottom:.55rem; font-weight:300; }
+    h1 em { font-style:italic; }
+    h2 { font-family:'Fraunces',serif; font-size:clamp(1.2rem,2.6vw,1.5rem); font-weight:600; margin:2rem 0 .65rem; color:var(--negro); }
+    h3 { font-family:'Fraunces',serif; font-size:1.05rem; font-weight:600; margin:1.2rem 0 .4rem; color:var(--negro); }
     p { margin-bottom:.75rem; }
-    ul { padding-left:1.1rem; margin-bottom:.75rem; }
-    .meta { font-size:12px; color:#cbd5e1; }
-    .box { border:1px solid var(--borde); border-radius:12px; background:var(--fondo); padding:.9rem 1rem; margin-top:.9rem; }
+    ul, ol { padding-left:1.2rem; margin-bottom:.75rem; }
+    li { margin-bottom:.35rem; }
+    .meta { font-size:12px; color:#cbd5e1; margin-top:.4rem; }
+    .hero p.lead { opacity:.95; max-width:62ch; font-size:15px; }
     a { color:var(--azul); }
+    .tldr { border:1.5px solid var(--borde); border-left:3px solid var(--azul); border-radius:10px; background:var(--fondo); padding:1rem 1.1rem; margin:1.25rem 0 1.5rem; }
+    .tldr-label { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--azul); margin-bottom:.4rem; }
+    .tldr ul { margin:.4rem 0 0 0; padding-left:1.1rem; }
+    .tldr li { font-size:14px; }
+    .toc { border:1px solid var(--borde); border-radius:10px; padding:.85rem 1rem; background:var(--blanco); margin-bottom:1.5rem; font-size:14px; }
+    .toc-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--suave); margin-bottom:.5rem; }
+    .toc ol { padding-left:1.2rem; margin:0; }
+    .toc a { text-decoration:none; }
+    .toc a:hover { text-decoration:underline; }
+    .tabla-wrap { overflow-x:auto; border:1px solid var(--borde); border-radius:12px; margin:1rem 0 1.25rem; }
+    table { width:100%; border-collapse:collapse; font-size:13.5px; min-width:520px; }
+    thead th { background:var(--fondo); text-align:left; padding:10px 12px; font-weight:600; color:var(--negro); border-bottom:1.5px solid var(--borde); font-size:12px; }
+    tbody td { padding:9px 12px; border-bottom:1px solid var(--borde); }
+    tbody tr:last-child td { border-bottom:none; }
+    tbody tr:hover { background:var(--fondo); }
+    tbody tr.highlight { background:var(--azul-l); }
+    .num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .ejemplo { border:1.5px solid var(--borde); border-radius:14px; padding:1.1rem 1.2rem; margin:1rem 0; background:var(--blanco); }
+    .ejemplo-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--azul); margin-bottom:.4rem; }
+    .ejemplo h3 { margin:.1rem 0 .55rem; }
+    .ejemplo-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px 14px; font-size:13.5px; margin:.6rem 0; }
+    .ejemplo-grid dt { color:var(--suave); }
+    .ejemplo-grid dd { color:var(--negro); font-weight:500; text-align:right; }
+    .ejemplo-veredicto { border-top:1px dashed var(--borde); padding-top:.65rem; margin-top:.5rem; font-size:14px; }
+    .ejemplo-veredicto.ok { color:#0e5b35; }
+    .ejemplo-veredicto.no { color:#8c1c12; }
+    .ejemplo-veredicto.medio { color:#7d540a; }
+    .formula { background:var(--fondo); border:1px solid var(--borde); border-radius:10px; padding:.9rem 1rem; font-size:14px; margin:.5rem 0 1rem; font-family:'DM Sans',sans-serif; }
+    .formula code { background:#fff; padding:1px 6px; border-radius:4px; border:1px solid var(--borde); font-family:'DM Sans',sans-serif; font-weight:500; }
+    .faq { margin:.5rem 0 1rem; }
+    .faq details { border:1px solid var(--borde); border-radius:10px; margin-bottom:8px; overflow:hidden; }
+    .faq details[open] { border-color:var(--negro); }
+    .faq summary { cursor:pointer; padding:.85rem 1rem; font-weight:500; color:var(--negro); list-style:none; display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:14.5px; }
+    .faq summary::-webkit-details-marker { display:none; }
+    .faq summary::after { content:'+'; color:var(--suave); font-size:1.1rem; flex-shrink:0; transition:transform .15s; }
+    .faq details[open] summary::after { content:'–'; }
+    .faq summary:hover { background:var(--fondo); }
+    .faq .faq-resp { padding:0 1rem 1rem; font-size:14px; color:var(--texto); line-height:1.7; }
+    .cta { border:1.5px solid var(--negro); border-radius:14px; padding:1.1rem 1.2rem; margin:1.5rem 0; background:var(--negro); color:#fff; }
+    .cta-titulo { font-family:'Fraunces',serif; font-size:1.15rem; margin-bottom:.4rem; }
+    .cta-sub { font-size:14px; opacity:.85; margin-bottom:.85rem; }
+    .cta-btn { display:inline-block; background:#fff; color:var(--negro); padding:9px 18px; border-radius:9px; text-decoration:none; font-weight:500; font-size:14px; }
+    .cta-btn:hover { background:var(--fondo); }
+    .relacionados { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:1rem 0 1.5rem; }
+    .rel-card { border:1px solid var(--borde); border-radius:12px; padding:.9rem 1rem; text-decoration:none; color:inherit; transition:.15s; background:#fff; }
+    .rel-card:hover { transform:translateY(-1px); border-color:#cfd8e3; box-shadow:0 6px 14px rgba(0,0,0,.05); }
+    .rel-k { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--suave); margin-bottom:.3rem; }
+    .rel-card strong { font-family:'Fraunces',serif; font-weight:600; color:var(--negro); display:block; margin-bottom:.25rem; font-size:14.5px; }
+    .rel-card span { font-size:12.5px; color:var(--suave); }
+    .fuentes { background:var(--fondo); border:1px solid var(--borde); border-radius:10px; padding:.95rem 1.1rem; font-size:13px; line-height:1.75; margin:1.25rem 0 .5rem; color:var(--texto); }
+    .fuentes-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--suave); margin-bottom:.4rem; }
+    .fuentes a { color:var(--azul); }
+    .nota-mini { font-size:11.5px; color:var(--suave2); margin-top:.5rem; font-style:italic; }
+    footer { border-top:1px solid var(--borde); padding:1.5rem 1.2rem 2rem; text-align:center; font-size:12px; color:var(--suave2); margin-top:2rem; }
+    footer a { color:var(--suave); margin:0 6px; text-decoration:none; }
+    footer a:hover { color:var(--negro); }
+    @media (max-width:760px) {
+      .relacionados { grid-template-columns:1fr; }
+      .ejemplo-grid { grid-template-columns:1fr 1fr; }
+    }
   </style>
 </head>
 <body>
   <nav>
     <a class="logo" href="/">Cuánto cuesta una <em>casa</em></a>
-    <a class="volver" href="/guia-vivienda-chile">Ver guía</a>
+    <a class="volver" href="/guia-vivienda-chile">← Ver guía completa</a>
   </nav>
+
   <main class="wrap">
-  <section class="hero">
-    <h1>Cuánto sueldo necesitas para comprar casa en Chile</h1>
-    <p class="meta">Última actualización: 8 abril 2026</p>
-  </section>
-  <p>Regla rápida: dividendo ideal bajo 30% del ingreso mensual líquido.</p>
-  <p>Ejemplo: dividendo de $450.000 suele requerir entre $1.500.000 y $1.800.000 según política del banco.</p>
-  <div class="box"><a href="/">Calcular mi caso real</a></div>
-  <h2>También te puede servir</h2>
-  <ul>
-    <li><a href="/cuanto-hay-que-ahorrar-para-el-pie">Cuánto hay que ahorrar para el pie</a></li>
-    <li><a href="/cuanto-cuesta-una-casa-en-chile-2026">Cuánto cuesta una casa en Chile 2026</a></li>
-  </ul>
-  <p><small>Fuentes de referencia: CMF, Banco Central y criterios bancarios de esfuerzo hipotecario.</small></p>
+    <p class="breadcrumb">
+      <a href="/">Inicio</a> · <a href="/guia-vivienda-chile">Guía vivienda</a> · <span>Cuánto sueldo necesitas para comprar casa</span>
+    </p>
+
+    <section class="hero">
+      <h1>Cuánto sueldo necesitas para <em>comprar casa</em> en Chile 2026</h1>
+      <p class="lead">El sueldo mínimo según el precio de la vivienda, la regla bancaria del 30% y cómo aumentar tu capacidad de compra. Datos CMF marzo 2026 e INE ESI 2024.</p>
+      <p class="meta">Última actualización: 28 de abril de 2026 · Lectura ≈ 7 min</p>
+    </section>
+
+    <div class="tldr" aria-label="Resumen ejecutivo">
+      <div class="tldr-label">Resumen rápido</div>
+      <ul>
+        <li>Regla bancaria: el dividendo no debe superar el <strong>25-30% del sueldo líquido</strong> del hogar.</li>
+        <li>Para una vivienda de <strong>$100 millones</strong> con pie 20% y 25 años, el sueldo mínimo es ~<strong>$1.420.000</strong>.</li>
+        <li>Para un departamento de 55 m² en Santiago (~$165 M) necesitas ~<strong>$2.350.000</strong> de hogar.</li>
+        <li>Con codeudor los ingresos se <strong>suman</strong>; cancelar deudas de consumo aumenta el monto aprobable.</li>
+      </ul>
+    </div>
+
+    <nav class="toc" aria-label="Tabla de contenidos">
+      <div class="toc-label">En esta página</div>
+      <ol>
+        <li><a href="#regla-30">La regla del 30% explicada</a></li>
+        <li><a href="#tabla-precio">Tabla: precio de la vivienda → sueldo mínimo</a></li>
+        <li><a href="#tabla-sueldo">Tabla inversa: tu sueldo → precio máximo</a></li>
+        <li><a href="#ejemplos">Ejemplos numéricos resueltos</a></li>
+        <li><a href="#aumentar">Cómo aumentar tu capacidad de compra</a></li>
+        <li><a href="#independientes">Honorarios, bonos y otras deudas</a></li>
+        <li><a href="#faq">Preguntas frecuentes</a></li>
+        <li><a href="#metodologia">Metodología y fuentes</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="regla-30">La regla del 30%: cómo decide el banco</h2>
+    <p>Los bancos chilenos aplican una <strong>regla de esfuerzo financiero</strong>: el dividendo mensual del crédito hipotecario no debe superar entre el <strong>25% y el 30% del sueldo líquido</strong> del hogar (la cifra exacta depende del banco y del perfil del solicitante). Si tienes otras deudas vigentes, la <em>carga financiera total</em> tampoco debe superar el 35-45%.</p>
+    <div class="formula">
+      <strong>Fórmula clave</strong><br>
+      Sueldo mínimo del hogar = <code>Dividendo mensual ÷ 0,30</code><br>
+      Dividendo mensual ≈ <code>Crédito × 0,005334</code> <span style="color:var(--suave);font-size:12px">(25 años, 4,1% anual en UF)</span><br>
+      Crédito = <code>Precio − Pie</code> (pie estándar: 20%)
+    </div>
+
+    <h2 id="tabla-precio">Tabla: precio de la vivienda → sueldo mínimo</h2>
+    <p>Sueldo líquido del hogar necesario según el precio total de la vivienda. Cálculo con pie 20%, plazo 25 años, tasa 4,1% en UF y regla del 30%.</p>
+    <div class="tabla-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Precio vivienda</th>
+            <th class="num">Pie 20%</th>
+            <th class="num">Crédito</th>
+            <th class="num">Dividendo</th>
+            <th class="num">Sueldo mínimo (30%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>$50 millones</td><td class="num">$10 M</td><td class="num">$40 M</td><td class="num">$213.000</td><td class="num">$711.000</td></tr>
+          <tr><td>$70 millones</td><td class="num">$14 M</td><td class="num">$56 M</td><td class="num">$299.000</td><td class="num">$996.000</td></tr>
+          <tr><td>$80 millones</td><td class="num">$16 M</td><td class="num">$64 M</td><td class="num">$341.000</td><td class="num">$1.140.000</td></tr>
+          <tr class="highlight"><td>$100 millones</td><td class="num">$20 M</td><td class="num">$80 M</td><td class="num">$427.000</td><td class="num">$1.420.000</td></tr>
+          <tr><td>$120 millones</td><td class="num">$24 M</td><td class="num">$96 M</td><td class="num">$512.000</td><td class="num">$1.700.000</td></tr>
+          <tr><td>$150 millones</td><td class="num">$30 M</td><td class="num">$120 M</td><td class="num">$640.000</td><td class="num">$2.130.000</td></tr>
+          <tr class="highlight"><td>$165 M (RM 55 m²)</td><td class="num">$33 M</td><td class="num">$132 M</td><td class="num">$705.000</td><td class="num">$2.350.000</td></tr>
+          <tr><td>$200 millones</td><td class="num">$40 M</td><td class="num">$160 M</td><td class="num">$853.000</td><td class="num">$2.840.000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota-mini">Si el banco aplica un esfuerzo del 25% en lugar del 30%, los sueldos requeridos suben aproximadamente un 20%. Si tienes otras deudas, el banco descuenta su cuota mensual antes de aplicar la regla.</p>
+
+    <h2 id="tabla-sueldo">Tabla inversa: tu sueldo → precio máximo financiable</h2>
+    <p>El otro ángulo de la pregunta. Con tu sueldo líquido actual, ¿qué precio máximo de vivienda puedes financiar con la regla del 30%, pie 20%, plazo 25 años y tasa 4,1%?</p>
+    <div class="tabla-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Sueldo líquido hogar</th>
+            <th class="num">Dividendo máx. (30%)</th>
+            <th class="num">Crédito máx.</th>
+            <th class="num">Precio máx. (pie 20%)</th>
+            <th>¿Qué alcanza?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>$500.000</td><td class="num">$150.000</td><td class="num">$28 M</td><td class="num">$35 M</td><td>Vivienda DS19 con subsidio</td></tr>
+          <tr><td>$700.000</td><td class="num">$210.000</td><td class="num">$39 M</td><td class="num">$49 M</td><td>DS19 nueva ≤ 950 UF</td></tr>
+          <tr><td>$900.000</td><td class="num">$270.000</td><td class="num">$50 M</td><td class="num">$63 M</td><td>Casa en Maule, Ñuble, Araucanía</td></tr>
+          <tr><td>$1.200.000</td><td class="num">$360.000</td><td class="num">$67 M</td><td class="num">$84 M</td><td>Casa en regiones intermedias</td></tr>
+          <tr class="highlight"><td>$1.500.000</td><td class="num">$450.000</td><td class="num">$84 M</td><td class="num">$105 M</td><td>Depto en Concepción / Valparaíso</td></tr>
+          <tr><td>$2.000.000</td><td class="num">$600.000</td><td class="num">$112 M</td><td class="num">$141 M</td><td>Depto periférico en Santiago</td></tr>
+          <tr class="highlight"><td>$2.500.000</td><td class="num">$750.000</td><td class="num">$141 M</td><td class="num">$176 M</td><td>Depto 55 m² nuevo en RM</td></tr>
+          <tr><td>$3.000.000</td><td class="num">$900.000</td><td class="num">$169 M</td><td class="num">$211 M</td><td>Depto en comuna central RM</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="nota-mini">El sueldo mediano en Chile es <strong>$611.162/mes líquidos</strong> (INE ESI 2024). Sin codeudor ni subsidio, ese ingreso queda por debajo del mínimo para casi cualquier vivienda nueva. La <a href="/subsidios-vivienda-chile-explicados">combinación con subsidios MINVU</a> y FOGAES es decisiva para la mediana del país.</p>
+
+    <h2 id="ejemplos">3 ejemplos numéricos resueltos</h2>
+
+    <div class="ejemplo">
+      <div class="ejemplo-label">Ejemplo 1 · Sueldo individual sin codeudor</div>
+      <h3>Sueldo $900.000 buscando vivienda en Concepción</h3>
+      <dl class="ejemplo-grid">
+        <dt>Dividendo máx. (30%)</dt><dd>$270.000</dd>
+        <dt>Crédito máx. (25 años, 4,1%)</dt><dd>~$50 M</dd>
+        <dt>Precio máx. con pie 20%</dt><dd>~$63 M</dd>
+        <dt>Depto 55 m² Biobío</dt><dd>$118 M</dd>
+      </dl>
+      <p class="ejemplo-veredicto no">Sin codeudor no alcanza para 55 m² nuevo en Biobío. Alcanza para depto 30 m² o casa usada pequeña en comuna periférica. Sumar codeudor con sueldo $700.000 amplía precio máximo a ~$112 M.</p>
+    </div>
+
+    <div class="ejemplo">
+      <div class="ejemplo-label">Ejemplo 2 · Pareja con codeudor</div>
+      <h3>Sueldo titular $1.300.000 + codeudor $900.000 en Santiago</h3>
+      <dl class="ejemplo-grid">
+        <dt>Sueldo hogar</dt><dd>$2.200.000</dd>
+        <dt>Dividendo máx. (30%)</dt><dd>$660.000</dd>
+        <dt>Crédito máx.</dt><dd>~$124 M</dd>
+        <dt>Precio máx. con pie 20%</dt><dd>~$155 M</dd>
+      </dl>
+      <p class="ejemplo-veredicto medio">Casi alcanza para 55 m² nuevo en RM ($165 M). Aumentando el plazo a 30 años o el pie al 25%, sí entra. Otra opción: depto usado de 55 m² (~62 UF/m²) por ~$133 M dentro del rango.</p>
+    </div>
+
+    <div class="ejemplo">
+      <div class="ejemplo-label">Ejemplo 3 · Sueldo medio con deuda de consumo</div>
+      <h3>Sueldo $1.500.000 con cuota de auto $200.000/mes</h3>
+      <dl class="ejemplo-grid">
+        <dt>Sueldo bruto disponible</dt><dd>$1.500.000</dd>
+        <dt>Cuota actual (auto)</dt><dd>$200.000</dd>
+        <dt>Carga total máx. 40%</dt><dd>$600.000</dd>
+        <dt>Dividendo aprobable</dt><dd>$400.000</dd>
+        <dt>Precio máx. con pie 20%</dt><dd>~$94 M</dd>
+      </dl>
+      <p class="ejemplo-veredicto medio">La cuota del auto reduce el precio máximo de $105 M a ~$94 M. Pagar el crédito automotriz antes de postular recupera completa la capacidad. Es la mejora #1 más rentable antes de aplicar al banco.</p>
+    </div>
+
+    <div class="cta">
+      <div class="cta-titulo">Calcula tu sueldo necesario exacto</div>
+      <div class="cta-sub">Ingresa tu situación real (sueldo, ahorro, región, deudas) y descubre qué vivienda puedes pagar y a qué subsidios MINVU calificas.</div>
+      <a class="cta-btn" href="/">→ Ir a la calculadora</a>
+    </div>
+
+    <h2 id="aumentar">Cómo aumentar tu capacidad de compra</h2>
+    <p>Cuatro vías concretas, ordenadas por impacto típico:</p>
+    <ol>
+      <li><strong>Sumar un codeudor</strong> — los ingresos líquidos se suman. Con pareja, padres o hermanos puedes prácticamente duplicar el precio máximo financiable.</li>
+      <li><strong>Cancelar deudas de consumo</strong> — cada $100.000 de cuota mensual eliminada libera ~$19 millones de crédito hipotecario aprobable. Pagar tarjetas y créditos pequeños antes de postular es el truco más rentable.</li>
+      <li><strong>Extender el plazo de 20 a 30 años</strong> — el dividendo baja ~15-18%, lo que sube el precio máximo financiable un 18-22%. Pagas más intereses totales, pero accedes a la vivienda hoy.</li>
+      <li><strong>Postular a un subsidio MINVU</strong> — el DS19 (180 UF) o DS1 reducen el precio efectivo y por tanto el sueldo necesario. La <a href="/subsidios-vivienda-chile-explicados">guía completa de subsidios</a> detalla los topes.</li>
+    </ol>
+    <p>Combinar las cuatro estrategias puede mover el precio máximo accesible desde $63 M a más de $130 M con el mismo sueldo individual.</p>
+
+    <h2 id="independientes">Honorarios, bonos y otras deudas: cómo te ve el banco</h2>
+
+    <h3>Trabajadores a honorarios o independientes</h3>
+    <p>Sí puedes pedir crédito hipotecario, pero el banco pedirá:</p>
+    <ul>
+      <li>Declaración anual de renta del último año (idealmente 2 últimos años).</li>
+      <li>Cotizaciones previsionales al día (al menos 12 meses).</li>
+      <li>Boletas de honorarios continuas o iniciación de actividades en SII.</li>
+      <li>Estados de cuenta bancarios de los últimos 6-12 meses.</li>
+    </ul>
+    <p>Muchos bancos usan el promedio de los últimos 12-24 meses como ingreso base, lo que penaliza meses con baja facturación. La continuidad importa más que el peak.</p>
+
+    <h3>Bonos, comisiones y aguinaldos</h3>
+    <ul>
+      <li><strong>Bonos contractuales fijos</strong> (por ejemplo, gratificación legal del 25%): se computan al 100%.</li>
+      <li><strong>Comisiones y bonos variables</strong>: se promedian de los últimos 6-12 meses y la mayoría de los bancos solo computa el 50%-70%.</li>
+      <li><strong>Aguinaldos y bonos no recurrentes</strong>: habitualmente <strong>no</strong> se incluyen.</li>
+    </ul>
+
+    <h3>Otras deudas vigentes</h3>
+    <p>El banco mira la <strong>carga financiera total</strong>, no solo el dividendo hipotecario. Las cuotas mensuales de tarjetas (CMR, Cencosud, Falabella), créditos de consumo, créditos automotrices y líneas de crédito se suman al cálculo. Si tu carga total supera el 40-45% del sueldo, el monto del crédito se reduce o se rechaza.</p>
+
+    <h2 id="faq">Preguntas frecuentes</h2>
+    <div class="faq">
+      <details>
+        <summary>¿Qué porcentaje del sueldo acepta un banco para el dividendo?</summary>
+        <div class="faq-resp">Los bancos en Chile generalmente aceptan que el dividendo no supere entre el 25% y el 30% del sueldo líquido del hogar. Esta es la regla de esfuerzo financiero. Si tu sueldo líquido es $1.000.000, el dividendo máximo aprobable está en torno a $250.000-$300.000 mensuales.</div>
+      </details>
+      <details>
+        <summary>¿Cuánto sueldo necesito para comprar una casa de $50 millones en Chile?</summary>
+        <div class="faq-resp">Con pie 20% ($10 millones), crédito de $40 millones a 25 años y tasa 4,1% en UF, el dividendo es ~$213.000/mes. Aplicando la regla del 30%, necesitas un sueldo líquido del hogar de al menos $711.000/mes.</div>
+      </details>
+      <details>
+        <summary>¿Cuánto sueldo necesito para comprar una casa de $80 millones?</summary>
+        <div class="faq-resp">Con pie 20% ($16 millones), crédito de $64 millones a 25 años y tasa 4,1%, el dividendo es ~$341.000/mes. Necesitas un sueldo líquido del hogar de al menos $1.140.000/mes.</div>
+      </details>
+      <details>
+        <summary>¿Cuánto sueldo necesito para comprar una casa de $100 millones?</summary>
+        <div class="faq-resp">Con pie 20% ($20 millones), crédito de $80 millones a 25 años y tasa 4,1%, el dividendo es ~$427.000/mes. Necesitas un sueldo líquido del hogar de al menos $1.420.000/mes.</div>
+      </details>
+      <details>
+        <summary>¿Cuánto sueldo necesito para comprar en Santiago?</summary>
+        <div class="faq-resp">Un departamento nuevo de 55 m² en la Región Metropolitana cuesta aproximadamente $165 millones (4.235 UF a 77 UF/m²). Con pie 20% y 25 años a 4,1%, el dividendo es ~$705.000 y necesitas un sueldo líquido de hogar de al menos $2.350.000/mes. Con codeudor los ingresos se suman y bajan el umbral por persona.</div>
+      </details>
+      <details>
+        <summary>¿Cuál es el sueldo mínimo para pedir un crédito hipotecario en Chile?</summary>
+        <div class="faq-resp">No existe un mínimo legal, pero los bancos exigen que el dividendo no supere el 30% del sueldo. Para un crédito de $30 millones a 25 años el dividendo es ~$160.000, lo que requiere un sueldo desde $533.000. En la práctica, los bancos suelen pedir sueldos desde $500.000-$700.000 líquidos.</div>
+      </details>
+      <details>
+        <summary>¿Un mayor pie reduce el sueldo exigido?</summary>
+        <div class="faq-resp">Sí, directamente. Más pie reduce el crédito, que reduce el dividendo, que reduce el sueldo necesario. Para una casa de $100 millones: con pie 20% (crédito $80M) necesitas $1.420.000; con pie 30% (crédito $70M) bajas a $1.245.000; con pie 40% (crédito $60M) bajas a $1.067.000.</div>
+      </details>
+      <details>
+        <summary>¿Puedo sumar el sueldo de un codeudor?</summary>
+        <div class="faq-resp">Sí. Con un codeudor (pareja, padres, hermanos), los ingresos líquidos se suman para calcular el dividendo máximo. Es la forma más común de calificar a viviendas de mayor valor cuando un sueldo individual no alcanza. Ambos quedan como titulares solidarios del crédito.</div>
+      </details>
+      <details>
+        <summary>¿Sirve mi sueldo si soy independiente o trabajo a honorarios?</summary>
+        <div class="faq-resp">Sí, pero el banco pedirá acreditar ingresos con declaración anual de renta, cotizaciones previsionales, estados de cuenta y al menos 12-24 meses de historial. Algunos bancos usan el promedio de los últimos 12 meses como ingreso base. Lo recomendable es mostrar continuidad y boletas regulares.</div>
+      </details>
+      <details>
+        <summary>¿Los bonos y comisiones cuentan como sueldo para el banco?</summary>
+        <div class="faq-resp">Parcialmente. Los bonos fijos contractuales suelen contar al 100%; los bonos variables (comisiones, gratificaciones extra) se promedian de los últimos 6-12 meses y muchos bancos solo computan el 50%-70%. Los aguinaldos y bonos puntuales no contractuales habitualmente no se incluyen.</div>
+      </details>
+      <details>
+        <summary>¿Qué pasa con el sueldo necesario si tengo otras deudas?</summary>
+        <div class="faq-resp">Las deudas vigentes (créditos de consumo, tarjetas como CMR/Cencosud, automotriz, líneas de crédito) se restan de tu capacidad de pago. La carga financiera total (hipotecario + otras deudas) no debe superar 35-45% del sueldo. Pagar deudas pequeñas antes de postular puede aumentar significativamente el monto aprobable.</div>
+      </details>
+      <details>
+        <summary>¿Cómo aumento mi capacidad de compra rápidamente?</summary>
+        <div class="faq-resp">Cuatro vías concretas: (1) sumar codeudor para combinar ingresos; (2) extender el plazo del crédito de 20 a 30 años (reduce el dividendo ~15%); (3) postular a un subsidio MINVU (DS19, DS1) para bajar el precio efectivo; (4) cancelar deudas de consumo previas. Combinar las cuatro puede duplicar el precio máximo accesible.</div>
+      </details>
+    </div>
+
+    <h2 id="metodologia">Metodología y fuentes</h2>
+    <p>Los cálculos asumen tasa 4,1% anual en UF (referencia <a href="https://www.cmfchile.cl/" rel="external nofollow noopener" target="_blank">CMF marzo 2026</a>) y plazo 25 años, lo que entrega un factor PMT mensual ≈ 0,005334. La regla del 30% es la práctica estándar de los principales bancos chilenos según política interna y normativa CMF de capacidad de pago. La conversión UF↔CLP usa $39.000 (referencia abril 2026, <a href="https://www.bcentral.cl/" rel="external nofollow noopener" target="_blank">Banco Central</a>).</p>
+    <p>El sueldo mediano de referencia ($611.162) corresponde a la <a href="https://www.ine.gob.cl/estadisticas/sociales/mercado-laboral/ingresos-de-hogares-y-personas" rel="external nofollow noopener" target="_blank">Encuesta Suplementaria de Ingresos del INE 2024</a>. Los topes y montos de subsidios provienen de los reglamentos vigentes del <a href="https://www.minvu.gob.cl/" rel="external nofollow noopener" target="_blank">MINVU 2026</a>.</p>
+
+    <div class="fuentes">
+      <div class="fuentes-label">Fuentes</div>
+      <a href="https://www.cmfchile.cl/" rel="external nofollow noopener" target="_blank">CMF Chile</a> ·
+      <a href="https://www.bcentral.cl/" rel="external nofollow noopener" target="_blank">Banco Central</a> ·
+      <a href="https://www.ine.gob.cl/" rel="external nofollow noopener" target="_blank">INE</a> ·
+      <a href="https://www.minvu.gob.cl/" rel="external nofollow noopener" target="_blank">MINVU</a> ·
+      <a href="https://www.cchc.cl/" rel="external nofollow noopener" target="_blank">CChC</a> ·
+      <a href="https://mindicador.cl/" rel="external nofollow noopener" target="_blank">mindicador.cl</a>
+    </div>
+
+    <h2>Sigue leyendo</h2>
+    <div class="relacionados">
+      <a class="rel-card" href="/cuanto-cuesta-una-casa-en-chile-2026">
+        <div class="rel-k">Guía 1</div>
+        <strong>Cuánto cuesta una casa en Chile 2026</strong>
+        <span>Precios por región, dividendo y ejemplos.</span>
+      </a>
+      <a class="rel-card" href="/cuanto-hay-que-ahorrar-para-el-pie">
+        <div class="rel-k">Guía 3</div>
+        <strong>Cuánto hay que ahorrar para el pie</strong>
+        <span>Pie 10% vs 20%, tiempo y estrategias.</span>
+      </a>
+      <a class="rel-card" href="/subsidios-vivienda-chile-explicados">
+        <div class="rel-k">Guía 4</div>
+        <strong>Subsidios vivienda Chile explicados</strong>
+        <span>DS19, DS1, FOGAES paso a paso.</span>
+      </a>
+      <a class="rel-card" href="/cuanto-te-presta-un-banco-en-chile">
+        <div class="rel-k">Guía 5</div>
+        <strong>Cuánto te presta un banco en Chile</strong>
+        <span>Tasas CMF 2026 y comparador de 11 bancos.</span>
+      </a>
+    </div>
+
+    <p class="nota-mini">Los valores son referenciales y dependen del banco, perfil del solicitante y condiciones del mercado. Esta guía no constituye asesoría financiera ni oferta de crédito.</p>
   </main>
+
+  <footer>
+    <a href="/">Inicio</a> ·
+    <a href="/guia-vivienda-chile">Guía vivienda</a> ·
+    <a href="/acerca">Acerca</a> ·
+    <a href="/privacidad">Privacidad</a> ·
+    <a href="/terminos">Términos</a>
+  </footer>
 </body>
 </html>
